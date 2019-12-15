@@ -1,0 +1,95 @@
+#include "MeshRenderer.h"
+using namespace DirectX;
+CBufferPool MeshRenderer::objectPool(sizeof(ObjectConstants), 256);
+MeshRenderer::MeshRenderer(
+	ID3D12Device* device,
+	XMFLOAT3 initPosition,
+	XMVECTOR initQuaternion,
+	XMFLOAT3 localScale,
+	ObjectPtr<Mesh> initMesh,
+	std::vector<ObjectPtr<Material>>& allMaterials
+) : MObject(), mMaterials(allMaterials.size()), mesh(initMesh), localScale(localScale), position(initPosition)
+{
+	for(int i = 0; i < allMaterials.size(); ++i)
+	{
+		mMaterials[i] = allMaterials[i];
+	}
+	
+	XMMATRIX rotationMatrix = XMMatrixRotationQuaternion(initQuaternion);
+	rotationMatrix = XMMatrixTranspose(rotationMatrix);
+	XMStoreFloat3(&right, rotationMatrix.r[0]);
+	XMStoreFloat3(&up, rotationMatrix.r[1]);
+	XMStoreFloat3(&forward, rotationMatrix.r[2]);
+	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
+	{
+		FrameResource* ptr = FrameResource::mFrameResources[i].get();
+		ptr->objectCBs[GetInstanceID()] = objectPool.GetBuffer(device);
+	}
+}
+
+MeshRenderer::~MeshRenderer()
+{
+	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
+	{
+		FrameResource* ptr = FrameResource::mFrameResources[i].get();
+		auto&& ite = ptr->objectCBs.find(GetInstanceID());
+		if (ite != ptr->objectCBs.end())
+		{
+			objectPool.Release(ite->second);
+			ptr->objectCBs.erase(GetInstanceID());
+		}
+	}
+}
+
+void MeshRenderer::Draw(
+	int targetPass,
+	int targetSubMesh,
+	ID3D12GraphicsCommandList* commandList,
+	ID3D12Device* device,
+	ConstBufferElement* cameraBuffer,
+	FrameResource* currentResource,
+	PSOContainer* container
+)
+{
+	PSODescriptor desc;
+	desc.meshLayoutIndex = mesh->GetLayoutIndex();
+	desc.shaderPass = targetPass;
+	Material* mat = mMaterials[targetSubMesh].operator->();
+	desc.shaderPtr = mat->GetShader();
+	ID3D12PipelineState* pso = container->GetState(desc, device);
+	commandList->SetPipelineState(pso);
+	mat->BindShaderResource(commandList);
+	ConstBufferElement& objBuffer = currentResource->objectCBs[GetInstanceID()];
+	mat->GetShader()->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer.operator->(), cameraBuffer->element);
+	mat->GetShader()->SetResource(commandList, ShaderID::GetPerObjectBufferID(), objBuffer.buffer.operator->(), objBuffer.element);
+	commandList->IASetVertexBuffers(0, 1, &mesh->VertexBufferView());
+	commandList->IASetIndexBuffer(&mesh->IndexBufferView(targetSubMesh));
+	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	SubMesh& subMesh = mesh->GetSubmesh(targetSubMesh);
+	commandList->DrawIndexedInstanced(subMesh.indexCount, 1, 0, 0, 0);
+}
+
+XMMATRIX MeshRenderer::GetLocalToWorldMatrix() const
+{
+	XMMATRIX target;
+	XMVECTOR vec = { right.x, right.y, right.z, 0 };
+	vec *= this->localScale.x;
+	target.r[0] = vec;
+	vec = { up.x, up.y, up.z, 0 };
+	vec *= this->localScale.y;
+	target.r[1] = vec;
+	vec = { forward.x, forward.y, forward.z, 0 };
+	vec *= this->localScale.z;
+	target.r[2] = vec;
+	target.r[3] = { position.x, position.y, position.z, 1 };
+	
+	return XMMatrixTranspose(target);
+}
+
+void MeshRenderer::UpdateObjectBuffer(FrameResource* resource) const
+{
+	ObjectConstants buffer;
+	XMStoreFloat4x4(&buffer.objectToWorld, GetLocalToWorldMatrix());
+	ConstBufferElement ele = resource->objectCBs[GetInstanceID()];
+	ele.buffer->CopyData(ele.element, &buffer);
+}

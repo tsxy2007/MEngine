@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\TaskFlow">
+      <UniqueIdentifier>{e0d874fb-4d09-43cc-add3-2a7d61fb3511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\PipelineComponent">
+      <UniqueIdentifier>{0f083510-e60c-4209-8fca-4c404db37de6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PipelineComponent">
+      <UniqueIdentifier>{996991c6-45f7-4c38-ae4c-50a344c802e0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common\DescriptorHeap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\d3dApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\d3dUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\d3dx12.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\DDSTextureLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\GameTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\GeometryGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MathHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\MObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\UploadBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton\FrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton\ShaderID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton\MeshLayout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton\PSOContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\CBufferPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\MeshRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\RenderTexture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\RenderTextureCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton\ShaderCompiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton\MathLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiThread\Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\architecture.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\architecture\arm.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\utility\backoff.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\compiler\clang.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\compiler\comp_detected.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\compiler.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\error\error.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\core\flow_builder.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\compiler\gcc.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\utility\generic_allocator.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\core\graph.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\os\ios.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\os\macos.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\architecture\mips.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\compiler\msvc.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\core\notifier.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\utility\object_pool.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\core\observer.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\os.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\os\os_detected.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\utility\passive_vector.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\architecture\ppc.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\utility\singular_allocator.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\core\spmc_queue.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\stringify.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\taskflow.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\core\taskflow.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\core\topology.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\utility\traits.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\version_number.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\predef\architecture\x86.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\core\executor.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="taskflow\core\task.hpp">
+      <Filter>Header Files\TaskFlow</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineComponent\ThreadCommand.h">
+      <Filter>Header Files\PipelineComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineComponent\CullTask.h">
+      <Filter>Header Files\PipelineComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\ConcurrentStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\ComputeShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Common\DescriptorHeap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\GameTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\GeometryGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MathHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CrateApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\UploadBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\MObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton\ShaderID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton\FrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton\MeshLayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DDSTextureLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\d3dApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\d3dUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton\PSOContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\CBufferPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\MeshRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\RenderTexture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\RenderTextureCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton\ShaderCompiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton\MathLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineComponent\ThreadCommand.cpp">
+      <Filter>Source Files\PipelineComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineComponent\CullTask.cpp">
+      <Filter>Source Files\PipelineComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\ComputeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Crate.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

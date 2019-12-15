@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common\Camera.h" />
+    <ClInclude Include="Common\ConcurrentStack.h" />
+    <ClInclude Include="Common\d3dApp.h" />
+    <ClInclude Include="Common\d3dUtil.h" />
+    <ClInclude Include="Common\d3dx12.h" />
+    <ClInclude Include="Common\DDSTextureLoader.h" />
+    <ClInclude Include="Common\DescriptorHeap.h" />
+    <ClInclude Include="Common\GameTimer.h" />
+    <ClInclude Include="Common\GeometryGenerator.h" />
+    <ClInclude Include="Common\MathHelper.h" />
+    <ClInclude Include="Common\MQueue.h" />
+    <ClInclude Include="MultiThread\Pool.h" />
+    <ClInclude Include="PipelineComponent\CullTask.h" />
+    <ClInclude Include="PipelineComponent\ThreadCommand.h" />
+    <ClInclude Include="RenderComponent\CBufferPool.h" />
+    <ClInclude Include="RenderComponent\ComputeShader.h" />
+    <ClInclude Include="RenderComponent\Material.h" />
+    <ClInclude Include="RenderComponent\Mesh.h" />
+    <ClInclude Include="RenderComponent\MeshRenderer.h" />
+    <ClInclude Include="RenderComponent\MObject.h" />
+    <ClInclude Include="RenderComponent\RenderTexture2D.h" />
+    <ClInclude Include="RenderComponent\RenderTextureCube.h" />
+    <ClInclude Include="RenderComponent\Shader.h" />
+    <ClInclude Include="RenderComponent\Skybox.h" />
+    <ClInclude Include="RenderComponent\Texture.h" />
+    <ClInclude Include="RenderComponent\UploadBuffer.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Singleton\FrameResource.h" />
+    <ClInclude Include="Singleton\MathLib.h" />
+    <ClInclude Include="Singleton\MeshLayout.h" />
+    <ClInclude Include="Singleton\PSOContainer.h" />
+    <ClInclude Include="Singleton\ShaderCompiler.h" />
+    <ClInclude Include="Singleton\ShaderID.h" />
+    <ClInclude Include="taskflow\core\executor.hpp" />
+    <ClInclude Include="taskflow\core\flow_builder.hpp" />
+    <ClInclude Include="taskflow\core\graph.hpp" />
+    <ClInclude Include="taskflow\core\notifier.hpp" />
+    <ClInclude Include="taskflow\core\observer.hpp" />
+    <ClInclude Include="taskflow\core\spmc_queue.hpp" />
+    <ClInclude Include="taskflow\core\task.hpp" />
+    <ClInclude Include="taskflow\core\taskflow.hpp" />
+    <ClInclude Include="taskflow\core\topology.hpp" />
+    <ClInclude Include="taskflow\error\error.hpp" />
+    <ClInclude Include="taskflow\predef\architecture.hpp" />
+    <ClInclude Include="taskflow\predef\architecture\arm.hpp" />
+    <ClInclude Include="taskflow\predef\architecture\mips.hpp" />
+    <ClInclude Include="taskflow\predef\architecture\ppc.hpp" />
+    <ClInclude Include="taskflow\predef\architecture\x86.hpp" />
+    <ClInclude Include="taskflow\predef\compiler.hpp" />
+    <ClInclude Include="taskflow\predef\compiler\clang.hpp" />
+    <ClInclude Include="taskflow\predef\compiler\comp_detected.hpp" />
+    <ClInclude Include="taskflow\predef\compiler\gcc.hpp" />
+    <ClInclude Include="taskflow\predef\compiler\msvc.hpp" />
+    <ClInclude Include="taskflow\predef\os.hpp" />
+    <ClInclude Include="taskflow\predef\os\ios.hpp" />
+    <ClInclude Include="taskflow\predef\os\macos.hpp" />
+    <ClInclude Include="taskflow\predef\os\os_detected.hpp" />
+    <ClInclude Include="taskflow\predef\stringify.hpp" />
+    <ClInclude Include="taskflow\predef\version_number.hpp" />
+    <ClInclude Include="taskflow\taskflow.hpp" />
+    <ClInclude Include="taskflow\utility\backoff.hpp" />
+    <ClInclude Include="taskflow\utility\generic_allocator.hpp" />
+    <ClInclude Include="taskflow\utility\object_pool.hpp" />
+    <ClInclude Include="taskflow\utility\passive_vector.hpp" />
+    <ClInclude Include="taskflow\utility\singular_allocator.hpp" />
+    <ClInclude Include="taskflow\utility\traits.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Common\Camera.cpp" />
+    <ClCompile Include="Common\d3dApp.cpp" />
+    <ClCompile Include="Common\d3dUtil.cpp" />
+    <ClCompile Include="Common\DDSTextureLoader.cpp" />
+    <ClCompile Include="Common\DescriptorHeap.cpp" />
+    <ClCompile Include="Common\GameTimer.cpp" />
+    <ClCompile Include="Common\GeometryGenerator.cpp" />
+    <ClCompile Include="Common\MathHelper.cpp" />
+    <ClCompile Include="CrateApp.cpp" />
+    <ClCompile Include="PipelineComponent\CullTask.cpp" />
+    <ClCompile Include="PipelineComponent\ThreadCommand.cpp" />
+    <ClCompile Include="RenderComponent\CBufferPool.cpp" />
+    <ClCompile Include="RenderComponent\ComputeShader.cpp" />
+    <ClCompile Include="RenderComponent\Material.cpp" />
+    <ClCompile Include="RenderComponent\Mesh.cpp" />
+    <ClCompile Include="RenderComponent\MeshRenderer.cpp" />
+    <ClCompile Include="RenderComponent\MObject.cpp" />
+    <ClCompile Include="RenderComponent\RenderTexture2D.cpp" />
+    <ClCompile Include="RenderComponent\RenderTextureCube.cpp" />
+    <ClCompile Include="RenderComponent\Shader.cpp" />
+    <ClCompile Include="RenderComponent\Skybox.cpp" />
+    <ClCompile Include="RenderComponent\Texture.cpp" />
+    <ClCompile Include="RenderComponent\UploadBuffer.cpp" />
+    <ClCompile Include="Singleton\FrameResource.cpp" />
+    <ClCompile Include="Singleton\MathLib.cpp" />
+    <ClCompile Include="Singleton\MeshLayout.cpp" />
+    <ClCompile Include="Singleton\PSOContainer.cpp" />
+    <ClCompile Include="Singleton\ShaderCompiler.cpp" />
+    <ClCompile Include="Singleton\ShaderID.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Crate.rc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{99BAD649-F897-4374-B69D-EEB3F9CAE027}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Crate</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

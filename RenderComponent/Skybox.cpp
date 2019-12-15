@@ -1,0 +1,79 @@
+#include "Skybox.h"
+
+std::unique_ptr<Mesh> Skybox::fullScreenMesh = nullptr;
+void Skybox::Draw(
+	int targetPass,
+	ID3D12GraphicsCommandList* commandList,
+	ID3D12Device* device,
+	ConstBufferElement* cameraBuffer,
+	FrameResource* currentResource,
+	PSOContainer* container
+)
+{
+	PSODescriptor desc;
+	desc.meshLayoutIndex = fullScreenMesh->GetLayoutIndex();
+	desc.shaderPass = targetPass;
+	desc.shaderPtr = skyboxMat->GetShader();
+	ID3D12PipelineState* pso = container->GetState(desc, device);
+	commandList->SetPipelineState(pso);
+	skyboxMat->BindShaderResource(commandList);
+	skyboxMat->GetShader()->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer.operator->(), cameraBuffer->element);
+	commandList->IASetVertexBuffers(0, 1, &fullScreenMesh->VertexBufferView());
+	commandList->IASetIndexBuffer(&fullScreenMesh->IndexBufferView(0));
+	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	SubMesh& subMesh = fullScreenMesh->GetSubmesh(0);
+	commandList->DrawIndexedInstanced(subMesh.indexCount, 1, 0, 0, 0);
+}
+
+Skybox::~Skybox()
+{
+	fullScreenMesh = nullptr;
+	skyboxTex = nullptr;
+	skyboxMat = nullptr;
+	texDescHeap = nullptr;
+}
+
+Skybox::Skybox(
+	ObjectPtr<Texture> tex,
+	ID3D12Device* device,
+	ID3D12GraphicsCommandList* commandList
+) : MObject(),
+skyboxTex(tex)
+{
+	texDescHeap = new DescriptorHeap();
+	texDescHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
+	D3D12_SHADER_RESOURCE_VIEW_DESC viewDesc;
+	tex->GetResourceViewDescriptor(viewDesc);
+	device->CreateShaderResourceView(tex->GetResource(), &viewDesc, texDescHeap->hCPU(0));
+	ObjectPtr<UploadBuffer> noProperty = nullptr;
+	skyboxMat = new Material(ShaderCompiler::GetShader("Skybox"), noProperty, 0, texDescHeap);
+	skyboxMat->SetBindlessResource(ShaderID::PropertyToID("cubemap"), 0);
+	if (fullScreenMesh == nullptr) {
+		std::array<DirectX::XMFLOAT3, 3> vertex;
+		vertex[0] = { -3, -1, 1 };
+		vertex[1] = { 1, 3, 1 };
+		vertex[2] = { 1, -1, 1 };
+		std::array<INT16, 3> indices{ 0, 1, 2 };
+		std::vector<SubMesh>* subMeshes = new std::vector<SubMesh>(1);
+		SubMesh& sm = (*subMeshes)[0];
+		sm.boundingCenter = { 0,0,0 };
+		sm.boundingExtent = { 1,1,1 };
+		sm.indexCount = 3;
+		sm.indexFormat = DXGI_FORMAT_R16_UINT;
+		sm.indexArrayPtr = indices.data();
+		fullScreenMesh = std::make_unique<Mesh>(
+			3,
+			vertex.data(),
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr,
+			device,
+			commandList,
+			subMeshes
+			);
+	}
+}

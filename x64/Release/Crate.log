@@ -1,0 +1,49 @@
+﻿  DescriptorHeap.cpp
+  CrateApp.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(294): warning C4267: “return”: 从“size_t”转换到“unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(304): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(304): warning C4267: “初始化”: 从“size_t”转换到“const unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\crateapp.cpp(218): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\user\source\repos\crate\crateapp.cpp(445): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\crateapp.cpp(498): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+  CullTask.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(294): warning C4267: “return”: 从“size_t”转换到“unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(304): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(304): warning C4267: “初始化”: 从“size_t”转换到“const unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\singleton\mathlib.h(24): warning C4305: “初始化”: 从“double”到“float”截断
+c:\users\user\source\repos\crate\singleton\mathlib.h(25): warning C4305: “初始化”: 从“double”到“float”截断
+  ComputeShader.cpp
+c:\users\user\source\repos\crate\rendercomponent\computeshader.cpp(68): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  Material.cpp
+c:\users\user\source\repos\crate\rendercomponent\material.cpp(57): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
+  Mesh.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+  MeshRenderer.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(294): warning C4267: “return”: 从“size_t”转换到“unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(304): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(304): warning C4267: “初始化”: 从“size_t”转换到“const unsigned int”，可能丢失数据
+  RenderTexture2D.cpp
+  RenderTextureCube.cpp
+  Shader.cpp
+c:\users\user\source\repos\crate\rendercomponent\shader.cpp(100): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  Skybox.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(294): warning C4267: “return”: 从“size_t”转换到“unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(304): warning C4267: “初始化”: 从“size_t”转换到“unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\core\executor.hpp(304): warning C4267: “初始化”: 从“size_t”转换到“const unsigned int”，可能丢失数据
+  MeshLayout.cpp
+c:\users\user\source\repos\crate\singleton\meshlayout.cpp(102): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
+  PSOContainer.cpp
+  正在生成代码
+  778 of 5854 functions (13.3%) were compiled, the rest were copied from previous compilation.
+    243 functions were new in current compilation
+    303 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Release\Crate.exe
