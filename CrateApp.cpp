@@ -25,7 +25,7 @@ using namespace DirectX::PackedVector;
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
 
-const int gNumFrameResources = 2;
+const int gNumFrameResources = 3;
 
 // Lightweight structure stores parameters to draw a shape.  This will
 // vary from app-to-app.
@@ -85,7 +85,7 @@ public:
 
 	void LoadTextures();
 	void BuildDescriptorHeaps();
-	void BuildShapeGeometry();
+	void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh);
 	void BuildPSOs();
 	void BuildFrameResources();
 	void BuildMaterials();
@@ -100,14 +100,17 @@ public:
 	std::unordered_map<std::string, std::unique_ptr<FMaterial>> mMaterials;
 	std::vector<ObjectPtr<Texture>> mTextures;
 	ObjectPtr<Mesh> boxMesh;
+	ObjectPtr<Mesh> sphereMesh;
 //	Shader* opaqueShader;
 	ObjectPtr<Material> opaqueMaterial;
 	ObjectPtr<MeshRenderer> mainRenderer;
+	ObjectPtr<MeshRenderer> mainRenderer1;
+	ComPtr<ID3D12CommandSignature> mCommandSignature;
 	ObjectPtr<Skybox> skybox;
 	PassConstants mMainPassCB;
 	ObjectPtr<Camera> mainCamera;
 	ObjectPtr <UploadBuffer> materialPropertyBuffer;
-	
+	ObjectPtr <UploadBuffer> indirectDrawBuffer;
 	float mTheta = 1.3f*XM_PI;
 	float mPhi = 0.4f*XM_PI;
 	float mRadius = 2.5f;
@@ -167,16 +170,18 @@ bool CrateApp::Initialize()
 	ShaderCompiler::Init(md3dDevice.Get());
 	LoadTextures();
 	BuildDescriptorHeaps();
-	BuildShapeGeometry();
+	GeometryGenerator geoGen;
+	BuildShapeGeometry(geoGen.CreateBox(1, 1, 1, 1), boxMesh);
+	BuildShapeGeometry(geoGen.CreateSphere(1, 32, 33), sphereMesh);
 	BuildMaterials();
 	BuildFrameResources();
 	BuildPSOs();
 	mainCamera =new Camera(md3dDevice.Get());
 	std::vector<ObjectPtr<Material>> mats(1);
 	mats[0] = opaqueMaterial;
-	XMFLOAT3 pos = { 0,0,0 };
+	XMFLOAT3 pos = { 0,-0.5,0 };
 	XMVECTOR quat = { 0,0,0,1 };
-	XMFLOAT3 localScale = { 1,1,1 };
+	XMFLOAT3 localScale = { 0.5,0.5,0.5 };
 	mainRenderer = new MeshRenderer(
 		md3dDevice.Get(),
 		pos,
@@ -185,6 +190,15 @@ bool CrateApp::Initialize()
 		boxMesh,
 		mats
 		);
+	pos.y = 0.5;
+	mainRenderer1 = new MeshRenderer(
+		md3dDevice.Get(),
+		pos,
+		quat,
+		localScale,
+		sphereMesh,
+		mats
+	);
 	//BuildPSOs();
 	// Execute the initialization commands.
 	ThrowIfFailed(mCommandList->Close());
@@ -217,7 +231,24 @@ void CrateApp::Update(const GameTimer& gt)
 	UpdateMaterialCBs(gt);
 	mainCamera->SetLens(0.333333 * MathHelper::Pi, AspectRatio(), 1.5, 100);
 	mainRenderer->UpdateObjectBuffer(FrameResource::mCurrFrameResource);
+	mainRenderer1->UpdateObjectBuffer(FrameResource::mCurrFrameResource);
 	mainCamera->UploadCameraBuffer(FrameResource::mCurrFrameResource, mMainPassCB);
+	IndirectDrawCommand commands[2];
+	mainRenderer->GetIndirectArgument(
+		0,
+		0,
+		md3dDevice.Get(),
+		FrameResource::mCurrFrameResource,
+		commands
+	);
+	mainRenderer1->GetIndirectArgument(
+		0,
+		0,
+		md3dDevice.Get(),
+		FrameResource::mCurrFrameResource,
+		commands + 1
+	);
+	indirectDrawBuffer->CopyDatas(0, 2, commands);
 }
 class DrawRenderTextureCommand
 {
@@ -240,7 +271,7 @@ public:
 			FrameResource::mCurrFrameResource,
 			separateContainer
 		);
-		ths->mainRenderer->Draw(
+		/*ths->mainRenderer->Draw(
 			1,
 			0,
 			mSeparateList,
@@ -249,11 +280,33 @@ public:
 			FrameResource::mCurrFrameResource,
 			separateContainer
 		);
+		ths->mainRenderer1->Draw(
+			1,
+			0,
+			mSeparateList,
+			ths->md3dDevice.Get(),
+			cameraBuffer,
+			FrameResource::mCurrFrameResource,
+			separateContainer
+		);*/
+		PSODescriptor desc;
+		desc.meshLayoutIndex = ths->boxMesh->GetLayoutIndex();
+		desc.shaderPass = 1;
+		Material* mat = ths->opaqueMaterial.operator->();
+		desc.shaderPtr = mat->GetShader();
+		ID3D12PipelineState* pso = separateContainer->GetState(desc, ths->md3dDevice.Get());
+		mSeparateList->SetPipelineState(pso);
+		mat->BindShaderResource(mSeparateList);
+		mSeparateList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		ConstBufferElement* camBuffer = &FrameResource::mCurrFrameResource->cameraCBs[ths->mainCamera->GetInstanceID()];
+		mat->GetShader()->SetResource(mSeparateList, ShaderID::GetPerCameraBufferID(), camBuffer->buffer.operator->(), camBuffer->element);
+		mSeparateList->ExecuteIndirect(ths->mCommandSignature.Get(), 2, ths->indirectDrawBuffer->Resource(), 0, nullptr, 0);
+
 		ComputeShader* cs = (ComputeShader*)&ths->testComputeShader;
 		ths->mainRenderTexture->SetUav(true, mSeparateList);
 		cs->BindRootSignature(mSeparateList, ths->uavTextureHeap.operator->());
 		cs->SetResource(mSeparateList, ShaderID::PropertyToID("_MainTex"), ths->uavTextureHeap.operator->(), 0);
-		const UINT ksize = 1024 / 8;
+		const UINT ksize = 512 / 8;
 		cs->Dispatch(mSeparateList, 0, ksize, ksize, 1);
 	}
 };
@@ -290,7 +343,7 @@ void CrateApp::Draw(const GameTimer& gt)
 		FrameResource::mCurrFrameResource,
 		mainPSO
 	);
-	mainRenderer->Draw(
+	/*mainRenderer->Draw(
 		0,
 		0,
 		mCommandList,
@@ -299,6 +352,27 @@ void CrateApp::Draw(const GameTimer& gt)
 		FrameResource::mCurrFrameResource,
 		mainPSO
 	);
+	mainRenderer1->Draw(
+		0,
+		0,
+		mCommandList,
+		md3dDevice.Get(),
+		camBuffer,
+		FrameResource::mCurrFrameResource,
+		mainPSO
+	);*/
+	PSODescriptor desc;
+	desc.meshLayoutIndex = boxMesh->GetLayoutIndex();
+	desc.shaderPass = 0;
+	Material* mat = opaqueMaterial.operator->();
+	desc.shaderPtr = mat->GetShader();
+	ID3D12PipelineState* pso = mainPSO->GetState(desc, md3dDevice.Get());
+	mCommandList->SetPipelineState(pso);
+	mat->BindShaderResource(mCommandList);
+	mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	mat->GetShader()->SetResource(mCommandList, ShaderID::GetPerCameraBufferID(), camBuffer->buffer.operator->(), camBuffer->element);
+	mCommandList->ExecuteIndirect(mCommandSignature.Get(), 2, indirectDrawBuffer->Resource(), 0, nullptr, 0);
+
 	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	ID3D12CommandList* value[2];
@@ -433,7 +507,7 @@ void CrateApp::LoadTextures()
 	mTextures.push_back(brickTex);
 	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "grasscube1024", L"Textures/grasscube1024.dds", Texture::Cubemap);
 	mTextures.push_back(brickTex);
-	mainRenderTexture = new RenderTexture2D(md3dDevice.Get(), 1024, 1024, DXGI_FORMAT_R16G16B16A16_FLOAT, true);
+	mainRenderTexture = new RenderTexture2D(md3dDevice.Get(), 1024, 1024, DXGI_FORMAT_R16G16B16A16_FLOAT, 2, true);
 }
 
 void CrateApp::BuildDescriptorHeaps()
@@ -452,16 +526,16 @@ void CrateApp::BuildDescriptorHeaps()
 		md3dDevice->CreateShaderResourceView(mTextures[i]->GetResource(), &srvDesc, bindlessTextureHeap->hCPU(i + 1));
 	}
 	uavTextureHeap = new DescriptorHeap();
-	uavTextureHeap->Create(md3dDevice.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
+	uavTextureHeap->Create(md3dDevice.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2, true);
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-	mainRenderTexture->GetUAVViewDesc(uavDesc);
+	mainRenderTexture->GetUAVViewDesc(uavDesc, 0);
 	md3dDevice->CreateUnorderedAccessView(mainRenderTexture->GetColorResource(), nullptr, &uavDesc, uavTextureHeap->hCPU(0));
+	mainRenderTexture->GetUAVViewDesc(uavDesc, 1);
+	md3dDevice->CreateUnorderedAccessView(mainRenderTexture->GetColorResource(), nullptr, &uavDesc, uavTextureHeap->hCPU(1));
 }
 
-void CrateApp::BuildShapeGeometry()
+void CrateApp::BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh)
 {
-	GeometryGenerator geoGen;
-	GeometryGenerator::MeshData box = geoGen.CreateBox(1, 1, 1, 1);
 	std::vector<XMFLOAT3> positions(box.Vertices.size());
 	std::vector<XMFLOAT3> normals(box.Vertices.size());
 	std::vector<XMFLOAT2> uvs(box.Vertices.size());
@@ -482,7 +556,7 @@ void CrateApp::BuildShapeGeometry()
 		{0,0,0},
 		{1,1,1}
 	};
-	boxMesh = new Mesh(
+	bMesh = new Mesh(
 		box.Vertices.size(),
 		positions.data(),
 		normals.data(),
@@ -496,6 +570,7 @@ void CrateApp::BuildShapeGeometry()
 		mCommandList.Get(),
 		subMeshs
 		);
+
 }
 void CrateApp::BuildFrameResources()
 {
@@ -518,7 +593,7 @@ void CrateApp::BuildMaterials()
 
 	mMaterials["woodCrate"] = std::move(woodCrate);
 	materialPropertyBuffer = new UploadBuffer();
-	materialPropertyBuffer->Create(md3dDevice.Get(), 1, true, sizeof(MaterialConstants));
+	materialPropertyBuffer->Create(md3dDevice.Get(), 1, true, sizeof(MaterialConstants), false);
 	opaqueMaterial = new Material(ShaderCompiler::GetShader("OpaqueStandard"), materialPropertyBuffer, 0, bindlessTextureHeap);
 	//opaqueMaterial->SetTexture2D(ShaderID::PropertyToID("gDiffuseMap"), mTextures[0]);
 
@@ -539,7 +614,23 @@ void CrateApp::BuildPSOs()
 	vars[0].space = 0;
 	vars[0].registerPos = 0;
 	vars[0].type = ComputeShaderVariable::UAVDescriptorHeap;
-	vars[0].tableSize = 1;
+	vars[0].tableSize = 2;
 	vars[0].name = "_MainTex";
 	new(&testComputeShader)ComputeShader(L"Shaders\\ComputeShaderTest.hlsl", kernelNames, vars, md3dDevice.Get());
+	D3D12_COMMAND_SIGNATURE_DESC desc = {};
+	D3D12_INDIRECT_ARGUMENT_DESC indDesc[4];
+	ZeroMemory(indDesc, 4 * sizeof(D3D12_INDIRECT_ARGUMENT_DESC));
+	indDesc[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW;
+	indDesc[0].ConstantBufferView.RootParameterIndex = opaqueMaterial->GetShader()->GetPropertyRootSigPos(ShaderID::GetPerObjectBufferID());
+	indDesc[1].Type = D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW;
+	indDesc[1].VertexBuffer.Slot = 0;
+	indDesc[2].Type = D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW;
+	indDesc[3].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
+	desc.ByteStride = sizeof(IndirectDrawCommand);
+	desc.NodeMask = 0;
+	desc.NumArgumentDescs = 4;
+	desc.pArgumentDescs = indDesc;
+	md3dDevice->CreateCommandSignature(&desc, opaqueMaterial->GetShader()->GetSignature(), IID_PPV_ARGS(&mCommandSignature));
+	indirectDrawBuffer = new UploadBuffer();
+	indirectDrawBuffer->Create(md3dDevice.Get(), 2, false, sizeof(IndirectDrawCommand), false);
 }

@@ -203,18 +203,6 @@ class Task {
     void _succeed(S&);
 };
 
-// Constructor
-inline Task::Task(Node& node) : _node {&node} {
-}
-
-// Constructor
-inline Task::Task(Node* node) : _node {node} {
-}
-
-// Constructor
-inline Task::Task(const Task& rhs) : _node {rhs._node} {
-}
-
 // Function: precede
 template <typename... Ts>
 Task& Task::precede(Ts&&... tgts) {
@@ -222,17 +210,6 @@ Task& Task::precede(Ts&&... tgts) {
   return *this;
 }
 
-// Function: precede
-inline Task& Task::precede(std::vector<Task>& tgts) {
-  _precede(tgts);
-  return *this;
-}
-
-// Function: precede
-inline Task& Task::precede(std::initializer_list<Task> tgts) {
-  _precede(tgts);
-  return *this;
-}
 
 // Procedure: _precede
 template <typename S>
@@ -256,19 +233,6 @@ void Task::_gather(S& tgts) {
     from._node->precede(*_node);
   }
 }
-
-// Function: gather
-inline Task& Task::gather(std::vector<Task>& tgts) {
-  _gather(tgts);
-  return *this;
-}
-
-// Function: gather
-inline Task& Task::gather(std::initializer_list<Task> tgts) {
-  _gather(tgts);
-  return *this;
-}
-
 // Function: succeed
 template <typename... Bs>
 Task& Task::succeed(Bs&&... tgts) {
@@ -284,33 +248,10 @@ void Task::_succeed(S& tgts) {
   }
 }
 
-// Function: succeed
-inline Task& Task::succeed(std::vector<Task>& tgts) {
-  _succeed(tgts);
-  return *this;
-}
-
-// Function: succeed
-inline Task& Task::succeed(std::initializer_list<Task> tgts) {
-  _succeed(tgts);
-  return *this;
-}
-
-// Operator =
-inline Task& Task::operator = (const Task& rhs) {
-  _node = rhs._node;
-  return *this;
-}
-
-// Operator =
-inline Task& Task::operator = (std::nullptr_t ptr) {
-  _node = ptr;
-  return *this;
-}
 
 // Function: work
 template <typename C>
-inline Task& Task::work(C&& c) {
+Task& Task::work(C&& c) {
 
   if(_node->_module) {
     TF_THROW(Error::TASKFLOW, "can't assign work to a module task");
@@ -319,43 +260,6 @@ inline Task& Task::work(C&& c) {
   _node->_work = std::forward<C>(c);
 
   return *this;
-}
-
-// Function: name
-inline Task& Task::name(const std::string& name) {
-  _node->_name = name;
-  return *this;
-}
-
-// Procedure: reset
-inline Task& Task::reset() {
-  _node = nullptr;
-  return *this;
-}
-
-// Function: name
-inline const std::string& Task::name() const {
-  return _node->_name;
-}
-
-// Function: num_dependents
-inline size_t Task::num_dependents() const {
-  return _node->num_dependents();
-}
-
-// Function: num_successors
-inline size_t Task::num_successors() const {
-  return _node->num_successors();
-}
-
-// Function: empty
-inline bool Task::empty() const {
-  return _node == nullptr;
-}
-
-// Function: has_work
-inline bool Task::has_work() const {
-  return _node ? _node->_work.index() != 0 : false;
 }
 
 // ----------------------------------------------------------------------------
@@ -435,63 +339,5 @@ class TaskView {
 
     Node* _node {nullptr};
 };
-// Constructor
-inline TaskView::TaskView(Node& node) : _node{ &node } {
-}
-
-// Constructor
-inline TaskView::TaskView(Node* node) : _node{ node } {
-}
-
-// Constructor
-inline TaskView::TaskView(const TaskView& rhs) : _node{ rhs._node } {
-}
-
-// Constructor
-inline TaskView::TaskView(const Task& task) : _node{ task._node } {
-}
-
-// Operator =
-inline TaskView& TaskView::operator = (const TaskView& rhs) {
-	_node = rhs._node;
-	return *this;
-}
-
-// Operator =
-inline TaskView& TaskView::operator = (const Task& rhs) {
-	_node = rhs._node;
-	return *this;
-}
-
-// Operator =
-inline TaskView& TaskView::operator = (std::nullptr_t ptr) {
-	_node = ptr;
-	return *this;
-}
-
-// Function: name
-inline const std::string& TaskView::name() const {
-	return _node->_name;
-}
-
-// Function: num_dependents
-inline size_t TaskView::num_dependents() const {
-	return _node->num_dependents();
-}
-
-// Function: num_successors
-inline size_t TaskView::num_successors() const {
-	return _node->num_successors();
-}
-
-// Function: reset
-inline void TaskView::reset() {
-	_node = nullptr;
-}
-
-// Function: empty
-inline bool TaskView::empty() const {
-	return _node == nullptr;
-}
 }  // end of namespace tf. ---------------------------------------------------
 

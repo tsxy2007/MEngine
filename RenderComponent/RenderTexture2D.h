@@ -24,6 +24,7 @@ public:
 		UINT width,
 		UINT height,
 		DXGI_FORMAT format,
+		UINT mipLevel,
 		bool useDepth
 	);
 	void SetUav(bool value, ID3D12GraphicsCommandList* commandList);
@@ -34,7 +35,7 @@ public:
 	DescriptorHeap* GetColorHeap() const;
 	DescriptorHeap* GetDepthHeap() const;
 	void GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
-	void GetUAVViewDesc(D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc);
+	void GetUAVViewDesc(D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, UINT targetMipLevel);
 	void GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
 	void ClearRenderTarget(ID3D12GraphicsCommandList* commandList, bool clearColor, bool clearDepth);
 	DXGI_FORMAT GetColorFormat() const;

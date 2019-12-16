@@ -22,15 +22,21 @@
     <Filter Include="Source Files\PipelineComponent">
       <UniqueIdentifier>{996991c6-45f7-4c38-ae4c-50a344c802e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Taskflow">
+      <UniqueIdentifier>{ac25d8ac-b7ae-4df2-9498-379032ac3371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RenderComponent">
+      <UniqueIdentifier>{f820d0f2-ad84-4cfe-aafc-6f921d95426d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RenderComponent">
+      <UniqueIdentifier>{98879e99-478b-4811-acd9-a2f3b9a43c37}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\DescriptorHeap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common\d3dApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common\d3dUtil.h">
@@ -51,18 +57,6 @@
     <ClInclude Include="Common\MathHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderComponent\Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent\MObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent\Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent\UploadBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Singleton\FrameResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,40 +66,16 @@
     <ClInclude Include="Singleton\MeshLayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Singleton\PSOContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RenderComponent\CBufferPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderComponent\Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent\MeshRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent\RenderTexture2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent\Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent\RenderTextureCube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Singleton\ShaderCompiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderComponent\Skybox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Singleton\MathLib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MultiThread\Pool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common\MQueue.h">
@@ -222,6 +192,51 @@
     <ClInclude Include="RenderComponent\ComputeShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Common\MetaLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Material.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\MObject.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton\PSOContainer.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\RenderTexture2D.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\RenderTextureCube.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Texture.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\UploadBuffer.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Mesh.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\MeshRenderer.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Shader.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\Skybox.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\IndirectDrawer.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\DescriptorHeap.cpp">
@@ -237,15 +252,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CrateApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\UploadBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderComponent\MObject.cpp">
@@ -272,31 +278,10 @@
     <ClCompile Include="Common\d3dUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Singleton\PSOContainer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RenderComponent\CBufferPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderComponent\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\MeshRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\RenderTexture2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\RenderTextureCube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Singleton\ShaderCompiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Singleton\MathLib.cpp">
@@ -310,6 +295,57 @@
     </ClCompile>
     <ClCompile Include="RenderComponent\ComputeShader.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="taskflow\core\executor.cpp">
+      <Filter>Source Files\Taskflow</Filter>
+    </ClCompile>
+    <ClCompile Include="taskflow\core\flow_builder.cpp">
+      <Filter>Source Files\Taskflow</Filter>
+    </ClCompile>
+    <ClCompile Include="taskflow\core\graph.cpp">
+      <Filter>Source Files\Taskflow</Filter>
+    </ClCompile>
+    <ClCompile Include="taskflow\core\observer.cpp">
+      <Filter>Source Files\Taskflow</Filter>
+    </ClCompile>
+    <ClCompile Include="taskflow\core\task.cpp">
+      <Filter>Source Files\Taskflow</Filter>
+    </ClCompile>
+    <ClCompile Include="taskflow\core\taskflow.cpp">
+      <Filter>Source Files\Taskflow</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton\PSOContainer.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\RenderTexture2D.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\RenderTextureCube.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Shader.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Skybox.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Texture.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\UploadBuffer.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Material.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\MeshRenderer.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\Mesh.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\IndirectDrawer.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

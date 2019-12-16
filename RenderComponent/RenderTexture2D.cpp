@@ -65,11 +65,11 @@ void RenderTexture2D::GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc)
 	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 }
 
-void RenderTexture2D::GetUAVViewDesc(D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc)
+void RenderTexture2D::GetUAVViewDesc(D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, UINT targetMipLevel)
 {
 	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 	uavDesc.Format = mResource->GetDesc().Format;;
-	uavDesc.Texture2D.MipSlice = 0;
+	uavDesc.Texture2D.MipSlice = targetMipLevel;
 	uavDesc.Texture2D.PlaneSlice = 0;
 }
 
@@ -89,6 +89,7 @@ RenderTexture2D::RenderTexture2D(
 	UINT width,
 	UINT height,
 	DXGI_FORMAT format,
+	UINT mipLevel,
 	bool useDepth
 ) : MObject(),
 mWidth(width),
@@ -115,7 +116,7 @@ isUAV(false)
 	texDesc.Width = mWidth;
 	texDesc.Height = mHeight;
 	texDesc.DepthOrArraySize = 1;
-	texDesc.MipLevels = 1;
+	texDesc.MipLevels = mipLevel;
 	texDesc.Format = mFormat;
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;

@@ -273,42 +273,6 @@ class FlowBuilder {
     void _linearize(L&);
 };
 
-// Constructor
-inline FlowBuilder::FlowBuilder(Graph& graph) :
-  _graph {graph} {
-}
-
-// Procedure: precede
-inline void FlowBuilder::precede(Task from, Task to) {
-  from._node->precede(*(to._node));
-}
-
-// Procedure: broadcast
-inline void FlowBuilder::broadcast(Task from, std::vector<Task>& keys) {
-  from.precede(keys);
-}
-
-// Procedure: broadcast
-inline void FlowBuilder::broadcast(Task from, std::initializer_list<Task> keys) {
-  from.precede(keys);
-}
-
-// Function: gather
-inline void FlowBuilder::gather(std::vector<Task>& keys, Task to) {
-  to.gather(keys);
-}
-
-// Function: gather
-inline void FlowBuilder::gather(std::initializer_list<Task> keys, Task to) {
-  to.gather(keys);
-}
-
-// Function: placeholder
-inline Task FlowBuilder::placeholder() {
-  auto& node = _graph.emplace_back();
-  return Task(node);
-}
-
 // Function: parallel_for
 template <typename I, typename C>
 std::pair<Task, Task> FlowBuilder::parallel_for(I beg, I end, C&& c, size_t p){
@@ -728,16 +692,6 @@ void FlowBuilder::_linearize(L& keys) {
   }
 }
 
-// Procedure: linearize
-inline void FlowBuilder::linearize(std::vector<Task>& keys) {
-  _linearize(keys); 
-}
-
-// Procedure: linearize
-inline void FlowBuilder::linearize(std::initializer_list<Task> keys) {
-  _linearize(keys);
-}
-
 // Proceduer: reduce
 template <typename I, typename T, typename B>
 std::pair<Task, Task> FlowBuilder::reduce(I beg, I end, T& result, B&& op) {
@@ -853,26 +807,6 @@ class Subflow : public FlowBuilder {
 template <typename... Args>
 Subflow::Subflow(Args&&... args) :
   FlowBuilder {std::forward<Args>(args)...} {
-}
-
-// Procedure: join
-inline void Subflow::join() {
-  _detached = false;
-}
-
-// Procedure: detach
-inline void Subflow::detach() {
-  _detached = true;
-}
-
-// Function: detached
-inline bool Subflow::detached() const {
-  return _detached;
-}
-
-// Function: joined
-inline bool Subflow::joined() const {
-  return !_detached;
 }
 
 // -----

@@ -29,12 +29,14 @@
     <ClInclude Include="Common\GameTimer.h" />
     <ClInclude Include="Common\GeometryGenerator.h" />
     <ClInclude Include="Common\MathHelper.h" />
+    <ClInclude Include="Common\MetaLib.h" />
     <ClInclude Include="Common\MQueue.h" />
-    <ClInclude Include="MultiThread\Pool.h" />
+    <ClInclude Include="Common\Pool.h" />
     <ClInclude Include="PipelineComponent\CullTask.h" />
     <ClInclude Include="PipelineComponent\ThreadCommand.h" />
     <ClInclude Include="RenderComponent\CBufferPool.h" />
     <ClInclude Include="RenderComponent\ComputeShader.h" />
+    <ClInclude Include="RenderComponent\IndirectDrawer.h" />
     <ClInclude Include="RenderComponent\Material.h" />
     <ClInclude Include="RenderComponent\Mesh.h" />
     <ClInclude Include="RenderComponent\MeshRenderer.h" />
@@ -100,6 +102,7 @@
     <ClCompile Include="PipelineComponent\ThreadCommand.cpp" />
     <ClCompile Include="RenderComponent\CBufferPool.cpp" />
     <ClCompile Include="RenderComponent\ComputeShader.cpp" />
+    <ClCompile Include="RenderComponent\IndirectDrawer.cpp" />
     <ClCompile Include="RenderComponent\Material.cpp" />
     <ClCompile Include="RenderComponent\Mesh.cpp" />
     <ClCompile Include="RenderComponent\MeshRenderer.cpp" />
@@ -116,6 +119,12 @@
     <ClCompile Include="Singleton\PSOContainer.cpp" />
     <ClCompile Include="Singleton\ShaderCompiler.cpp" />
     <ClCompile Include="Singleton\ShaderID.cpp" />
+    <ClCompile Include="taskflow\core\executor.cpp" />
+    <ClCompile Include="taskflow\core\flow_builder.cpp" />
+    <ClCompile Include="taskflow\core\graph.cpp" />
+    <ClCompile Include="taskflow\core\observer.cpp" />
+    <ClCompile Include="taskflow\core\task.cpp" />
+    <ClCompile Include="taskflow\core\taskflow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Crate.rc" />

@@ -6,7 +6,7 @@
 class UploadBuffer : public MObject
 {
 public:
-	void Create(ID3D12Device* device, UINT elementCount, bool isConstantBuffer, size_t stride);
+	void Create(ID3D12Device* device, UINT elementCount, bool isConstantBuffer, size_t stride, bool isUAV);
 	UploadBuffer() : MObject() {}
     UploadBuffer(const UploadBuffer& rhs) = delete;
     UploadBuffer& operator=(const UploadBuffer& rhs) = delete;
@@ -26,10 +26,13 @@ private:
 		UINT startIndex;
 		UINT count;
 	};
+	bool GetUAV() const { return mIsUAV; }
+	void SetUAV(bool isUAV, ID3D12GraphicsCommandList* cmdList);
 	void UploadDataToDefaultBuffer(ID3D12GraphicsCommandList* commandList);
 	static std::vector<UploadBuffer*> needUpdateLists;
 	std::vector<UploadCommand> needUpdateElements;
 	void* mMappedData;
+	bool mIsUAV;
     Microsoft::WRL::ComPtr<ID3D12Resource> mUploadBuffer;
 	Microsoft::WRL::ComPtr<ID3D12Resource> mDefaultBuffer;
 	size_t mStride;

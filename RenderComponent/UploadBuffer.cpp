@@ -1,6 +1,6 @@
 #include "UploadBuffer.h"
 std::vector<UploadBuffer*> UploadBuffer::needUpdateLists;
-void UploadBuffer::Create(ID3D12Device* device, UINT elementCount, bool isConstantBuffer, size_t stride)
+void UploadBuffer::Create(ID3D12Device* device, UINT elementCount, bool isConstantBuffer, size_t stride, bool isUAV)
 {
 	needUpdateElements.reserve(elementCount);
 	mIsConstantBuffer = isConstantBuffer;
@@ -15,6 +15,7 @@ void UploadBuffer::Create(ID3D12Device* device, UINT elementCount, bool isConsta
 		mElementByteSize = d3dUtil::CalcConstantBufferByteSize(stride);
 	else mElementByteSize = stride;
 	mStride = stride;
+	mIsUAV = isUAV;
 	ThrowIfFailed(device->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
@@ -26,7 +27,7 @@ void UploadBuffer::Create(ID3D12Device* device, UINT elementCount, bool isConsta
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer(mElementByteSize*elementCount, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+		isUAV ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS : D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&mDefaultBuffer)));
 	ThrowIfFailed(mUploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mMappedData)));
@@ -79,11 +80,29 @@ void UploadBuffer::UploadData(ID3D12GraphicsCommandList* commandList)
 	needUpdateLists.clear();
 }
 
+void UploadBuffer::SetUAV(bool isUAV, ID3D12GraphicsCommandList* cmdList)
+{
+	if (mIsUAV == isUAV) return;
+	mIsUAV = isUAV;
+	if (isUAV)
+	{
+		cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mDefaultBuffer.Get(),
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
+	}
+	else
+	{
+		cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mDefaultBuffer.Get(),
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_GENERIC_READ));
+	}
+}
+
 void UploadBuffer::UploadDataToDefaultBuffer(ID3D12GraphicsCommandList* commandList)
 {
 	isDirty = false;
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mDefaultBuffer.Get(),
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+		mIsUAV ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS : D3D12_RESOURCE_STATE_GENERIC_READ,
 		D3D12_RESOURCE_STATE_COPY_DEST));
 	for (int i = 0; i < needUpdateElements.size(); ++i)
 	{
@@ -94,6 +113,6 @@ void UploadBuffer::UploadDataToDefaultBuffer(ID3D12GraphicsCommandList* commandL
 	needUpdateElements.clear();
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mDefaultBuffer.Get(),
 		D3D12_RESOURCE_STATE_COPY_DEST,
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
+		mIsUAV ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS : D3D12_RESOURCE_STATE_GENERIC_READ));
 
 }

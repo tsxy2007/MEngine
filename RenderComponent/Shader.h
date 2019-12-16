@@ -48,6 +48,8 @@ public:
 	ShaderVariable GetVariable(std::string name);
 	ShaderVariable GetVariable(UINT id);
 	void BindRootSignature(ID3D12GraphicsCommandList* commandList);
+	int GetPropertyRootSigPos(UINT id);
+	ID3D12RootSignature* GetSignature() const { return mRootSignature.Get(); }
 	void SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset);
 	bool TryGetShaderVariable(UINT id, ShaderVariable& targetVar);
 	size_t VariableLength() const { return mVariablesVector.size(); }

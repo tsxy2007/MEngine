@@ -31,7 +31,7 @@ public:
 		if (allPtrs.size() <= 0)
 			AllocateMemory();
 		T* value = allPtrs[allPtrs.size() - 1];
-		allPtrs.erase(allPtrs.begin() + allPtrs.size() - 1);
+		allPtrs.erase(allPtrs.end() - 1);
 		new (value)T(args...);
 		return value;
 	}

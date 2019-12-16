@@ -7,6 +7,13 @@
 #include "../Singleton/ShaderID.h"
 #include "CBufferPool.h"
 #include "../Singleton/FrameResource.h"
+struct IndirectDrawCommand
+{
+	D3D12_GPU_VIRTUAL_ADDRESS objectCBufferAddress; // Object Constant Buffer Address
+	D3D12_VERTEX_BUFFER_VIEW vertexBuffer;			// Vertex Buffer Address
+	D3D12_INDEX_BUFFER_VIEW indexBuffer;			//Index Buffer Address
+	D3D12_DRAW_INDEXED_ARGUMENTS drawArgs;			//Draw Arguments
+};
 class MeshRenderer : public MObject
 {
 private:
@@ -37,6 +44,13 @@ public:
 		ConstBufferElement* cameraBuffer,
 		FrameResource* currentResource,
 		PSOContainer* container
+	);
+	void GetIndirectArgument(
+		int targetPass,
+		int targetSubMesh,
+		ID3D12Device* device,
+		FrameResource* currentResource,
+		IndirectDrawCommand* command
 	);
 	void UpdateObjectBuffer(FrameResource* resource) const;
 };

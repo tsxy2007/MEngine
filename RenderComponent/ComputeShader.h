@@ -20,11 +20,12 @@ class ComputeShader
 {
 private:
 	std::vector<Pass> allPasses;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature;
+	
 	std::unordered_map<UINT, UINT> mVariablesDict;
 	std::vector<ComputeShaderVariable> mVariablesVector;
 	std::vector<Microsoft::WRL::ComPtr<ID3DBlob>> csShaders;
 	std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> pso;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature;
 public:
 	ComputeShader(
 		std::wstring compilePath,

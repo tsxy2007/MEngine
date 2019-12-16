@@ -69,6 +69,26 @@ void MeshRenderer::Draw(
 	commandList->DrawIndexedInstanced(subMesh.indexCount, 1, 0, 0, 0);
 }
 
+void MeshRenderer::GetIndirectArgument(
+	int targetPass,
+	int targetSubMesh,
+	ID3D12Device* device,
+	FrameResource* currentResource,
+	IndirectDrawCommand* command
+)
+{
+	SubMesh& subMesh = mesh->GetSubmesh(targetSubMesh);
+	ConstBufferElement& objBuffer = currentResource->objectCBs[GetInstanceID()];
+	command->indexBuffer = mesh->IndexBufferView(targetSubMesh);
+	command->objectCBufferAddress = objBuffer.buffer->Resource()->GetGPUVirtualAddress() + objBuffer.element * objBuffer.buffer->GetAlignedStride();
+	command->vertexBuffer = mesh->VertexBufferView();
+	command->drawArgs.BaseVertexLocation = 0;
+	command->drawArgs.IndexCountPerInstance = subMesh.indexCount;
+	command->drawArgs.InstanceCount = 1;
+	command->drawArgs.StartIndexLocation = 0;
+	command->drawArgs.StartInstanceLocation = 0;
+}
+
 XMMATRIX MeshRenderer::GetLocalToWorldMatrix() const
 {
 	XMMATRIX target;
@@ -83,7 +103,7 @@ XMMATRIX MeshRenderer::GetLocalToWorldMatrix() const
 	target.r[2] = vec;
 	target.r[3] = { position.x, position.y, position.z, 1 };
 	
-	return XMMatrixTranspose(target);
+	return target;
 }
 
 void MeshRenderer::UpdateObjectBuffer(FrameResource* resource) const

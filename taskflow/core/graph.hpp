@@ -119,91 +119,6 @@ template <typename C>
 Node::Node(C&& c) : _work {std::forward<C>(c)} {
 }
 
-// Destructor
-inline Node::~Node() {
-  // this is to avoid stack overflow
-  if(_subgraph.has_value()) {
-    std::vector<std::unique_ptr<Node>> nodes;
-    std::move(
-     _subgraph->_nodes.begin(), _subgraph->_nodes.end(), std::back_inserter(nodes)
-    );
-    _subgraph->_nodes.clear();
-    _subgraph.reset();
-    size_t i = 0;
-    while(i < nodes.size()) {
-      if(auto& sbg = nodes[i]->_subgraph; sbg) {
-        std::move(
-          sbg->_nodes.begin(), sbg->_nodes.end(), std::back_inserter(nodes)
-        );
-        sbg->_nodes.clear();
-        sbg.reset();
-      }
-      ++i;
-    }
-  }
-}
-
-// Procedure: precede
-inline void Node::precede(Node& v) {
-  _successors.push_back(&v);
-  v._dependents.push_back(this);
-  v._num_dependents.fetch_add(1, std::memory_order_relaxed);
-}
-
-// Function: num_successors
-inline size_t Node::num_successors() const {
-  return _successors.size();
-}
-
-// Function: dependents
-inline size_t Node::num_dependents() const {
-  return _dependents.size();
-}
-
-// Function: name
-inline const std::string& Node::name() const {
-  return _name;
-}
-
-// Function: dump
-inline std::string Node::dump() const {
-  std::ostringstream os;  
-  dump(os);
-  return os.str();
-}
-
-// Function: dump
-inline void Node::dump(std::ostream& os) const {
-
-  os << 'p' << this << "[label=\"";
-  if(_name.empty()) os << 'p' << this;
-  else os << _name;
-  os << "\"];\n";
-  
-  for(const auto s : _successors) {
-    os << 'p' << this << " -> " << 'p' << s << ";\n";
-  }
-  
-  if(_subgraph && !_subgraph->empty()) {
-
-    os << "subgraph cluster_";
-    if(_name.empty()) os << 'p' << this;
-    else os << _name;
-    os << " {\n";
-
-    os << "label=\"Subflow_";
-    if(_name.empty()) os << 'p' << this;
-    else os << _name;
-
-    os << "\";\n" << "color=blue\n";
-
-    for(const auto& n : _subgraph->nodes()) {
-      n->dump(os);
-    }
-    os << "}\n";
-  }
-}
-
 // ----------------------------------------------------------------------------
 
 /*// Class: NodePool
@@ -229,7 +144,7 @@ class NodePool {
 
 // Function: acquire
 template <typename C>
-inline std::unique_ptr<Node> NodePool::acquire(C&& c) {
+std::unique_ptr<Node> NodePool::acquire(C&& c) {
   if(_nodes.empty()) {
     return std::make_unique<Node>(std::forward<C>(c));
   }
@@ -242,7 +157,7 @@ inline std::unique_ptr<Node> NodePool::acquire(C&& c) {
 }
 
 // Function: acquire
-inline std::unique_ptr<Node> NodePool::acquire() {
+std::unique_ptr<Node> NodePool::acquire() {
   if(_nodes.empty()) {
     return std::make_unique<Node>();
   }
@@ -254,7 +169,7 @@ inline std::unique_ptr<Node> NodePool::acquire() {
 }
 
 // Procedure: release
-inline void NodePool::release(std::unique_ptr<Node> node) {
+void NodePool::release(std::unique_ptr<Node> node) {
 
   return;
 
@@ -275,7 +190,7 @@ inline void NodePool::release(std::unique_ptr<Node> node) {
 }
 
 // Procedure: _recycle
-inline void NodePool::_recycle(Node& node) {
+void NodePool::_recycle(Node& node) {
   node._name.clear();
   node._work = {};
   node._successors.clear();
@@ -290,54 +205,11 @@ inline void NodePool::_recycle(Node& node) {
 // ----------------------------------------------------------------------------
 
 namespace this_thread {
-  inline thread_local NodePool nodepool;
+  thread_local NodePool nodepool;
 }
 */
 
 // ----------------------------------------------------------------------------
-
-// Move constructor
-inline Graph::Graph(Graph&& other) : 
-  _nodes {std::move(other._nodes)} {
-}
-
-// Move assignment
-inline Graph& Graph::operator = (Graph&& other) {
-  _nodes = std::move(other._nodes);
-  return *this;
-}
-
-// Procedure: clear
-// clear and recycle the nodes
-inline void Graph::clear() {
-  _nodes.clear();
-}
-
-// Function: size
-// query the size
-inline size_t Graph::size() const {
-  return _nodes.size();
-}
-
-// Function: empty
-// query the emptiness
-inline bool Graph::empty() const {
-  return _nodes.empty();
-}
-    
-// Function: nodes
-// return a mutable reference to the node data structure
-//inline std::vector<std::unique_ptr<Node>>& Graph::nodes() {
-inline std::vector<std::unique_ptr<Node>>& Graph::nodes() {
-  return _nodes;
-}
-
-// Function: nodes
-// returns a constant reference to the node data structure
-//inline const std::vector<std::unique_ptr<Node>>& Graph::nodes() const {
-inline const std::vector<std::unique_ptr<Node>>& Graph::nodes() const {
-  return _nodes;
-}
 
 // Function: emplace_back
 // create a node from a give argument; constructor is called if necessary
@@ -347,12 +219,6 @@ Node& Graph::emplace_back(C&& c) {
   return *(_nodes.back());
 }
 
-// Function: emplace_back
-// create a node from a give argument; constructor is called if necessary
-inline Node& Graph::emplace_back() {
-  _nodes.push_back(std::make_unique<Node>());
-  return *(_nodes.back());
-}
 
 
 }  // end of namespace tf. ---------------------------------------------------

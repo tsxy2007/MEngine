@@ -19,7 +19,7 @@ void Shader::BindRootSignature(ID3D12GraphicsCommandList* commandList)
 void Shader::GetPassPSODesc(UINT pass, D3D12_GRAPHICS_PIPELINE_STATE_DESC* targetPSO)
 {
 	Pass& p = allPasses[pass];
-	targetPSO->VS = 
+	targetPSO->VS =
 	{
 		reinterpret_cast<BYTE*>(p.vsShader->GetBufferPointer()),
 		p.vsShader->GetBufferSize()
@@ -46,9 +46,9 @@ Shader::Shader(
 	for (int i = 0; i < passPaths.size(); ++i)
 	{
 		Pass& p = passPaths[i];
-		if(p.vsShader == nullptr)
+		if (p.vsShader == nullptr)
 			p.vsShader = d3dUtil::CompileShader(p.filePath, nullptr, p.vertex, "vs_5_1");
-		if(p.psShader == nullptr)
+		if (p.psShader == nullptr)
 			p.psShader = d3dUtil::CompileShader(p.filePath, nullptr, p.fragment, "ps_5_1");
 		allPasses.push_back(std::move(p));
 	}
@@ -59,7 +59,7 @@ Shader::Shader(
 		ShaderVariable& variable = allShaderVariables[i];
 		mVariablesDict[ShaderID::PropertyToID(variable.name)] = i;
 		mVariablesVector.push_back(variable);
-		
+
 	}
 
 	vector<CD3DX12_ROOT_PARAMETER> allParameter;
@@ -67,7 +67,7 @@ Shader::Shader(
 	allParameter.reserve(VariableLength());
 	std::vector< CD3DX12_DESCRIPTOR_RANGE> allTexTable;
 	IterateVariables([&](ShaderVariable& var) -> void {
-		if(var.type == ShaderVariable::Type::DescriptorHeap)
+		if (var.type == ShaderVariable::Type::DescriptorHeap)
 		{
 			CD3DX12_DESCRIPTOR_RANGE texTable;
 			texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, var.tableSize, var.registerPos, var.space);
@@ -114,6 +114,13 @@ Shader::Shader(
 		serializedRootSig->GetBufferPointer(),
 		serializedRootSig->GetBufferSize(),
 		IID_PPV_ARGS(mRootSignature.GetAddressOf())));
+}
+
+int Shader::GetPropertyRootSigPos(UINT id)
+{
+	auto&& ite = mVariablesDict.find(id);
+	if (ite == mVariablesDict.end()) return -1;
+	return (int)ite->second;
 }
 
 void Shader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset)

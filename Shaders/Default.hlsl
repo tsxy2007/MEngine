@@ -89,7 +89,7 @@ float4 PS(VertexOut pin) : SV_Target
 {
    // float2 bindlessChooser = floor(saturate(pin.TexC) * 3);
  //   uint sampleCount = (uint)(bindlessChooser.x * 3 + bindlessChooser.y);
-    float4 diffuseAlbedo = gDiffuseMap[0].Sample(gsamLinear, pin.TexC.xy);
+    float4 diffuseAlbedo = gDiffuseMap[0].SampleLevel(gsamLinear, pin.TexC.xy, 1);
     return diffuseAlbedo;
 }
 
