@@ -1,0 +1,28 @@
+cbuffer CBuffer : register(b0)
+{
+    uint _Count;
+};
+struct MultiDrawCommand
+{
+    uint value[18]; //same size as CPU
+};
+RWStructuredBuffer<MultiDrawCommand> _InputBuffer : register(u0);
+RWStructuredBuffer<MultiDrawCommand> _OutputBuffer : register(u1);
+RWStructuredBuffer<uint> _CountBuffer : register(u2);
+
+[numthreads(64, 1, 1)]
+void CSMain(uint id : SV_DISPATCHTHREADID)
+{
+    if(id >= _Count) return;
+    uint count;
+    //TODO
+    //Frustum Cull here
+    InterlockedAdd(_CountBuffer[0], 1, count);
+    _OutputBuffer[count] = _InputBuffer[id];
+}
+
+[numthreads(1,1,1)]
+void Clear(uint id : SV_DISPATCHTHREADID)
+{
+    _CountBuffer[id] = 0;
+}

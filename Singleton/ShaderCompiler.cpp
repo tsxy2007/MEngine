@@ -1,13 +1,26 @@
 #include "ShaderCompiler.h"
+#include "../RenderComponent/Shader.h"
+#include "../RenderComponent/ComputeShader.h"
 std::unordered_map<std::string, Shader*> ShaderCompiler::mShaders;
+std::unordered_map<std::string, ComputeShader*> ShaderCompiler::mComputeShaders;
 void ShaderCompiler::AddShader(std::string str, Shader* shad)
 {
 	mShaders[str] = shad;
 }
 
+void ShaderCompiler::AddComputeShader(std::string str, ComputeShader* shad)
+{
+	mComputeShaders[str] = shad;
+}
+
 Shader* ShaderCompiler::GetShader(std::string name)
 {
 	return mShaders[name];
+}
+
+ComputeShader* ShaderCompiler::GetComputeShader(std::string name)
+{
+	return mComputeShaders[name];
 }
 
 void GetOpaqueStandardShader(ID3D12Device* device)
@@ -117,10 +130,38 @@ void GetSkyboxShader(ID3D12Device* device)
 	ShaderCompiler::AddShader("Skybox", skyboxShader);
 }
 
+void GetCullingShader(ID3D12Device* device)
+{
+	std::vector<std::string> kernelNames(2);
+	kernelNames[0] = "CSMain";
+	kernelNames[1] = "Clear";
+	std::vector<ComputeShaderVariable> vars(4);
+	vars[0].name = "CBuffer";
+	vars[0].registerPos = 0;
+	vars[0].space = 0;
+	vars[0].type = ComputeShaderVariable::ConstantBuffer;
+	vars[1].name = "_InputBuffer";
+	vars[1].registerPos = 0;
+	vars[1].space = 0;
+	vars[1].type = ComputeShaderVariable::RWStructuredBuffer;
+	vars[2].name = "_OutputBuffer";
+	vars[2].registerPos = 1;
+	vars[2].space = 0;
+	vars[2].type = ComputeShaderVariable::RWStructuredBuffer;
+	vars[3].name = "_CountBuffer";
+	vars[3].registerPos = 2;
+	vars[3].space = 0;
+	vars[3].type = ComputeShaderVariable::RWStructuredBuffer;
+	ComputeShader* cs = new ComputeShader(L"Shaders\\Cull.compute", kernelNames, vars, device);
+	ShaderCompiler::AddComputeShader("Cull", cs);
+}
+
 void ShaderCompiler::Init(ID3D12Device* device)
 {
 	mShaders.reserve(50);
+	mComputeShaders.reserve(50);
 	GetOpaqueStandardShader(device);
 	GetSkyboxShader(device);
+	GetCullingShader(device);
 }
 

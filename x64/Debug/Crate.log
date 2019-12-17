@@ -1,7 +1,7 @@
-﻿  CrateApp.cpp
-c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+﻿  IndirectDrawer.cpp
 c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\crateapp.cpp(232): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-c:\users\user\source\repos\crate\crateapp.cpp(519): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\crateapp.cpp(572): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+c:\users\user\source\repos\crate\rendercomponent\indirectdrawer.cpp(45): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Debug\Crate.exe

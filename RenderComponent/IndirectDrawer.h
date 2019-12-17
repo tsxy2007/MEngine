@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "../Singleton/FrameResource.h"
 #include "../Singleton/PSOContainer.h"
+class DescriptorHeap;
 struct MultiDrawCommand
 {
 	D3D12_GPU_VIRTUAL_ADDRESS objectCBufferAddress; // Object Constant Buffer Address
@@ -20,6 +21,10 @@ struct MeshCommand
 	UINT subMeshIndex;
 	UINT materialIndex;
 };
+struct CullShaderData
+{
+	UINT _Count;
+};
 class IndirectDrawer : public MObject
 {
 private:
@@ -29,22 +34,43 @@ private:
 	UploadBuffer materialBuffers;
 	UploadBuffer objectBuffers;
 	UploadBuffer indirectDataBuffer;
+	UploadBuffer csConstBuffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indirectDrawBuffer;
 public:
+	struct HeapSet
+	{
+		UINT shaderID;
+		UINT heapOffset;
+	};
 	IndirectDrawer(
 		Shader* targetShader,
 		MeshCommand* commands,
-		size_t objectBufferStride,
 		UINT commandCount,
+		size_t objectBufferStride,
 		size_t materialBufferStride,
 		UINT materialCount,
-		ID3D12Device* device
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList
 	);
+	Shader* GetShader() const { return mShader; }
 	void Draw(
 		int targetPass,
 		ID3D12GraphicsCommandList* commandList,
 		ID3D12Device* device,
 		ConstBufferElement* cameraBuffer,
 		FrameResource* currentResource,
-		PSOContainer* container
+		PSOContainer* container,
+		DescriptorHeap* srvHeap,
+		HeapSet* heapSets,
+		UINT heapSetCount
 	);
+	void UploadObjectBuffer(
+		const void* dataPtr,
+		UINT pos
+	);
+	void UploadMaterialBuffer(
+		const void* dataPtr,
+		UINT pos
+	);
+	virtual ~IndirectDrawer();
 };

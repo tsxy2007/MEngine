@@ -18,6 +18,7 @@
 #include "Singleton/ShaderCompiler.h"
 #include "RenderComponent/Skybox.h"
 #include "RenderComponent/ComputeShader.h"
+#include "RenderComponent/IndirectDrawer.h"
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -97,6 +98,7 @@ public:
 	ObjectPtr<RenderTexture2D> mainRenderTexture;
 	ObjectPtr<DescriptorHeap> bindlessTextureHeap;
 	ObjectPtr<DescriptorHeap> uavTextureHeap;
+	ObjectPtr<IndirectDrawer> indirectDrawer;
 	std::unordered_map<std::string, std::unique_ptr<FMaterial>> mMaterials;
 	std::vector<ObjectPtr<Texture>> mTextures;
 	ObjectPtr<Mesh> boxMesh;
@@ -105,12 +107,10 @@ public:
 	ObjectPtr<Material> opaqueMaterial;
 	ObjectPtr<MeshRenderer> mainRenderer;
 	ObjectPtr<MeshRenderer> mainRenderer1;
-	ComPtr<ID3D12CommandSignature> mCommandSignature;
 	ObjectPtr<Skybox> skybox;
 	PassConstants mMainPassCB;
 	ObjectPtr<Camera> mainCamera;
 	ObjectPtr <UploadBuffer> materialPropertyBuffer;
-	ObjectPtr <UploadBuffer> indirectDrawBuffer;
 	float mTheta = 1.3f*XM_PI;
 	float mPhi = 0.4f*XM_PI;
 	float mRadius = 2.5f;
@@ -233,22 +233,16 @@ void CrateApp::Update(const GameTimer& gt)
 	mainRenderer->UpdateObjectBuffer(FrameResource::mCurrFrameResource);
 	mainRenderer1->UpdateObjectBuffer(FrameResource::mCurrFrameResource);
 	mainCamera->UploadCameraBuffer(FrameResource::mCurrFrameResource, mMainPassCB);
-	IndirectDrawCommand commands[2];
-	mainRenderer->GetIndirectArgument(
-		0,
-		0,
-		md3dDevice.Get(),
-		FrameResource::mCurrFrameResource,
-		commands
-	);
-	mainRenderer1->GetIndirectArgument(
-		0,
-		0,
-		md3dDevice.Get(),
-		FrameResource::mCurrFrameResource,
-		commands + 1
-	);
-	indirectDrawBuffer->CopyDatas(0, 2, commands);
+	MaterialConstants matConstants;
+	matConstants.DiffuseAlbedo = {1,1,1,1};
+	matConstants.FresnelR0 = {1,1,1};
+	matConstants.Roughness = 1;
+	ObjectConstants objCsts[2];
+	XMStoreFloat4x4(&objCsts[0].objectToWorld, mainRenderer->GetLocalToWorldMatrix());
+	XMStoreFloat4x4(&objCsts[1].objectToWorld, mainRenderer1->GetLocalToWorldMatrix());
+	indirectDrawer->UploadMaterialBuffer(&matConstants, 0);
+	indirectDrawer->UploadObjectBuffer(objCsts, 0);
+	indirectDrawer->UploadObjectBuffer(objCsts + 1, 1);
 }
 class DrawRenderTextureCommand
 {
@@ -289,19 +283,20 @@ public:
 			FrameResource::mCurrFrameResource,
 			separateContainer
 		);*/
-		PSODescriptor desc;
-		desc.meshLayoutIndex = ths->boxMesh->GetLayoutIndex();
-		desc.shaderPass = 1;
-		Material* mat = ths->opaqueMaterial.operator->();
-		desc.shaderPtr = mat->GetShader();
-		ID3D12PipelineState* pso = separateContainer->GetState(desc, ths->md3dDevice.Get());
-		mSeparateList->SetPipelineState(pso);
-		mat->BindShaderResource(mSeparateList);
-		mSeparateList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		ConstBufferElement* camBuffer = &FrameResource::mCurrFrameResource->cameraCBs[ths->mainCamera->GetInstanceID()];
-		mat->GetShader()->SetResource(mSeparateList, ShaderID::GetPerCameraBufferID(), camBuffer->buffer.operator->(), camBuffer->element);
-		mSeparateList->ExecuteIndirect(ths->mCommandSignature.Get(), 2, ths->indirectDrawBuffer->Resource(), 0, nullptr, 0);
-
+		IndirectDrawer::HeapSet hpSt;
+		hpSt.heapOffset = 0;
+		hpSt.shaderID = ShaderID::PropertyToID("gDiffuseMap");
+		ths->indirectDrawer->Draw(
+			1,
+			mSeparateList,
+			ths->md3dDevice.Get(),
+			cameraBuffer,
+			FrameResource::mCurrFrameResource,
+			separateContainer,
+			ths->bindlessTextureHeap.operator->(),
+			&hpSt,
+			1
+		);
 		ComputeShader* cs = (ComputeShader*)&ths->testComputeShader;
 		ths->mainRenderTexture->SetUav(true, mSeparateList);
 		cs->BindRootSignature(mSeparateList, ths->uavTextureHeap.operator->());
@@ -312,6 +307,7 @@ public:
 };
 void CrateApp::Draw(const GameTimer& gt)
 {
+	size_t sizefffff = sizeof(MultiDrawCommand);
 	mainThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(md3dDevice.Get());
 	separateThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(md3dDevice.Get());
 	mainThreadCommand->ResetCommand();
@@ -361,18 +357,21 @@ void CrateApp::Draw(const GameTimer& gt)
 		FrameResource::mCurrFrameResource,
 		mainPSO
 	);*/
-	PSODescriptor desc;
-	desc.meshLayoutIndex = boxMesh->GetLayoutIndex();
-	desc.shaderPass = 0;
-	Material* mat = opaqueMaterial.operator->();
-	desc.shaderPtr = mat->GetShader();
-	ID3D12PipelineState* pso = mainPSO->GetState(desc, md3dDevice.Get());
-	mCommandList->SetPipelineState(pso);
-	mat->BindShaderResource(mCommandList);
-	mCommandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	mat->GetShader()->SetResource(mCommandList, ShaderID::GetPerCameraBufferID(), camBuffer->buffer.operator->(), camBuffer->element);
-	mCommandList->ExecuteIndirect(mCommandSignature.Get(), 2, indirectDrawBuffer->Resource(), 0, nullptr, 0);
-
+	IndirectDrawer::HeapSet hpSt;
+	hpSt.heapOffset = 0;
+	hpSt.shaderID = ShaderID::PropertyToID("gDiffuseMap");
+	indirectDrawer->Draw(
+		0,
+		mCommandList,
+		md3dDevice.Get(),
+		camBuffer,
+		FrameResource::mCurrFrameResource,
+		mainPSO,
+		bindlessTextureHeap.operator->(),
+		&hpSt,
+		1
+	);
+	
 	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	ID3D12CommandList* value[2];
@@ -617,20 +616,22 @@ void CrateApp::BuildPSOs()
 	vars[0].tableSize = 2;
 	vars[0].name = "_MainTex";
 	new(&testComputeShader)ComputeShader(L"Shaders\\ComputeShaderTest.hlsl", kernelNames, vars, md3dDevice.Get());
-	D3D12_COMMAND_SIGNATURE_DESC desc = {};
-	D3D12_INDIRECT_ARGUMENT_DESC indDesc[4];
-	ZeroMemory(indDesc, 4 * sizeof(D3D12_INDIRECT_ARGUMENT_DESC));
-	indDesc[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW;
-	indDesc[0].ConstantBufferView.RootParameterIndex = opaqueMaterial->GetShader()->GetPropertyRootSigPos(ShaderID::GetPerObjectBufferID());
-	indDesc[1].Type = D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW;
-	indDesc[1].VertexBuffer.Slot = 0;
-	indDesc[2].Type = D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW;
-	indDesc[3].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
-	desc.ByteStride = sizeof(IndirectDrawCommand);
-	desc.NodeMask = 0;
-	desc.NumArgumentDescs = 4;
-	desc.pArgumentDescs = indDesc;
-	md3dDevice->CreateCommandSignature(&desc, opaqueMaterial->GetShader()->GetSignature(), IID_PPV_ARGS(&mCommandSignature));
-	indirectDrawBuffer = new UploadBuffer();
-	indirectDrawBuffer->Create(md3dDevice.Get(), 2, false, sizeof(IndirectDrawCommand), false);
+	std::array<MeshCommand, 2> comds;
+	comds[0].materialIndex = 0;
+	comds[0].mesh = boxMesh.operator->();
+	comds[0].subMeshIndex = 0;
+	comds[1].materialIndex = 0;
+	comds[1].mesh = sphereMesh.operator->();
+	comds[1].subMeshIndex = 0;
+
+	indirectDrawer = new IndirectDrawer(
+		ShaderCompiler::GetShader("OpaqueStandard"),
+		comds.data(),
+		2,
+		sizeof(ObjectConstants),
+		sizeof(MaterialConstants),
+		1,
+		md3dDevice.Get(),
+		mCommandList.Get()
+	);
 }

@@ -6,7 +6,7 @@ struct ComputeShaderVariable
 {
 	enum Type
 	{
-		ConstantBuffer, StructuredBuffer, SRVDescriptorHeap, UAVDescriptorHeap
+		ConstantBuffer, StructuredBuffer, RWStructuredBuffer, SRVDescriptorHeap, UAVDescriptorHeap
 	};
 	std::string name;
 	Type type;
@@ -15,6 +15,7 @@ struct ComputeShaderVariable
 	UINT space;
 
 };
+
 class DescriptorHeap;
 class ComputeShader
 {
@@ -35,6 +36,7 @@ public:
 	size_t VariableLength() const { return mVariablesVector.size(); }
 	void BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* heap);
 	void SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset);
+	void SetStructuredBufferByAddress(ID3D12GraphicsCommandList* commandList, UINT id, D3D12_GPU_VIRTUAL_ADDRESS address);
 	void Dispatch(ID3D12GraphicsCommandList* cList, UINT kernel, UINT x, UINT y, UINT z);
 	template<typename Func>
 	void IterateVariables(Func&& f)

@@ -58,6 +58,9 @@ ComputeShader::ComputeShader(
 		case ComputeShaderVariable::Type::StructuredBuffer:
 			slotRootParameter.InitAsShaderResourceView(var.registerPos, var.space);
 			break;
+		case ComputeShaderVariable::Type::RWStructuredBuffer:
+			slotRootParameter.InitAsUnorderedAccessView(var.registerPos, var.space);
+			break;
 		default:
 			return;
 		}
@@ -100,7 +103,8 @@ ComputeShader::ComputeShader(
 void ComputeShader::BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* heap)
 {
 	commandList->SetComputeRootSignature(mRootSignature.Get());
-	commandList->SetDescriptorHeaps(1, heap->Get().GetAddressOf());
+	if(heap != nullptr)
+		commandList->SetDescriptorHeaps(1, heap->Get().GetAddressOf());
 }
 
 void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset)
@@ -132,12 +136,39 @@ void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id,
 			uploadBufferPtr->Resource()->GetGPUVirtualAddress() + indexOffset * uploadBufferPtr->GetAlignedStride()
 		);
 		break;
-	case ComputeShaderVariable::Type::StructuredBuffer:
+	case ComputeShaderVariable::Type::RWStructuredBuffer:
 		uploadBufferPtr = ((UploadBuffer*)targetObj);
 		commandList->SetComputeRootUnorderedAccessView(
 			rootSigPos,
 			uploadBufferPtr->Resource()->GetGPUVirtualAddress() + indexOffset * uploadBufferPtr->GetStride());
 		break;
+	case ComputeShaderVariable::Type::StructuredBuffer:
+		uploadBufferPtr = ((UploadBuffer*)targetObj);
+		commandList->SetComputeRootShaderResourceView(
+			rootSigPos,
+			uploadBufferPtr->Resource()->GetGPUVirtualAddress() + indexOffset * uploadBufferPtr->GetStride());
+		break;
+	}
+}
+
+void ComputeShader::SetStructuredBufferByAddress(ID3D12GraphicsCommandList* commandList, UINT id, D3D12_GPU_VIRTUAL_ADDRESS address)
+{
+	auto&& ite = mVariablesDict.find(id);
+	if (ite == mVariablesDict.end()) return;
+	UINT rootSigPos = ite->second;
+	ComputeShaderVariable& var = mVariablesVector[rootSigPos];
+	if (var.type == ComputeShaderVariable::Type::RWStructuredBuffer)
+	{
+		commandList->SetComputeRootUnorderedAccessView(
+			rootSigPos,
+			address);
+	}
+	else if (var.type == ComputeShaderVariable::Type::StructuredBuffer)
+	{
+		commandList->SetComputeRootShaderResourceView(
+			rootSigPos,
+			address
+		);
 	}
 }
 
