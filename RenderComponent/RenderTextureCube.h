@@ -24,22 +24,23 @@ private:
 	DXGI_FORMAT mDepthFormat;
 	Microsoft::WRL::ComPtr<ID3D12Resource> mColorResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> mDepthResource;
-	std::unique_ptr<DescriptorHeap> rtvHeap;
-	std::unique_ptr<DescriptorHeap> dsvHeap;
+	DescriptorHeap rtvHeap;
+	DescriptorHeap dsvHeap;
 public:
-	~RenderTextureCube();
+	virtual ~RenderTextureCube();
 	RenderTextureCube(
 		ID3D12Device* device,
 		UINT width,
 		UINT height,
 		DXGI_FORMAT format,
-		bool useDepth
+		bool useDepth,
+		int mipCount
 	);
 	void SetViewport(ID3D12GraphicsCommandList* commandList);
 	ID3D12Resource* GetDepthResource() const;
 	ID3D12Resource* GetColorResource() const;
-	D3D12_CPU_DESCRIPTOR_HANDLE GetColorDescriptor(CubeMapFace face) const;
-	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthDescriptor(CubeMapFace face) const;
+	D3D12_CPU_DESCRIPTOR_HANDLE GetColorDescriptor(CubeMapFace face);
+	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthDescriptor(CubeMapFace face);
 	void GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
 	void GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
 	void ClearRenderTarget(ID3D12GraphicsCommandList* commandList, CubeMapFace face, DirectX::XMVECTORF32 color, bool clearColor, bool clearDepth);

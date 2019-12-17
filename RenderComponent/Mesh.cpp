@@ -1,5 +1,5 @@
 #include "Mesh.h"
-
+#include "../Singleton/FrameResource.h"
 //CPP
 D3D12_VERTEX_BUFFER_VIEW Mesh::VertexBufferView() const
 {
@@ -180,4 +180,5 @@ Mesh::Mesh(
 		memcpy(indexBufferStart + (*indexOffsets)[i], (*subMeshes)[i].indexArrayPtr, (*subMeshes)[i].indexCount * (((*subMeshes)[i].indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4));
 	}
 	dataBuffer = d3dUtil::CreateDefaultBuffer(device, commandList, dataPtr, indexSize + VertexBufferByteSize, uploadBuffer);
+	FrameResource::mCurrFrameResource->ReleaseResourceAfterFlush(uploadBuffer);
 }

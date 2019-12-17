@@ -3,8 +3,6 @@ RenderTextureCube::~RenderTextureCube()
 {
 	mColorResource = nullptr;
 	mDepthResource = nullptr;
-	rtvHeap = nullptr;
-	dsvHeap = nullptr;
 }
 ID3D12Resource* RenderTextureCube::GetDepthResource() const { return mDepthResource.Get(); }
 ID3D12Resource* RenderTextureCube::GetColorResource() const { return mColorResource.Get(); }
@@ -13,9 +11,9 @@ DXGI_FORMAT RenderTextureCube::GetDepthFormat() const { return mDepthFormat; }
 void RenderTextureCube::ClearRenderTarget(ID3D12GraphicsCommandList* commandList, CubeMapFace face, DirectX::XMVECTORF32 color, bool clearColor, bool clearDepth)
 {
 	if (clearColor)
-		commandList->ClearRenderTargetView(rtvHeap->hCPU((int)face), color, 0, nullptr);
-	if (clearDepth && dsvHeap != nullptr)
-		commandList->ClearDepthStencilView(dsvHeap->hCPU((int)face), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 0, 0, 0, nullptr);
+		commandList->ClearRenderTargetView(rtvHeap.hCPU((int)face), color, 0, nullptr);
+	if (clearDepth && mDepthResource != nullptr)
+		commandList->ClearDepthStencilView(dsvHeap.hCPU((int)face), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 0, 0, 0, nullptr);
 }
 void RenderTextureCube::GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc)
 {
@@ -42,13 +40,13 @@ void RenderTextureCube::GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDes
 	srvDesc.TextureCube.MipLevels = mColorResource->GetDesc().MipLevels;
 	srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
 }
-D3D12_CPU_DESCRIPTOR_HANDLE RenderTextureCube::GetColorDescriptor(CubeMapFace face) const
+D3D12_CPU_DESCRIPTOR_HANDLE RenderTextureCube::GetColorDescriptor(CubeMapFace face)
 {
-	return rtvHeap->hCPU((int)face);
+	return rtvHeap.hCPU((int)face);
 }
-D3D12_CPU_DESCRIPTOR_HANDLE RenderTextureCube::GetDepthDescriptor(CubeMapFace face) const
+D3D12_CPU_DESCRIPTOR_HANDLE RenderTextureCube::GetDepthDescriptor(CubeMapFace face)
 {
-	return dsvHeap->hCPU((int)face);
+	return dsvHeap.hCPU((int)face);
 }
 
 RenderTextureCube::RenderTextureCube(
@@ -56,15 +54,14 @@ RenderTextureCube::RenderTextureCube(
 	UINT width,
 	UINT height,
 	DXGI_FORMAT format,
-	bool useDepth
+	bool useDepth,
+	int mipCount
 ) : MObject(),
 	mWidth(width),
 	mHeight(height),
 	mFormat(format),
 	mViewport({ 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f }),
 	mScissorRect({ 0, 0, (int)width, (int)height }),
-	rtvHeap(std::make_unique<DescriptorHeap>()),
-	dsvHeap(nullptr),
 	mDepthFormat(DXGI_FORMAT_D24_UNORM_S8_UINT)
 {
 	D3D12_RESOURCE_DESC texDesc;
@@ -74,7 +71,7 @@ RenderTextureCube::RenderTextureCube(
 	texDesc.Width = mWidth;
 	texDesc.Height = mHeight;
 	texDesc.DepthOrArraySize = 6;
-	texDesc.MipLevels = 1;
+	texDesc.MipLevels = mipCount;
 	texDesc.Format = mFormat;
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
@@ -89,7 +86,7 @@ RenderTextureCube::RenderTextureCube(
 		nullptr,
 		IID_PPV_ARGS(mColorResource.GetAddressOf())));
 
-	rtvHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 6, false);
+	rtvHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 6, false);
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
 	rtvDesc.Format = mFormat;
@@ -103,12 +100,11 @@ RenderTextureCube::RenderTextureCube(
 		// Render target to ith element.
 		rtvDesc.Texture2DArray.FirstArraySlice = i;
 		// Create RTV to ith cubemap face.
-		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, rtvHeap->hCPU(i));
+		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, rtvHeap.hCPU(i));
 	}
 	if (useDepth)
 	{
-		dsvHeap = std::make_unique<DescriptorHeap>();
-		dsvHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 6, false);
+		dsvHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 6, false);
 		D3D12_RESOURCE_DESC depthStencilDesc;
 		depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		depthStencilDesc.Alignment = 0;
@@ -147,7 +143,7 @@ RenderTextureCube::RenderTextureCube(
 		for (int i = 0; i < 6; ++i)
 		{
 			dsvDesc.Texture2DArray.FirstArraySlice = i;
-			device->CreateDepthStencilView(mDepthResource.Get(), &dsvDesc, dsvHeap->hCPU(i));
+			device->CreateDepthStencilView(mDepthResource.Get(), &dsvDesc, dsvHeap.hCPU(i));
 		}
 	}
 }

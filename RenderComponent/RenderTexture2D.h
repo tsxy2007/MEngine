@@ -14,8 +14,8 @@ private:
 	DXGI_FORMAT mDepthFormat;
 	Microsoft::WRL::ComPtr<ID3D12Resource> mResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> mDepthResource = nullptr;
-	std::unique_ptr<DescriptorHeap> rtvHeap;
-	std::unique_ptr<DescriptorHeap> dsvHeap;
+	DescriptorHeap rtvHeap;
+	DescriptorHeap dsvHeap;
 	bool isUAV;
 public:
 	~RenderTexture2D();
@@ -32,8 +32,8 @@ public:
 	void SetViewport(ID3D12GraphicsCommandList* commandList);
 	ID3D12Resource* GetDepthResource() const;
 	ID3D12Resource* GetColorResource() const;
-	DescriptorHeap* GetColorHeap() const;
-	DescriptorHeap* GetDepthHeap() const;
+	DescriptorHeap* GetColorHeap();
+	DescriptorHeap* GetDepthHeap();
 	void GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
 	void GetUAVViewDesc(D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, UINT targetMipLevel);
 	void GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);

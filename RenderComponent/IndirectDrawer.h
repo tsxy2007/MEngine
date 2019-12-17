@@ -72,5 +72,9 @@ public:
 		const void* dataPtr,
 		UINT pos
 	);
+	UploadBuffer* GetIndirectDataBuffer()
+	{
+		return &indirectDataBuffer;
+	}
 	virtual ~IndirectDrawer();
 };

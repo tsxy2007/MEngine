@@ -92,7 +92,7 @@ public:
 	void BuildMaterials();
 	//void BuildRenderItems();
 	//void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems);
-	
+
 	int mCurrFrameResourceIndex = 0;
 	//ComPtr<ID3D12DescriptorHeap> mSrvDescriptorHeap = nullptr;
 	ObjectPtr<RenderTexture2D> mainRenderTexture;
@@ -103,7 +103,7 @@ public:
 	std::vector<ObjectPtr<Texture>> mTextures;
 	ObjectPtr<Mesh> boxMesh;
 	ObjectPtr<Mesh> sphereMesh;
-//	Shader* opaqueShader;
+	//	Shader* opaqueShader;
 	ObjectPtr<Material> opaqueMaterial;
 	ObjectPtr<MeshRenderer> mainRenderer;
 	ObjectPtr<MeshRenderer> mainRenderer1;
@@ -176,7 +176,7 @@ bool CrateApp::Initialize()
 	BuildMaterials();
 	BuildFrameResources();
 	BuildPSOs();
-	mainCamera =new Camera(md3dDevice.Get());
+	mainCamera = new Camera(md3dDevice.Get());
 	std::vector<ObjectPtr<Material>> mats(1);
 	mats[0] = opaqueMaterial;
 	XMFLOAT3 pos = { 0,-0.5,0 };
@@ -189,7 +189,7 @@ bool CrateApp::Initialize()
 		localScale,
 		boxMesh,
 		mats
-		);
+	);
 	pos.y = 0.5;
 	mainRenderer1 = new MeshRenderer(
 		md3dDevice.Get(),
@@ -206,7 +206,6 @@ bool CrateApp::Initialize()
 	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 	// Wait until initialization is complete.
 	FlushCommandQueue();
-
 	return true;
 }
 
@@ -234,8 +233,8 @@ void CrateApp::Update(const GameTimer& gt)
 	mainRenderer1->UpdateObjectBuffer(FrameResource::mCurrFrameResource);
 	mainCamera->UploadCameraBuffer(FrameResource::mCurrFrameResource, mMainPassCB);
 	MaterialConstants matConstants;
-	matConstants.DiffuseAlbedo = {1,1,1,1};
-	matConstants.FresnelR0 = {1,1,1};
+	matConstants.DiffuseAlbedo = { 1,1,1,1 };
+	matConstants.FresnelR0 = { 1,1,1 };
 	matConstants.Roughness = 1;
 	ObjectConstants objCsts[2];
 	XMStoreFloat4x4(&objCsts[0].objectToWorld, mainRenderer->GetLocalToWorldMatrix());
@@ -371,7 +370,7 @@ void CrateApp::Draw(const GameTimer& gt)
 		&hpSt,
 		1
 	);
-	
+
 	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	ID3D12CommandList* value[2];
@@ -382,7 +381,7 @@ void CrateApp::Draw(const GameTimer& gt)
 	mCommandQueue->ExecuteCommandLists(_countof(value), value);
 	FrameResource::mCurrFrameResource->ReleaseThreadCommand(mainThreadCommand);
 	FrameResource::mCurrFrameResource->ReleaseThreadCommand(separateThreadCommand);
-	
+
 	// Swap the back and front buffers
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
@@ -449,7 +448,7 @@ void CrateApp::UpdateCamera(const GameTimer& gt)
 	XMFLOAT3 target = { 0,0,0 };
 	XMFLOAT3 up = { 0,1,0 };
 	mainCamera->LookAt(mEyePos, target, up);
-	
+
 }
 
 void CrateApp::AnimateMaterials(const GameTimer& gt)
@@ -568,7 +567,7 @@ void CrateApp::BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Me
 		md3dDevice.Get(),
 		mCommandList.Get(),
 		subMeshs
-		);
+	);
 
 }
 void CrateApp::BuildFrameResources()
@@ -623,7 +622,6 @@ void CrateApp::BuildPSOs()
 	comds[1].materialIndex = 0;
 	comds[1].mesh = sphereMesh.operator->();
 	comds[1].subMeshIndex = 0;
-
 	indirectDrawer = new IndirectDrawer(
 		ShaderCompiler::GetShader("OpaqueStandard"),
 		comds.data(),

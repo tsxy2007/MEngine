@@ -82,7 +82,7 @@ allMeshCommands(commandCount)
 	indirectDataBuffer.Create(device, commandCount, false, sizeof(MultiDrawCommand), true);
 	materialBuffers.Create(device, materialCount, true, materialBufferStride, false);
 	objectBuffers.Create(device, commandCount, true, objectBufferStride, false);
-	MultiDrawCommand* tempCommand = new MultiDrawCommand[commandCount];//Use Heap prevent stack overflow
+	std::vector<MultiDrawCommand> tempCommand(commandCount);
 	for (UINT i = 0; i < commandCount; ++i)
 	{
 		MultiDrawCommand& t = tempCommand[i];
@@ -98,8 +98,7 @@ allMeshCommands(commandCount)
 		t.drawArgs.StartIndexLocation = 0;
 		t.drawArgs.StartInstanceLocation = 0;
 	}
-	indirectDataBuffer.CopyDatas(0, commandCount, tempCommand);
-	delete[] tempCommand;
+	indirectDataBuffer.CopyDatas(0, commandCount, tempCommand.data());
 	ThrowIfFailed(device->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 		D3D12_HEAP_FLAG_NONE,
@@ -107,6 +106,7 @@ allMeshCommands(commandCount)
 		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
 		nullptr,
 		IID_PPV_ARGS(&indirectDrawBuffer)));
+	indirectDataBuffer.MakeNoLongerWritable();
 }
 
 IndirectDrawer::~IndirectDrawer()

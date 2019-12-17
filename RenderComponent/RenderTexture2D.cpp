@@ -8,10 +8,10 @@ void RenderTexture2D::ClearRenderTarget(ID3D12GraphicsCommandList* commandList, 
 		SetUav(false, commandList);
 		float colors[4];
 		memset(colors, 0, sizeof(float) * 4);
-		commandList->ClearRenderTargetView(rtvHeap->hCPU(0), colors, 0, nullptr);
+		commandList->ClearRenderTargetView(rtvHeap.hCPU(0), colors, 0, nullptr);
 	}
-	if (clearDepth && dsvHeap != nullptr)
-		commandList->ClearDepthStencilView(dsvHeap->hCPU(0), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 0, 0, 0, nullptr);
+	if (clearDepth && mDepthResource != nullptr)
+		commandList->ClearDepthStencilView(dsvHeap.hCPU(0), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 0, 0, 0, nullptr);
 }
 
 void RenderTexture2D::SetUav(bool value, ID3D12GraphicsCommandList* commandList)
@@ -45,14 +45,14 @@ ID3D12Resource* RenderTexture2D::GetColorResource() const
 	return mResource.Get();
 }
 
-DescriptorHeap* RenderTexture2D::GetColorHeap() const
+DescriptorHeap* RenderTexture2D::GetColorHeap()
 {
-	return rtvHeap.get();
+	return &rtvHeap;
 }
 
-DescriptorHeap* RenderTexture2D::GetDepthHeap() const
+DescriptorHeap* RenderTexture2D::GetDepthHeap()
 {
-	return dsvHeap.get();
+	return &dsvHeap;
 }
 
 void RenderTexture2D::GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc)
@@ -95,8 +95,6 @@ RenderTexture2D::RenderTexture2D(
 mWidth(width),
 mHeight(height),
 mFormat(format),
-rtvHeap(std::make_unique<DescriptorHeap>()),
-dsvHeap(nullptr),
 mDepthFormat(DXGI_FORMAT_D24_UNORM_S8_UINT),
 isUAV(false)
 {
@@ -108,7 +106,7 @@ isUAV(false)
 	mViewport.MaxDepth = 1.0f;
 	mScissorRect = { 0, 0, (LONG)width, (LONG)height };
 
-	rtvHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
+	rtvHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1, false);
 	D3D12_RESOURCE_DESC texDesc;
 	ZeroMemory(&texDesc, sizeof(D3D12_RESOURCE_DESC));
 	texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -141,11 +139,10 @@ isUAV(false)
 	rtvDesc.Format = mFormat;
 	rtvDesc.Texture2D.MipSlice = 0;
 	rtvDesc.Texture2D.PlaneSlice = 0;
-	device->CreateRenderTargetView(mResource.Get(), &rtvDesc, rtvHeap->hCPU(0));
+	device->CreateRenderTargetView(mResource.Get(), &rtvDesc, rtvHeap.hCPU(0));
 	if (useDepth)
 	{
-		dsvHeap = std::make_unique<DescriptorHeap>();
-		dsvHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
+		dsvHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 		D3D12_RESOURCE_DESC depthStencilDesc;
 		depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		depthStencilDesc.Alignment = 0;
@@ -182,16 +179,14 @@ isUAV(false)
 		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		dsvDesc.Format = mDepthFormat;
 		dsvDesc.Texture2D.MipSlice = 0;
-		device->CreateDepthStencilView(mDepthResource.Get(), &dsvDesc, dsvHeap->hCPU(0));
+		device->CreateDepthStencilView(mDepthResource.Get(), &dsvDesc, dsvHeap.hCPU(0));
 	}
 }
 
 RenderTexture2D::~RenderTexture2D()
 {
 	mResource = nullptr;
-	rtvHeap = nullptr;
 	mDepthResource = nullptr;
-	dsvHeap = nullptr;
 }
 
 void RenderTexture2D::SetViewport(ID3D12GraphicsCommandList* commandList)

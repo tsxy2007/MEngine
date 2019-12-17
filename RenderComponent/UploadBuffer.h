@@ -2,7 +2,7 @@
 
 #include "../Common/d3dUtil.h"
 #include "../RenderComponent/MObject.h"
-
+#include <mutex>
 class UploadBuffer : public MObject
 {
 public:
@@ -20,14 +20,18 @@ public:
 	size_t GetStride() const { return mStride; }
 	size_t GetAlignedStride() const { return mElementByteSize; }
 	static void UploadData(ID3D12GraphicsCommandList* commandList);
+	bool GetUAV() const { return mIsUAV; }
+	void SetUAV(bool isUAV, ID3D12GraphicsCommandList* cmdList);
+	bool isWritable() const { return mIsWritable; }
+	void MakeNoLongerWritable();
 private:
 	struct UploadCommand
 	{
 		UINT startIndex;
 		UINT count;
 	};
-	bool GetUAV() const { return mIsUAV; }
-	void SetUAV(bool isUAV, ID3D12GraphicsCommandList* cmdList);
+	std::mutex localMtx;
+	bool mIsWritable = false;
 	void UploadDataToDefaultBuffer(ID3D12GraphicsCommandList* commandList);
 	static std::vector<UploadBuffer*> needUpdateLists;
 	std::vector<UploadCommand> needUpdateElements;

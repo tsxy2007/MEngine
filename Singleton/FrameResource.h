@@ -40,7 +40,8 @@ struct FrameResource
 {
 private:
 	static Pool<ThreadCommand> threadCommandMemoryPool;
-	std::vector<std::shared_ptr<std::function<void()>>> afterFlushEvents;
+	static std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResourcesAfterFlush;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResources;
 public:
 	static std::vector<std::unique_ptr<FrameResource>> mFrameResources;
 	static FrameResource* mCurrFrameResource;
@@ -49,7 +50,7 @@ public:
     FrameResource& operator=(const FrameResource& rhs) = delete;
     ~FrameResource();
 	void UpdateBeforeFrame(ID3D12Fence* mFence);
-	void AddAfterFlushEvent(std::shared_ptr<std::function<void()>>& func);
+	static void ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources);
 	void UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* commandQueue, ID3D12Fence* mFence);
 	ThreadCommand* GetNewThreadCommand(ID3D12Device* device);
 	void ReleaseThreadCommand(ThreadCommand* targetCmd);

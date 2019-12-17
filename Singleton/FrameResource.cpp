@@ -1,29 +1,30 @@
 #include "FrameResource.h"
 std::vector<std::unique_ptr<FrameResource>> FrameResource::mFrameResources;
 Pool<ThreadCommand> FrameResource::threadCommandMemoryPool(20);
+std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> FrameResource::needClearResourcesAfterFlush;
 FrameResource* FrameResource::mCurrFrameResource = nullptr;
 FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount)
 {
 	threadCommands.reserve(20);
 	cameraCBs.reserve(50);
 	objectCBs.reserve(50);
-	afterFlushEvents.reserve(10);
+	needClearResources.reserve(10);
+	needClearResourcesAfterFlush.reserve(10);
 }
 
 void FrameResource::UpdateBeforeFrame(ID3D12Fence* mFence)
 {
-	if (Fence != 0 && mFence->GetCompletedValue() < Fence)
+	if (Fence != 0)
 	{
-		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-		ThrowIfFailed(mFence->SetEventOnCompletion(Fence, eventHandle));
-		WaitForSingleObject(eventHandle, INFINITE);
-		CloseHandle(eventHandle);
-		for (int i = 0; i < afterFlushEvents.size(); ++i)
+		if (mFence->GetCompletedValue() < Fence)
 		{
-			(*afterFlushEvents[i])();
-			afterFlushEvents[i] = nullptr;
+			HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+			ThrowIfFailed(mFence->SetEventOnCompletion(Fence, eventHandle));
+			WaitForSingleObject(eventHandle, INFINITE);
+			CloseHandle(eventHandle);
 		}
-		afterFlushEvents.clear();
+		needClearResources.clear();
+		needClearResourcesAfterFlush.clear();
 	}
 }
 void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* commandQueue, ID3D12Fence* mFence)
@@ -37,9 +38,12 @@ void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* c
 	commandQueue->Signal(mFence, currentFence);
 }
 
-void FrameResource::AddAfterFlushEvent(std::shared_ptr<std::function<void()>>& func)
+void FrameResource::ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources)
 {
-	afterFlushEvents.push_back(func);
+	if (mCurrFrameResource == nullptr)
+		needClearResourcesAfterFlush.push_back(resources);
+	else
+		mCurrFrameResource->needClearResources.push_back(resources);
 }
 
 
@@ -67,4 +71,6 @@ FrameResource::~FrameResource()
 	{
 		threadCommandMemoryPool.Delete(threadCommands[i]);
 	}*/
+	if (mCurrFrameResource == this)
+		mCurrFrameResource = nullptr;
 }
