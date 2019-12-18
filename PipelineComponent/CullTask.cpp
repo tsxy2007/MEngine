@@ -10,7 +10,7 @@ void CullTask::ScheduleCullingJob(std::vector<MeshRenderer*>* targets, DirectX::
 		for (UINT i = 0; i < this->waitingBoundingBox->size(); ++i)
 		{
 			MeshRenderer* box = (*this->waitingBoundingBox)[i];
-			XMMATRIX localToWorldMat = box->GetLocalToWorldMatrix();
+			XMMATRIX localToWorldMat = box->transform.GetLocalToWorldMatrix();
 			for (UINT j = 0; j < box->mesh->GetSubmeshSize(); ++j)
 			{
 				SubMesh& sm = box->mesh->GetSubmesh(j);

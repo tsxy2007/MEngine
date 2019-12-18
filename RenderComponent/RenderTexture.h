@@ -12,13 +12,36 @@ enum class CubeMapFace : int
 	NegativeZ = 5
 };
 
-enum class RenderTextureType
+enum class RenderTextureType : int
 {
 	Tex2D = 0,
 	Tex2DArray = 1,
 	Tex3D = 2,
 	Cubemap = 3
 };
+
+struct RenderTextureDescriptor
+{
+	UINT width;
+	UINT height;
+	UINT depthSlice;
+	RenderTextureType type;
+	DXGI_FORMAT colorFormat;
+	DXGI_FORMAT depthFormat;
+};
+
+namespace std
+{
+	template <>
+	class hash<RenderTextureDescriptor>
+	{
+		size_t operator()(const RenderTextureDescriptor& o) const
+		{
+			hash<UINT> ulongHash;
+			return ulongHash(o.width) ^ ulongHash(o.height) ^ ulongHash(o.depthSlice) ^ ulongHash((UINT)o.type) ^ ulongHash((UINT)o.colorFormat) ^ ulongHash((UINT)o.depthFormat);
+		}
+	};
+}
 
 class RenderTexture : public MObject
 {
@@ -34,8 +57,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> mDepthResource;
 	DescriptorHeap rtvHeap;
 	DescriptorHeap dsvHeap;
-	RenderTextureType mType;
-	bool isUAV;
+	RenderTextureType mType; 
 public:
 	virtual ~RenderTexture();
 	RenderTextureType GetType() const { return mType; }
@@ -49,8 +71,6 @@ public:
 		int depthCount,
 		int mipCount
 	);
-	bool IsUAV() const { return isUAV; }
-	void SetUAV(ID3D12GraphicsCommandList* commandList, bool value);
 	void SetViewport(ID3D12GraphicsCommandList* commandList);
 	ID3D12Resource* GetDepthResource() const;
 	ID3D12Resource* GetColorResource() const;

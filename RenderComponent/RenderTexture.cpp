@@ -10,7 +10,6 @@ DXGI_FORMAT RenderTexture::GetColorFormat() const { return mFormat; }
 DXGI_FORMAT RenderTexture::GetDepthFormat() const { return mDepthFormat; }
 void RenderTexture::ClearRenderTarget(ID3D12GraphicsCommandList* commandList, UINT slice, bool clearColor, bool clearDepth)
 {
-	SetUAV(commandList, false);
 	if (clearColor)
 	{
 		float colors[4] = { 0,0,0,0 };
@@ -135,19 +134,22 @@ D3D12_CPU_DESCRIPTOR_HANDLE RenderTexture::GetDepthDescriptor(UINT slice)
 {
 	return dsvHeap.hCPU(slice);
 }
-
+/*
 void RenderTexture::SetUAV(ID3D12GraphicsCommandList* commandList, bool value)
 {
-	if (value == isUAV) return;
-	isUAV = value;
-	if (value)
-		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mColorResource.Get(),
-			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
-	else
-		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mColorResource.Get(),
-			D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_RENDER_TARGET));
-}
+	CD3DX12_RESOURCE_BARRIER result;
+	ZeroMemory(&result, sizeof(result));
+	D3D12_RESOURCE_BARRIER &barrier = result;
+	result.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	result.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.UAV.pResource = mColorResource.Get();
 
+	if (value)
+		commandList->ResourceBarrier(1, &result);
+	else
+		commandList->ResourceBarrier(1, &result);
+}
+*/
 RenderTexture::RenderTexture(
 	ID3D12Device* device,
 	UINT width,
@@ -164,7 +166,6 @@ mHeight(height),
 mFormat(format),
 mViewport({ 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f }),
 mScissorRect({ 0, 0, (int)width, (int)height }),
-isUAV(false),
 mDepthFormat(DXGI_FORMAT_D24_UNORM_S8_UINT)
 {
 	UINT arraySize;

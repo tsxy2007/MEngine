@@ -14,6 +14,7 @@ private:
 	};
 
 	template <typename T, typename ... Args>
+
 	class AlignedTuple_Package<T, Args...>
 	{
 	private:
@@ -48,3 +49,35 @@ public:
 		return arr + offsets[index];
 	}
 };
+
+template <typename F, int count>
+struct LoopClass
+{
+	static void Do(F&& f)
+	{
+		LoopClass<F, count - 1>::Do(std::move(f));
+		f(count);
+	}
+};
+
+template <typename F>
+struct LoopClass<F, 0>
+{
+	static void Do(F&& f)
+	{
+		f(0);
+	}
+};
+
+template <typename F>
+struct LoopClass<F, -1>
+{
+	static void Do(F&& f) {}
+};
+
+
+template <typename F, int count>
+void Loop(F&& function)
+{
+	LoopClass<F, count - 1>::Do(std::move(function));
+}

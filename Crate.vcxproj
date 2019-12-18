@@ -32,7 +32,9 @@
     <ClInclude Include="Common\MetaLib.h" />
     <ClInclude Include="Common\MQueue.h" />
     <ClInclude Include="Common\Pool.h" />
+    <ClInclude Include="LogicComponent\Transform.h" />
     <ClInclude Include="PipelineComponent\CullTask.h" />
+    <ClInclude Include="PipelineComponent\PipelineComponent.h" />
     <ClInclude Include="PipelineComponent\ThreadCommand.h" />
     <ClInclude Include="RenderComponent\CBufferPool.h" />
     <ClInclude Include="RenderComponent\ComputeShader.h" />
@@ -97,7 +99,9 @@
     <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="CrateApp.cpp" />
+    <ClCompile Include="LogicComponent\Transform.cpp" />
     <ClCompile Include="PipelineComponent\CullTask.cpp" />
+    <ClCompile Include="PipelineComponent\PipelineComponent.cpp" />
     <ClCompile Include="PipelineComponent\ThreadCommand.cpp" />
     <ClCompile Include="RenderComponent\CBufferPool.cpp" />
     <ClCompile Include="RenderComponent\ComputeShader.cpp" />

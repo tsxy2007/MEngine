@@ -31,6 +31,12 @@
     <Filter Include="Source Files\RenderComponent">
       <UniqueIdentifier>{98879e99-478b-4811-acd9-a2f3b9a43c37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\LogicComponent">
+      <UniqueIdentifier>{f580adad-7fcb-4903-9fd8-716289a60636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LogicComponent">
+      <UniqueIdentifier>{b44114fe-3994-4b68-8e55-962e859eef9b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\DescriptorHeap.h">
@@ -234,6 +240,12 @@
     <ClInclude Include="RenderComponent\RenderTexture.h">
       <Filter>Header Files\RenderComponent</Filter>
     </ClInclude>
+    <ClInclude Include="LogicComponent\Transform.h">
+      <Filter>Source Files\LogicComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineComponent\PipelineComponent.h">
+      <Filter>Header Files\PipelineComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\DescriptorHeap.cpp">
@@ -340,6 +352,12 @@
     </ClCompile>
     <ClCompile Include="RenderComponent\RenderTexture.cpp">
       <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="LogicComponent\Transform.cpp">
+      <Filter>Header Files\LogicComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineComponent\PipelineComponent.cpp">
+      <Filter>Source Files\PipelineComponent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@
 #include "../Singleton/ShaderID.h"
 #include "CBufferPool.h"
 #include "../Singleton/FrameResource.h"
+#include "../LogicComponent/Transform.h"
 struct IndirectDrawCommand
 {
 	D3D12_GPU_VIRTUAL_ADDRESS objectCBufferAddress; // Object Constant Buffer Address
@@ -22,11 +23,7 @@ public:
 	virtual ~MeshRenderer();
 	ObjectPtr<Mesh> mesh;
 	std::vector<ObjectPtr<Material>> mMaterials;
-	DirectX::XMFLOAT3 position;
-	DirectX::XMFLOAT3 up;
-	DirectX::XMFLOAT3 right;
-	DirectX::XMFLOAT3 forward;
-	DirectX::XMFLOAT3 localScale;
+	Transform transform;
 	MeshRenderer(
 		ID3D12Device* device,
 		DirectX::XMFLOAT3 initPosition,
@@ -35,7 +32,6 @@ public:
 		ObjectPtr<Mesh> initMesh,
 		std::vector<ObjectPtr<Material>>& allMaterials
 	);
-	DirectX::XMMATRIX GetLocalToWorldMatrix() const;
 	void Draw(
 		int targetPass,
 		int targetSubMesh,
@@ -52,5 +48,5 @@ public:
 		FrameResource* currentResource,
 		IndirectDrawCommand* command
 	);
-	void UpdateObjectBuffer(FrameResource* resource) const;
+	void UpdateObjectBuffer(FrameResource* resource);
 };

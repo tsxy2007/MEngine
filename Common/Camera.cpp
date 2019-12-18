@@ -21,7 +21,7 @@ Camera::~Camera()
 {
 	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
 	{
-		ConstBufferElement constBuffer = FrameResource::mFrameResources[i]->cameraCBs[GetInstanceID()];
+		ConstBufferElement& constBuffer = FrameResource::mFrameResources[i]->cameraCBs[GetInstanceID()];
 		pool.Release({ constBuffer.buffer, constBuffer.element });
 		FrameResource::mFrameResources[i]->cameraCBs.erase(GetInstanceID());
 	}

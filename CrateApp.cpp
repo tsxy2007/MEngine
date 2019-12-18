@@ -238,8 +238,8 @@ void CrateApp::Update(const GameTimer& gt)
 	matConstants.FresnelR0 = { 1,1,1 };
 	matConstants.Roughness = 1;
 	ObjectConstants objCsts[2];
-	XMStoreFloat4x4(&objCsts[0].objectToWorld, mainRenderer->GetLocalToWorldMatrix());
-	XMStoreFloat4x4(&objCsts[1].objectToWorld, mainRenderer1->GetLocalToWorldMatrix());
+	XMStoreFloat4x4(&objCsts[0].objectToWorld, mainRenderer->transform.GetLocalToWorldMatrix());
+	XMStoreFloat4x4(&objCsts[1].objectToWorld, mainRenderer1->transform.GetLocalToWorldMatrix());
 	indirectDrawer->UploadMaterialBuffer(&matConstants, 0);
 	indirectDrawer->UploadObjectBuffer(objCsts, 0);
 	indirectDrawer->UploadObjectBuffer(objCsts + 1, 1);
@@ -252,6 +252,7 @@ public:
 	PSOContainer* separateContainer;
 	void operator()()
 	{
+		ths->separateThreadCommand->ResetCommand();
 		ID3D12GraphicsCommandList* mSeparateList = ths->separateThreadCommand->GetCmdList();
 		UploadBuffer::UploadData(mSeparateList);
 		ths->mainRenderTexture->ClearRenderTarget(mSeparateList, 0, true, true);
@@ -298,11 +299,11 @@ public:
 			1
 		);
 		ComputeShader* cs = (ComputeShader*)&ths->testComputeShader;
-		ths->mainRenderTexture->SetUAV(mSeparateList, true);
 		cs->BindRootSignature(mSeparateList, ths->uavTextureHeap.operator->());
 		cs->SetResource(mSeparateList, ShaderID::PropertyToID("_MainTex"), ths->uavTextureHeap.operator->(), 0);
 		const UINT ksize = 512 / 8;
 		cs->Dispatch(mSeparateList, 0, ksize, ksize, 1);
+		mSeparateList->Close();
 	}
 };
 void CrateApp::Draw(const GameTimer& gt)
@@ -310,8 +311,6 @@ void CrateApp::Draw(const GameTimer& gt)
 	size_t sizefffff = sizeof(MultiDrawCommand);
 	mainThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(md3dDevice.Get());
 	separateThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(md3dDevice.Get());
-	mainThreadCommand->ResetCommand();
-	separateThreadCommand->ResetCommand();
 	ID3D12GraphicsCommandList* mCommandList = mainThreadCommand->GetCmdList();
 	taskFlow.clear();
 	ConstBufferElement* camBuffer = &FrameResource::mCurrFrameResource->cameraCBs[mainCamera->GetInstanceID()];
@@ -319,6 +318,7 @@ void CrateApp::Draw(const GameTimer& gt)
 	DrawRenderTextureCommand func = { this, camBuffer, separatePSO };
 	tf::Task firstTask = taskFlow.emplace(func);
 	std::future<void> runner = taskFlowExecutor.run(taskFlow);
+	mainThreadCommand->ResetCommand();
 	mCommandList->RSSetViewports(1, &mScreenViewport);
 	mCommandList->RSSetScissorRects(1, &mScissorRect);
 	// Indicate a state transition on the resource usage.
@@ -374,18 +374,18 @@ void CrateApp::Draw(const GameTimer& gt)
 
 	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	mCommandList->Close();
 	ID3D12CommandList* value[2];
-	UINT count = 0;
 	runner.wait();
-	separateThreadCommand->CollectCommand(value, &count);
-	mainThreadCommand->CollectCommand(value, &count);
+	value[0] = separateThreadCommand->GetCmdList();
+	value[1] = mCommandList;
 	mCommandQueue->ExecuteCommandLists(_countof(value), value);
-	FrameResource::mCurrFrameResource->ReleaseThreadCommand(mainThreadCommand);
-	FrameResource::mCurrFrameResource->ReleaseThreadCommand(separateThreadCommand);
 
 	// Swap the back and front buffers
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+	FrameResource::mCurrFrameResource->ReleaseThreadCommand(mainThreadCommand);
+	FrameResource::mCurrFrameResource->ReleaseThreadCommand(separateThreadCommand);
 	FrameResource::mCurrFrameResource->UpdateAfterFrame(mCurrentFence, mCommandQueue.Get(), mFence.Get());
 
 }

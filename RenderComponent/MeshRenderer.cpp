@@ -8,18 +8,15 @@ MeshRenderer::MeshRenderer(
 	XMFLOAT3 localScale,
 	ObjectPtr<Mesh> initMesh,
 	std::vector<ObjectPtr<Material>>& allMaterials
-) : MObject(), mMaterials(allMaterials.size()), mesh(initMesh), localScale(localScale), position(initPosition)
+) : MObject(), mMaterials(allMaterials.size()), mesh(initMesh)
 {
-	for(int i = 0; i < allMaterials.size(); ++i)
+	for (int i = 0; i < allMaterials.size(); ++i)
 	{
 		mMaterials[i] = allMaterials[i];
 	}
-	
-	XMMATRIX rotationMatrix = XMMatrixRotationQuaternion(initQuaternion);
-	rotationMatrix = XMMatrixTranspose(rotationMatrix);
-	XMStoreFloat3(&right, rotationMatrix.r[0]);
-	XMStoreFloat3(&up, rotationMatrix.r[1]);
-	XMStoreFloat3(&forward, rotationMatrix.r[2]);
+	transform.SetLocalScale(localScale);
+	transform.SetRotation(initQuaternion);
+	transform.SetPosition(initPosition);
 	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
 	{
 		FrameResource* ptr = FrameResource::mFrameResources[i].get();
@@ -88,28 +85,10 @@ void MeshRenderer::GetIndirectArgument(
 	command->drawArgs.StartIndexLocation = 0;
 	command->drawArgs.StartInstanceLocation = 0;
 }
-
-XMMATRIX MeshRenderer::GetLocalToWorldMatrix() const
-{
-	XMMATRIX target;
-	XMVECTOR vec = { right.x, right.y, right.z, 0 };
-	vec *= this->localScale.x;
-	target.r[0] = vec;
-	vec = { up.x, up.y, up.z, 0 };
-	vec *= this->localScale.y;
-	target.r[1] = vec;
-	vec = { forward.x, forward.y, forward.z, 0 };
-	vec *= this->localScale.z;
-	target.r[2] = vec;
-	target.r[3] = { position.x, position.y, position.z, 1 };
-	
-	return target;
-}
-
-void MeshRenderer::UpdateObjectBuffer(FrameResource* resource) const
+void MeshRenderer::UpdateObjectBuffer(FrameResource* resource)
 {
 	ObjectConstants buffer;
-	XMStoreFloat4x4(&buffer.objectToWorld, GetLocalToWorldMatrix());
+	XMStoreFloat4x4(&buffer.objectToWorld, transform.GetLocalToWorldMatrix());
 	ConstBufferElement ele = resource->objectCBs[GetInstanceID()];
 	ele.buffer->CopyData(ele.element, &buffer);
 }
