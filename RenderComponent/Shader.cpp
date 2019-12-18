@@ -3,7 +3,6 @@
 #include "Texture.h"
 #include "../Common/DescriptorHeap.h"
 #include "UploadBuffer.h"
-#include "RenderTexture2D.h"
 using namespace std;
 using Microsoft::WRL::ComPtr;
 Shader::~Shader()

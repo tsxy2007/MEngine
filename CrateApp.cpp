@@ -19,6 +19,7 @@
 #include "RenderComponent/Skybox.h"
 #include "RenderComponent/ComputeShader.h"
 #include "RenderComponent/IndirectDrawer.h"
+#include "RenderComponent/RenderTexture.h"
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -95,7 +96,7 @@ public:
 
 	int mCurrFrameResourceIndex = 0;
 	//ComPtr<ID3D12DescriptorHeap> mSrvDescriptorHeap = nullptr;
-	ObjectPtr<RenderTexture2D> mainRenderTexture;
+	ObjectPtr<RenderTexture> mainRenderTexture;
 	ObjectPtr<DescriptorHeap> bindlessTextureHeap;
 	ObjectPtr<DescriptorHeap> uavTextureHeap;
 	ObjectPtr<IndirectDrawer> indirectDrawer;
@@ -253,9 +254,9 @@ public:
 	{
 		ID3D12GraphicsCommandList* mSeparateList = ths->separateThreadCommand->GetCmdList();
 		UploadBuffer::UploadData(mSeparateList);
-		ths->mainRenderTexture->ClearRenderTarget(mSeparateList, true, true);
+		ths->mainRenderTexture->ClearRenderTarget(mSeparateList, 0, true, true);
 		ths->mainRenderTexture->SetViewport(mSeparateList);
-		mSeparateList->OMSetRenderTargets(1, &ths->mainRenderTexture->GetColorHeap()->hCPU(0), true, &ths->mainRenderTexture->GetDepthHeap()->hCPU(0));
+		mSeparateList->OMSetRenderTargets(1, &ths->mainRenderTexture->GetColorDescriptor(0), true, &ths->mainRenderTexture->GetDepthDescriptor(0));
 		ths->skybox->Draw(
 			0,
 			mSeparateList,
@@ -297,7 +298,7 @@ public:
 			1
 		);
 		ComputeShader* cs = (ComputeShader*)&ths->testComputeShader;
-		ths->mainRenderTexture->SetUav(true, mSeparateList);
+		ths->mainRenderTexture->SetUAV(mSeparateList, true);
 		cs->BindRootSignature(mSeparateList, ths->uavTextureHeap.operator->());
 		cs->SetResource(mSeparateList, ShaderID::PropertyToID("_MainTex"), ths->uavTextureHeap.operator->(), 0);
 		const UINT ksize = 512 / 8;
@@ -505,7 +506,7 @@ void CrateApp::LoadTextures()
 	mTextures.push_back(brickTex);
 	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "grasscube1024", L"Textures/grasscube1024.dds", Texture::Cubemap);
 	mTextures.push_back(brickTex);
-	mainRenderTexture = new RenderTexture2D(md3dDevice.Get(), 1024, 1024, DXGI_FORMAT_R16G16B16A16_FLOAT, 2, true);
+	mainRenderTexture = new RenderTexture(md3dDevice.Get(), 1024, 1024, DXGI_FORMAT_R16G16B16A16_FLOAT, true, RenderTextureType::Tex2D, 1, 2);
 }
 
 void CrateApp::BuildDescriptorHeaps()
@@ -526,9 +527,9 @@ void CrateApp::BuildDescriptorHeaps()
 	uavTextureHeap = new DescriptorHeap();
 	uavTextureHeap->Create(md3dDevice.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 2, true);
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-	mainRenderTexture->GetUAVViewDesc(uavDesc, 0);
+	mainRenderTexture->GetColorUAVDesc(uavDesc, 0);
 	md3dDevice->CreateUnorderedAccessView(mainRenderTexture->GetColorResource(), nullptr, &uavDesc, uavTextureHeap->hCPU(0));
-	mainRenderTexture->GetUAVViewDesc(uavDesc, 1);
+	mainRenderTexture->GetColorUAVDesc(uavDesc, 1);
 	md3dDevice->CreateUnorderedAccessView(mainRenderTexture->GetColorResource(), nullptr, &uavDesc, uavTextureHeap->hCPU(1));
 }
 

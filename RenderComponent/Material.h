@@ -6,7 +6,6 @@
 #include <vector>
 #include <memory>
 #include "../Common/DescriptorHeap.h"
-#include "RenderTexture2D.h"
 class Material : public MObject
 {
 private:

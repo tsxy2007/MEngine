@@ -6,6 +6,7 @@ HRESULT DescriptorHeap::Create(
 	UINT NumDescriptors,
 	bool bShaderVisible)
 {
+	mNumDescriptors = NumDescriptors;
 	Desc.Type = Type;
 	Desc.NumDescriptors = NumDescriptors;
 	Desc.Flags = (bShaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE);

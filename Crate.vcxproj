@@ -41,8 +41,7 @@
     <ClInclude Include="RenderComponent\Mesh.h" />
     <ClInclude Include="RenderComponent\MeshRenderer.h" />
     <ClInclude Include="RenderComponent\MObject.h" />
-    <ClInclude Include="RenderComponent\RenderTexture2D.h" />
-    <ClInclude Include="RenderComponent\RenderTextureCube.h" />
+    <ClInclude Include="RenderComponent\RenderTexture.h" />
     <ClInclude Include="RenderComponent\Shader.h" />
     <ClInclude Include="RenderComponent\Skybox.h" />
     <ClInclude Include="RenderComponent\Texture.h" />
@@ -107,8 +106,7 @@
     <ClCompile Include="RenderComponent\Mesh.cpp" />
     <ClCompile Include="RenderComponent\MeshRenderer.cpp" />
     <ClCompile Include="RenderComponent\MObject.cpp" />
-    <ClCompile Include="RenderComponent\RenderTexture2D.cpp" />
-    <ClCompile Include="RenderComponent\RenderTextureCube.cpp" />
+    <ClCompile Include="RenderComponent\RenderTexture.cpp" />
     <ClCompile Include="RenderComponent\Shader.cpp" />
     <ClCompile Include="RenderComponent\Skybox.cpp" />
     <ClCompile Include="RenderComponent\Texture.cpp" />
