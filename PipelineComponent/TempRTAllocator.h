@@ -1,11 +1,17 @@
 #pragma once
 #include "../RenderComponent/MObject.h"
 #include "../RenderComponent/RenderTexture.h"
+#define K RenderTextureDescriptor
+#define V std::vector<TempRTData>*
 class TempRTAllocator
 {
 private:
+	struct TempRTData
+	{
+		ObjectPtr<RenderTexture> rt;
+		UINT containedFrame;
+	};
 
-	template <typename K, typename V>
 	class Dictionary
 	{
 	public:
@@ -16,52 +22,23 @@ private:
 		};
 		std::unordered_map<K, UINT> keyDicts;
 		std::vector<KVPair> values;
-		void Reserve(UINT capacity)
-		{
-			keyDicts.reserve(capacity);
-			values.reserve(capacity);
-		}
-		bool TryGet(const K& key, V* value)
-		{
-			auto&& ite = keyDicts.find(key);
-			if (ite == keyDicts.end()) return false;
-			*value = values[ite->second].value;
-			return true;
-		}
+		void Reserve(UINT capacity);
+		bool TryGet(K& key, V* value);
 
-		void Add(const K& key, const V& value)
-		{
-			keyDicts[key] = values.size();
-			values.push_back({ std::move(key), std::move(value) });
-		}
+		void Add(K& key, V& value);
+		void Remove(K& key);
 
-		void Remove(const K& key)
-		{
-			auto&& ite = keyDicts.find(key);
-			if (ite == keyDicts.end()) return;
-			KVPair& p = values[ite->second];
-			p = values[values.size() - 1];
-			keyDicts[p.key] = ite->second;
-			values.erase(values.end() - 1);
-			keyDicts.erase(ite->first);
-		}
-
-		void Clear()
-		{
-			keyDicts.clear();
-			values.clear();
-		}
+		void Clear();
 	};
-	struct TempRTData
-	{
-		ObjectPtr<RenderTexture> rt;
-		UINT containedFrame;
-	};
-	Dictionary<RenderTextureDescriptor, TempRTData> usingRT;
-	Dictionary<RenderTextureDescriptor, TempRTData> waitingRT;
+
+	Dictionary waitingRT;
 public:
 	TempRTAllocator();
 	~TempRTAllocator();
+	void GetRenderTextures(ID3D12Device* device, RenderTextureDescriptor* descriptors, RenderTexture** rtResults, UINT count);
+	void CumulateReleaseAfterFrame();
 	//TODO
 };
+#undef K 
+#undef V 
 

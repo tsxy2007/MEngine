@@ -18,6 +18,50 @@ void RenderTexture::ClearRenderTarget(ID3D12GraphicsCommandList* commandList, UI
 	if (clearDepth && mDepthResource != nullptr)
 		commandList->ClearDepthStencilView(dsvHeap.hCPU(slice), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 0, 0, 0, nullptr);
 }
+
+bool RenderTextureDescriptor::operator==(const RenderTextureDescriptor& other) const
+{
+	return
+		width == other.width &&
+		height == other.height &&
+		depthSlice == other.depthSlice &&
+		type == other.type &&
+		colorFormat == other.colorFormat &&
+		depthFormat == other.depthFormat;
+}
+
+bool RenderTextureDescriptor::operator==(RenderTextureDescriptor&& other) const
+{
+	return
+		width == other.width &&
+		height == other.height &&
+		depthSlice == other.depthSlice &&
+		type == other.type &&
+		colorFormat == other.colorFormat &&
+		depthFormat == other.depthFormat;
+}
+
+bool RenderTextureDescriptor::operator!=(const RenderTextureDescriptor& other) const
+{
+	return
+		width != other.width &&
+		height != other.height &&
+		depthSlice != other.depthSlice &&
+		type != other.type &&
+		colorFormat != other.colorFormat &&
+		depthFormat != other.depthFormat;
+}
+
+bool RenderTextureDescriptor::operator!=(RenderTextureDescriptor&& other) const
+{
+	return
+		width != other.width &&
+		height != other.height &&
+		depthSlice != other.depthSlice &&
+		type != other.type &&
+		colorFormat != other.colorFormat &&
+		depthFormat != other.depthFormat;
+}
 void RenderTexture::GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc)
 {
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;

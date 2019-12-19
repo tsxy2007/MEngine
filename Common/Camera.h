@@ -14,13 +14,18 @@
 #include "d3dUtil.h"
 #include "../RenderComponent/MObject.h"
 #include "../RenderComponent/CBufferPool.h"
-#include "../Singleton/FrameResource.h"
 #include "../RenderComponent/UploadBuffer.h"
+#include "../Singleton/FrameResource.h"
 class Camera : public MObject
 {
 public:
+	enum CameraRenderPath
+	{
+		DefaultPipeline = 0,
+		Depth = 1
+	};
 	virtual ~Camera();
-	Camera(ID3D12Device* device);
+	Camera(ID3D12Device* device, CameraRenderPath rtType);
 	// Get/Set world camera position.
 	DirectX::XMVECTOR GetPosition()const;
 	DirectX::XMFLOAT3 GetPosition3f()const;
@@ -73,9 +78,9 @@ public:
 	// After modifying camera position/orientation, call to rebuild the view matrix.
 	void UpdateViewMatrix();
 	void UploadCameraBuffer(FrameResource* res, PassConstants& mMainPassCB);
-
+	CameraRenderPath GetRenderingPath() const { return renderType; }
 private:
-	static CBufferPool pool;
+	CameraRenderPath renderType;
 	// Camera coordinate system with coordinates relative to world space.
 	DirectX::XMFLOAT3 mPosition = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 mRight = { 1.0f, 0.0f, 0.0f };

@@ -246,6 +246,12 @@
     <ClInclude Include="PipelineComponent\PipelineComponent.h">
       <Filter>Header Files\PipelineComponent</Filter>
     </ClInclude>
+    <ClInclude Include="PipelineComponent\TempRTAllocator.h">
+      <Filter>Header Files\PipelineComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineComponent\RenderPipeline.h">
+      <Filter>Header Files\PipelineComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\DescriptorHeap.cpp">
@@ -357,6 +363,12 @@
       <Filter>Header Files\LogicComponent</Filter>
     </ClCompile>
     <ClCompile Include="PipelineComponent\PipelineComponent.cpp">
+      <Filter>Source Files\PipelineComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineComponent\TempRTAllocator.cpp">
+      <Filter>Source Files\PipelineComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineComponent\RenderPipeline.cpp">
       <Filter>Source Files\PipelineComponent</Filter>
     </ClCompile>
   </ItemGroup>

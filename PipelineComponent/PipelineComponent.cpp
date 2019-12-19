@@ -6,23 +6,15 @@ RenderTexture* PipelineComponent::GetTempRT(UINT index)
 	return allTempRT[index];
 }
 
-void PipelineComponent::AddAllTempRT(RenderTexture** rts, UINT length)
+void PipelineComponent::InitThreadCommand(ID3D12Device* device, Camera* cam, FrameResource* resource)
 {
-	allTempRT.clear();
-	for (int i = 0; i < length; ++i)
-	{
-		allTempRT.push_back(rts[i]);
-	}
+	if (threadCommand == nullptr)
+		threadCommand = resource->GetNewThreadCommand(cam, device);
 }
-
-void PipelineComponent::InitThreadCommand(ID3D12Device* device)
-{
-	threadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(device);
-}
-void PipelineComponent::ExecuteThreadCommand(std::vector<ID3D12CommandList*>& executableCommands)
+void PipelineComponent::ExecuteThreadCommand(std::vector<ID3D12CommandList*>& executableCommands, Camera* cam)
 {
 	if (threadCommand == nullptr) return;
-	executableCommands.push_back(threadCommand->GetCmdList());
-	FrameResource::mCurrFrameResource->ReleaseThreadCommand(threadCommand);
+	executableCommands.emplace_back(threadCommand->GetCmdList());
+	FrameResource::mCurrFrameResource->ReleaseThreadCommand(cam, threadCommand);
 	threadCommand = nullptr;
 }

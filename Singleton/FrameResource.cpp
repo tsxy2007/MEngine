@@ -1,11 +1,13 @@
 #include "FrameResource.h"
+#include "../Common/Camera.h"
 std::vector<std::unique_ptr<FrameResource>> FrameResource::mFrameResources;
 Pool<ThreadCommand> FrameResource::threadCommandMemoryPool(20);
 std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> FrameResource::needClearResourcesAfterFlush;
 FrameResource* FrameResource::mCurrFrameResource = nullptr;
+CBufferPool FrameResource::cameraCBufferPool(sizeof(PassConstants), 256);
 FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount)
 {
-	threadCommands.reserve(20);
+	perCameraDatas.reserve(20);
 	cameraCBs.reserve(50);
 	objectCBs.reserve(50);
 	needClearResources.reserve(10);
@@ -38,6 +40,22 @@ void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* c
 	commandQueue->Signal(mFence, currentFence);
 }
 
+void FrameResource::OnLoadCamera(Camera* targetCamera, ID3D12Device* device)
+{
+	perCameraDatas[targetCamera] = new PerCameraData();
+	ConstBufferElement constBuffer = cameraCBufferPool.GetBuffer(device);
+	cameraCBs[targetCamera->GetInstanceID()] = constBuffer;
+}
+void FrameResource::OnUnloadCamera(Camera* targetCamera)
+{
+	PerCameraData* data = perCameraDatas[targetCamera];
+	perCameraDatas.erase(targetCamera);
+	ConstBufferElement& constBuffer = cameraCBs[targetCamera->GetInstanceID()];
+	cameraCBufferPool.Release({ constBuffer.buffer, constBuffer.element });
+	cameraCBs.erase(targetCamera->GetInstanceID());
+	delete data;
+}
+
 void FrameResource::ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources)
 {
 	if (mCurrFrameResource == nullptr)
@@ -47,8 +65,9 @@ void FrameResource::ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resou
 }
 
 
-ThreadCommand* FrameResource::GetNewThreadCommand(ID3D12Device* device)
+ThreadCommand* FrameResource::GetNewThreadCommand(Camera* cam, ID3D12Device* device)
 {
+	std::vector<ThreadCommand*>& threadCommands = perCameraDatas[cam]->threadCommands;
 	if (threadCommands.size() <= 0)
 	{
 		return threadCommandMemoryPool.New(device);
@@ -60,8 +79,9 @@ ThreadCommand* FrameResource::GetNewThreadCommand(ID3D12Device* device)
 		return result;
 	}
 }
-void FrameResource::ReleaseThreadCommand(ThreadCommand* targetCmd)
+void FrameResource::ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd)
 {
+	std::vector<ThreadCommand*>& threadCommands = perCameraDatas[cam]->threadCommands;
 	threadCommands.push_back(targetCmd);
 }
 

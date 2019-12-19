@@ -7,6 +7,7 @@
 #include <functional>
 #include "../PipelineComponent/ThreadCommand.h"
 #include "../Common/Pool.h"
+class Camera;
 struct Vertex
 {
     DirectX::XMFLOAT3 Pos;
@@ -33,7 +34,6 @@ struct PassConstants
 	float FarZ = 0.0f;
 };
 
-
 // Stores the resources needed for the CPU to build the command lists
 // for a frame.  
 struct FrameResource
@@ -43,6 +43,13 @@ private:
 	static std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResourcesAfterFlush;
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResources;
 public:
+	struct PerCameraData
+	{
+		std::vector<ThreadCommand*> threadCommands;
+		//TODO
+		//All Per camera datas
+	};
+	static CBufferPool cameraCBufferPool;
 	static std::vector<std::unique_ptr<FrameResource>> mFrameResources;
 	static FrameResource* mCurrFrameResource;
     FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount);
@@ -52,12 +59,14 @@ public:
 	void UpdateBeforeFrame(ID3D12Fence* mFence);
 	static void ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources);
 	void UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* commandQueue, ID3D12Fence* mFence);
-	ThreadCommand* GetNewThreadCommand(ID3D12Device* device);
-	void ReleaseThreadCommand(ThreadCommand* targetCmd);
+	ThreadCommand* GetNewThreadCommand(Camera* cam, ID3D12Device* device);
+	void ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd);
+	void OnLoadCamera(Camera* targetCamera, ID3D12Device* device);
+	void OnUnloadCamera(Camera* targetCamera);
     // We cannot reset the allocator until the GPU is done processing the commands.
     // So each frame needs their own allocator.
     //Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CmdListAlloc;
-	std::vector<ThreadCommand*> threadCommands;
+	std::unordered_map<Camera*, PerCameraData*> perCameraDatas;
     // We cannot update a cbuffer until the GPU is done processing the commands
     // that reference it.  So each frame needs their own cbuffers.
    // std::unique_ptr<UploadBuffer<FrameConstants>> FrameCB = nullptr;

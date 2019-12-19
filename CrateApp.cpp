@@ -177,7 +177,7 @@ bool CrateApp::Initialize()
 	BuildMaterials();
 	BuildFrameResources();
 	BuildPSOs();
-	mainCamera = new Camera(md3dDevice.Get());
+	mainCamera = new Camera(md3dDevice.Get(), Camera::CameraRenderPath::DefaultPipeline);
 	std::vector<ObjectPtr<Material>> mats(1);
 	mats[0] = opaqueMaterial;
 	XMFLOAT3 pos = { 0,-0.5,0 };
@@ -309,8 +309,8 @@ public:
 void CrateApp::Draw(const GameTimer& gt)
 {
 	size_t sizefffff = sizeof(MultiDrawCommand);
-	mainThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(md3dDevice.Get());
-	separateThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(md3dDevice.Get());
+	mainThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(mainCamera.operator->(), md3dDevice.Get());
+	separateThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(mainCamera.operator->(), md3dDevice.Get());
 	ID3D12GraphicsCommandList* mCommandList = mainThreadCommand->GetCmdList();
 	taskFlow.clear();
 	ConstBufferElement* camBuffer = &FrameResource::mCurrFrameResource->cameraCBs[mainCamera->GetInstanceID()];
@@ -384,8 +384,8 @@ void CrateApp::Draw(const GameTimer& gt)
 	// Swap the back and front buffers
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-	FrameResource::mCurrFrameResource->ReleaseThreadCommand(mainThreadCommand);
-	FrameResource::mCurrFrameResource->ReleaseThreadCommand(separateThreadCommand);
+	FrameResource::mCurrFrameResource->ReleaseThreadCommand(mainCamera.operator->(), mainThreadCommand);
+	FrameResource::mCurrFrameResource->ReleaseThreadCommand(mainCamera.operator->(), separateThreadCommand);
 	FrameResource::mCurrFrameResource->UpdateAfterFrame(mCurrentFence, mCommandQueue.Get(), mFence.Get());
 
 }

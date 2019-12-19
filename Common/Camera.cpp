@@ -3,17 +3,14 @@
 //***************************************************************************************
 
 #include "Camera.h"
-
 using namespace DirectX;
 
-CBufferPool Camera::pool(sizeof(PassConstants), 256);
-Camera::Camera(ID3D12Device* device) : MObject()
+Camera::Camera(ID3D12Device* device, CameraRenderPath renderType) : MObject(), renderType(renderType)
 {
 	SetLens(0.25f*MathHelper::Pi, 1.0f, 1.0f, 1000.0f);
 	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
 	{
-		ConstBufferElement constBuffer = pool.GetBuffer(device);
-		FrameResource::mFrameResources[i]->cameraCBs[GetInstanceID()] = constBuffer;
+		FrameResource::mFrameResources[i]->OnLoadCamera(this, device);
 	}
 }
 
@@ -21,9 +18,7 @@ Camera::~Camera()
 {
 	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
 	{
-		ConstBufferElement& constBuffer = FrameResource::mFrameResources[i]->cameraCBs[GetInstanceID()];
-		pool.Release({ constBuffer.buffer, constBuffer.element });
-		FrameResource::mFrameResources[i]->cameraCBs.erase(GetInstanceID());
+		FrameResource::mFrameResources[i]->OnUnloadCamera(this);
 	}
 }
 

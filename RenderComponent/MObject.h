@@ -7,11 +7,11 @@ class MObject
 {
 	friend class PtrLink;
 private:
+	static std::mutex mtx;
 	std::vector<PtrLink*> allPtrs;
 	void AddPtr(PtrLink* ptr);
 	void RemovePtr(PtrLink* ptr);
 	static std::atomic<unsigned int> CurrentID;
-	std::mutex mtx;
 	unsigned int instanceID;
 public:
 	void Destroy();

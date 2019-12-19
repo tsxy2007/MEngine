@@ -28,6 +28,15 @@ struct RenderTextureDescriptor
 	RenderTextureType type;
 	DXGI_FORMAT colorFormat;
 	DXGI_FORMAT depthFormat;
+	bool operator==(const RenderTextureDescriptor& other) const;
+
+	bool operator==(RenderTextureDescriptor&& other) const;
+
+	bool operator!=(const RenderTextureDescriptor& other) const;
+
+	bool operator!=(RenderTextureDescriptor&& other) const;
+
+	//bool operator!=(const)
 };
 
 namespace std
@@ -35,6 +44,7 @@ namespace std
 	template <>
 	class hash<RenderTextureDescriptor>
 	{
+	public:
 		size_t operator()(const RenderTextureDescriptor& o) const
 		{
 			hash<UINT> ulongHash;
