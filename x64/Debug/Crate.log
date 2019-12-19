@@ -1,6 +1,3 @@
-﻿  RenderPipeline.cpp
-c:\users\user\source\repos\crate\singleton\frameresource.h(40): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
-  c:\users\user\source\repos\crate\singleton\frameresource.h(39): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(18): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(31): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+﻿  FrameResource.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Debug\Crate.exe

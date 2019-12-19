@@ -49,6 +49,10 @@ void FrameResource::OnLoadCamera(Camera* targetCamera, ID3D12Device* device)
 void FrameResource::OnUnloadCamera(Camera* targetCamera)
 {
 	PerCameraData* data = perCameraDatas[targetCamera];
+	for (int i = 0; i < data->threadCommands.size(); ++i)
+	{
+		threadCommandMemoryPool.Delete(data->threadCommands[i]);
+	}
 	perCameraDatas.erase(targetCamera);
 	ConstBufferElement& constBuffer = cameraCBs[targetCamera->GetInstanceID()];
 	cameraCBufferPool.Release({ constBuffer.buffer, constBuffer.element });
@@ -87,10 +91,6 @@ void FrameResource::ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd)
 
 FrameResource::~FrameResource()
 {
-	/*for (int i = 0; i < threadCommands.size(); ++i)
-	{
-		threadCommandMemoryPool.Delete(threadCommands[i]);
-	}*/
 	if (mCurrFrameResource == this)
 		mCurrFrameResource = nullptr;
 }

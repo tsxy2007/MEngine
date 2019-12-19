@@ -7,7 +7,7 @@ void RenderPipeline::RenderCamera(ID3D12Device* device, ID3D12CommandQueue* comm
 	{
 		Camera* cam = allCameras[camIndex];
 		std::vector<PipelineComponent*> waitingComponents = renderPathComponents[(UINT)cam->GetRenderingPath()];
-		
+		allPipelineTasks.clear();
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{ 
 			PipelineComponent* component = waitingComponents[i];
@@ -16,10 +16,7 @@ void RenderPipeline::RenderCamera(ID3D12Device* device, ID3D12CommandQueue* comm
 			//Allocate Temporal Render Texture
 			component->allTempRT.resize(descriptors.size());
 			tempRTAllocator.GetRenderTextures(device, descriptors.data(), component->allTempRT.data(), component->allTempRT.size());
-			tf::Task preEventTask = component->RenderPreEvent(taskFlow);
-			tf::Task postEventTask = component->RenderPostEvent(taskFlow);
-			if (!preEventTask.empty())
-				preEventTask.precede(postEventTask);
+			allPipelineTasks[component] = component->RenderEvent(taskFlow);
 			component->ExecuteThreadCommand(commandLists, cam);//Add Command Lists to waiting vector
 		}
 		//TODO

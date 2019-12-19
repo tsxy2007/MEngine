@@ -10,14 +10,16 @@ class Camera;
 class RenderPipeline final
 {
 private:
-	AlignedTuple<int> components;//TODO
+
+	AlignedTuple<int> components; //TODO All Event Placement
 	TempRTAllocator tempRTAllocator;
 	std::unordered_map<std::string, PipelineComponent*> componentPtrs;
+	std::unordered_map<PipelineComponent*, tf::Task> allPipelineTasks;
 	std::vector<std::vector<PipelineComponent*>> renderPathComponents;
 	std::vector<ID3D12CommandList*> commandLists;
 	tf::Taskflow taskFlow;
 public:
-	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* directCommandList);
-	~RenderPipeline();
+	//RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* directCommandList);
+	//~RenderPipeline();
 	void RenderCamera(ID3D12Device* device, ID3D12CommandQueue* commandQueue, FrameResource* resource, std::vector<Camera*>& allCameras, tf::Executor& executor);
 };

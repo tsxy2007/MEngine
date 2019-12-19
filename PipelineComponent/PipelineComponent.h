@@ -15,8 +15,7 @@ protected:
 	ThreadCommand* threadCommand = nullptr;
 	virtual std::vector<RenderTextureDescriptor>& SendRenderTextureRequire() = 0;
 	RenderTexture* GetTempRT(UINT index);
-	virtual tf::Task RenderPreEvent(tf::Taskflow& taskFlow) = 0;
-	virtual tf::Task RenderPostEvent(tf::Taskflow& taskFlow) = 0;
+	virtual tf::Task RenderEvent(tf::Taskflow& taskFlow) = 0;
 public:
 	void InitThreadCommand(ID3D12Device* device, Camera* cam, FrameResource* resource);
 	void ExecuteThreadCommand(std::vector<ID3D12CommandList*>& executableCommands, Camera* cam);
