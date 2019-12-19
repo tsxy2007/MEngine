@@ -8,7 +8,7 @@ RenderTexture* PipelineComponent::GetTempRT(UINT index)
 
 void PipelineComponent::InitThreadCommand(ID3D12Device* device, Camera* cam, FrameResource* resource)
 {
-	if (threadCommand == nullptr)
+	if (NeedCommandList() && threadCommand == nullptr)
 		threadCommand = resource->GetNewThreadCommand(cam, device);
 }
 void PipelineComponent::ExecuteThreadCommand(std::vector<ID3D12CommandList*>& executableCommands, Camera* cam)

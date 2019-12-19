@@ -1,12 +1,82 @@
-﻿  CrateApp.cpp
+﻿  Camera.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+  d3dApp.cpp
+  DescriptorHeap.cpp
+  CrateApp.cpp
 c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
 c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
 c:\users\user\source\repos\crate\crateapp.cpp(232): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-c:\users\user\source\repos\crate\crateapp.cpp(519): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\crateapp.cpp(572): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+c:\users\user\source\repos\crate\crateapp.cpp(518): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\crateapp.cpp(571): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+  Transform.cpp
+  CullTask.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\mathlib.h(24): warning C4305: “初始化”: 从“double”到“float”截断
+c:\users\user\source\repos\crate\singleton\mathlib.h(25): warning C4305: “初始化”: 从“double”到“float”截断
+  PipelineComponent.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(40): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(39): note: 参见“FrameResource”的声明
+  RenderPipeline.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(40): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(39): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(18): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(28): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  TempRTAllocator.cpp
+c:\users\user\source\repos\crate\pipelinecomponent\temprtallocator.cpp(19): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
+  ThreadCommand.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+  CBufferPool.cpp
+c:\users\user\source\repos\crate\rendercomponent\cbufferpool.cpp(22): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\cbufferpool.cpp(56): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
+  ComputeShader.cpp
+c:\users\user\source\repos\crate\rendercomponent\computeshader.cpp(71): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  IndirectDrawer.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+c:\users\user\source\repos\crate\rendercomponent\indirectdrawer.cpp(45): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  Material.cpp
+c:\users\user\source\repos\crate\rendercomponent\material.cpp(57): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
+  Mesh.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+  MeshRenderer.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+  MObject.cpp
+c:\users\user\source\repos\crate\rendercomponent\mobject.cpp(17): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+  RenderTexture.cpp
+c:\users\user\source\repos\crate\rendercomponent\rendertexture.cpp(274): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\user\source\repos\crate\rendercomponent\rendertexture.cpp(289): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\user\source\repos\crate\rendercomponent\rendertexture.cpp(348): warning C4018: “<”: 有符号/无符号不匹配
+  Shader.cpp
+c:\users\user\source\repos\crate\rendercomponent\shader.cpp(99): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  Skybox.cpp
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+  正在编译...
+  Texture.cpp
+  UploadBuffer.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\rendercomponent\uploadbuffer.cpp(17): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\uploadbuffer.cpp(18): warning C4267: “=”: 从“size_t”转换到“UINT”，可能丢失数据
+  FrameResource.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+  PSOContainer.cpp
+  ShaderCompiler.cpp
+c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(188): warning C4099: “ID3D12Device”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): note: 参见“ID3D12Device”的声明
+c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): warning C4099: “ID3D12Device”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
   正在生成代码
-  5 of 5903 functions (<0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  1175 of 6423 functions (18.3%) were compiled, the rest were copied from previous compilation.
+    668 functions were new in current compilation
+    549 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Release\Crate.exe
