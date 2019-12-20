@@ -1,4 +1,10 @@
-﻿  PipelineComponent.cpp
-c:\users\user\source\repos\crate\singleton\frameresource.h(40): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
-  c:\users\user\source\repos\crate\singleton\frameresource.h(39): note: 参见“FrameResource”的声明
+﻿  RenderPipeline.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(67): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(97): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Debug\Crate.exe

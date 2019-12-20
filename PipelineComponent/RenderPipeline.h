@@ -16,10 +16,8 @@ private:
 	std::unordered_map<PipelineComponent*, tf::Task> allPipelineTasks;
 	std::unordered_map<std::string, PipelineComponent*> componentsLink;
 	std::unordered_map<PipelineComponent*, std::vector<PipelineComponent*>*> dependMap;
-
-	tf::Taskflow taskFlower;
 	std::vector<std::vector<PipelineComponent*>> renderPathComponents;
-	std::vector<ID3D12CommandList*> commandLists;
+	bool commandListFlag = false;
 	template<typename T, typename ... Args>
 	void Init(Args... args)
 	{
@@ -31,5 +29,13 @@ private:
 public:
 	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* directCommandList);
 	//~RenderPipeline();
-	void RenderCamera(ID3D12Device* device, ID3D12CommandQueue* commandQueue, FrameResource* resource, std::vector<Camera*>& allCameras, tf::Executor& executor);
+	void RenderCamera(
+		ID3D12Device* device,
+		ID3D12CommandQueue* commandQueue, 
+		FrameResource* lastResource,
+		FrameResource* resource,
+		std::vector<Camera*>& allCameras, 
+		tf::Executor& executor,
+		ID3D12Fence* fence,
+		UINT64& fenceIndex);
 };

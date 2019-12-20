@@ -16,8 +16,11 @@
 #include "../RenderComponent/CBufferPool.h"
 #include "../RenderComponent/UploadBuffer.h"
 #include "../Singleton/FrameResource.h"
+#include "../PipelineComponent/IPerCameraResource.h"
+class PipelineComponent;
 class Camera : public MObject
 {
+	friend class PipelineComponent;
 public:
 	enum CameraRenderPath
 	{
@@ -81,6 +84,7 @@ public:
 	CameraRenderPath GetRenderingPath() const { return renderType; }
 private:
 	CameraRenderPath renderType;
+	PerCameraData cameraRenderData;
 	// Camera coordinate system with coordinates relative to world space.
 	DirectX::XMFLOAT3 mPosition = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 mRight = { 1.0f, 0.0f, 0.0f };

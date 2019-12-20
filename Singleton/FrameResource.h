@@ -7,7 +7,10 @@
 #include <functional>
 #include "../PipelineComponent/ThreadCommand.h"
 #include "../Common/Pool.h"
+#include "../PipelineComponent/IPerCameraResource.h"
+#include "../taskflow/taskflow.hpp"
 class Camera;
+class IPerCameraResource;
 struct Vertex
 {
     DirectX::XMFLOAT3 Pos;
@@ -43,9 +46,10 @@ private:
 	static std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResourcesAfterFlush;
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResources;
 public:
-	struct PerCameraData
+	struct FrameResCamera
 	{
 		std::vector<ThreadCommand*> threadCommands;
+		PerCameraData camData;
 		//TODO
 		//All Per camera datas
 	};
@@ -66,7 +70,7 @@ public:
     // We cannot reset the allocator until the GPU is done processing the commands.
     // So each frame needs their own allocator.
     //Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CmdListAlloc;
-	std::unordered_map<Camera*, PerCameraData*> perCameraDatas;
+	std::unordered_map<Camera*, FrameResCamera*> perCameraDatas;
     // We cannot update a cbuffer until the GPU is done processing the commands
     // that reference it.  So each frame needs their own cbuffers.
    // std::unique_ptr<UploadBuffer<FrameConstants>> FrameCB = nullptr;
@@ -75,4 +79,8 @@ public:
     // Fence value to mark commands up to this fence point.  This lets us
     // check if these frame resources are still in use by the GPU.
     UINT64 Fence = 0;
+	//Rendering Events
+	std::vector<ID3D12CommandList*> executableCommandList;
+	tf::Taskflow taskFlow;
+	std::future<void> waiter;
 };

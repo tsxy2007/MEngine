@@ -20,6 +20,7 @@
 #include "RenderComponent/ComputeShader.h"
 #include "RenderComponent/IndirectDrawer.h"
 #include "RenderComponent/RenderTexture.h"
+#include "PipelineComponent/RenderPipeline.h"
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -111,6 +112,7 @@ public:
 	ObjectPtr<Skybox> skybox;
 	PassConstants mMainPassCB;
 	ObjectPtr<Camera> mainCamera;
+
 	ObjectPtr <UploadBuffer> materialPropertyBuffer;
 	float mTheta = 1.3f*XM_PI;
 	float mPhi = 0.4f*XM_PI;
@@ -315,6 +317,8 @@ void CrateApp::Draw(const GameTimer& gt)
 	FrameResource::mCurrFrameResource->ReleaseThreadCommand(mainCamera.operator->(), separateThreadCommand);
 	ID3D12GraphicsCommandList* mCommandList = mainThreadCommand->GetCmdList();
 	taskFlow.clear();
+	std::vector<Camera*> cam(1);
+	cam[0] = mainCamera.operator->();
 	ConstBufferElement* camBuffer = &FrameResource::mCurrFrameResource->cameraCBs[mainCamera->GetInstanceID()];
 	PSOContainer* separatePSO = (PSOContainer*)&mirrorRTPsoContainter;
 	DrawRenderTextureCommand func = { this, camBuffer, separatePSO };
@@ -382,11 +386,11 @@ void CrateApp::Draw(const GameTimer& gt)
 	value[0] = separateThreadCommand->GetCmdList();
 	value[1] = mCommandList;
 	mCommandQueue->ExecuteCommandLists(_countof(value), value);
-
+	FrameResource::mCurrFrameResource->UpdateAfterFrame(mCurrentFence, mCommandQueue.Get(), mFence.Get());
 	// Swap the back and front buffers
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-	FrameResource::mCurrFrameResource->UpdateAfterFrame(mCurrentFence, mCommandQueue.Get(), mFence.Get());
+	
 
 }
 

@@ -526,7 +526,7 @@ void D3DApp::CreateSwapChain()
 		&sd, 
 		&mSwapChain));
 }
-
+#include "../Singleton/FrameResource.h"
 void D3DApp::FlushCommandQueue()
 {
 	// Advance the fence value to mark commands up to this fence point.
