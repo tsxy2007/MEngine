@@ -1,44 +1,30 @@
 #pragma once
 #include "../RenderComponent/MObject.h"
 #include "../RenderComponent/RenderTexture.h"
-#define K RenderTextureDescriptor
-#define V std::vector<TempRTData>*
+#include "../Common/MetaLib.h"
 class TempRTAllocator
 {
+public:
+	struct UsingTempRT
+	{
+		ObjectPtr<RenderTexture> rt;
+		RenderTextureDescriptor desc;
+	};
 private:
 	struct TempRTData
 	{
 		ObjectPtr<RenderTexture> rt;
 		UINT containedFrame;
 	};
-
-	class Dictionary
-	{
-	public:
-		struct KVPair
-		{
-			K key;
-			V value;
-		};
-		std::unordered_map<K, UINT> keyDicts;
-		std::vector<KVPair> values;
-		void Reserve(UINT capacity);
-		bool TryGet(K& key, V* value);
-
-		void Add(K& key, V& value);
-		void Remove(K& key);
-
-		void Clear();
-	};
-
-	Dictionary waitingRT;
+	Dictionary<RenderTextureDescriptor, std::vector<TempRTData>*> waitingRT;
+	Dictionary<UINT, UsingTempRT> usingRT;
 public:
 	TempRTAllocator();
 	~TempRTAllocator();
-	void GetRenderTextures(ID3D12Device* device, RenderTextureDescriptor* descriptors, RenderTexture** rtResults, UINT count);
+	UsingTempRT* GetUsingData(UINT id);
+	RenderTexture* GetRenderTextures(ID3D12Device* device, UINT id, RenderTextureDescriptor& descriptors);
+	void ReleaseRenderTexutre(UINT id);
 	void CumulateReleaseAfterFrame();
 	//TODO
 };
-#undef K 
-#undef V 
 

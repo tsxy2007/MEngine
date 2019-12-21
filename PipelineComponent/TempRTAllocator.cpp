@@ -1,43 +1,4 @@
 #include "TempRTAllocator.h"
-#define K RenderTextureDescriptor
-#define V std::vector<TempRTData>*
-void TempRTAllocator::Dictionary::Reserve(UINT capacity)
-{
-	keyDicts.reserve(capacity);
-	values.reserve(capacity);
-}
-bool TempRTAllocator::Dictionary::TryGet(K& key, V* value)
-{
-	auto&& ite = keyDicts.find(key);
-	if (ite == keyDicts.end()) return false;
-	*value = values[ite->second].value;
-	return true;
-}
-
-void TempRTAllocator::Dictionary::Add(K& key, V& value)
-{
-	keyDicts[key] = values.size();
-	values.push_back({ std::move(key), std::move(value) });
-}
-
-void TempRTAllocator::Dictionary::Remove(K& key)
-{
-	auto&& ite = keyDicts.find(key);
-	if (ite == keyDicts.end()) return;
-	KVPair& p = values[ite->second];
-	p = values[values.size() - 1];
-	keyDicts[p.key] = ite->second;
-	values.erase(values.end() - 1);
-	keyDicts.erase(ite->first);
-}
-
-void TempRTAllocator::Dictionary::Clear()
-{
-	keyDicts.clear();
-	values.clear();
-}
-#undef K 
-#undef V 
 
 TempRTAllocator::TempRTAllocator()
 {
@@ -56,39 +17,56 @@ TempRTAllocator::~TempRTAllocator()
 	}
 }
 
-void TempRTAllocator::GetRenderTextures(ID3D12Device* device, RenderTextureDescriptor* descriptors, RenderTexture** rtResults, UINT count)
+TempRTAllocator::UsingTempRT* TempRTAllocator::GetUsingData(UINT id)
 {
-	std::vector<ObjectPtr<RenderTexture>> cacheResults(count);
-	for (UINT i = 0; i < count; ++i)
+	UsingTempRT* ptr = usingRT[id];
+	return ptr;
+}
+
+RenderTexture* TempRTAllocator::GetRenderTextures(ID3D12Device* device, UINT id, RenderTextureDescriptor& descriptor)
+{
+
+	std::vector<TempRTData>* datas = nullptr;
+	std::vector<TempRTData>** datasPtr = waitingRT[descriptor];
+	if (datasPtr == nullptr)
 	{
-		std::vector<TempRTData>* datas = nullptr;
-		if (!waitingRT.TryGet(descriptors[i], &datas))
-		{
-			datas = new std::vector<TempRTData>();
-			waitingRT.Add(descriptors[i], datas);
-		}
-		if (datas->size() > 0)
-		{
-			TempRTData& data = (*datas)[datas->size() - 1];
-			cacheResults[i] = data.rt;
-			datas->erase(datas->end() - 1);
-		}
-		else
-		{
-			auto& desc = descriptors[i];
-			cacheResults[i] = new RenderTexture(device, desc.width, desc.height, desc.colorFormat, (int)desc.depthFormat != 0, desc.type, desc.depthSlice, 1);
-		}
+		datas = new std::vector<TempRTData>();
+		waitingRT.Add(descriptor, datas);
 	}
-	for (UINT i = 0; i < count; ++i)
+	else
+		datas = *datasPtr;
+	if (datas->size() > 0)
 	{
-		rtResults[i] = cacheResults[i].operator->();
-		std::vector<TempRTData>* datas = nullptr;
-		if (!waitingRT.TryGet(descriptors[i], &datas))
+		TempRTData& data = (*datas)[datas->size() - 1];
+		UsingTempRT usingRTData;
+		usingRTData.rt = data.rt;
+		usingRTData.desc = descriptor;
+		usingRT.Add(id, usingRTData);
+		RenderTexture* result = data.rt.operator->();
+		datas->erase(datas->end() - 1);
+		return result;
+	}
+	else
+	{
+		UsingTempRT usingRTData;
+		usingRTData.rt = new RenderTexture(device, descriptor.width, descriptor.height, descriptor.colorFormat, (int)descriptor.depthFormat != 0, descriptor.type, descriptor.depthSlice, 1);;
+		usingRTData.desc = descriptor;
+		usingRT.Add(id, usingRTData);
+		return usingRTData.rt.operator->();
+	}
+}
+
+void TempRTAllocator::ReleaseRenderTexutre(UINT id)
+{
+	UsingTempRT* rt = usingRT[id];
+	if (rt != nullptr)
+	{
+		std::vector<TempRTData>** datasPtr = waitingRT[rt->desc];
+		if (datasPtr != nullptr)
 		{
-			datas = new std::vector<TempRTData>();
-			waitingRT.Add(descriptors[i], datas);
+			(*datasPtr)->push_back({ rt->rt, id });
 		}
-		datas->push_back({ cacheResults[i], 0 });
+		usingRT.Remove(id);
 	}
 }
 

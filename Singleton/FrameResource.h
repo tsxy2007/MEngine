@@ -42,17 +42,17 @@ struct PassConstants
 struct FrameResource
 {
 private:
-	static Pool<ThreadCommand> threadCommandMemoryPool;
-	static std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResourcesAfterFlush;
-	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResources;
-public:
 	struct FrameResCamera
 	{
 		std::vector<ThreadCommand*> threadCommands;
 		PerCameraData camData;
-		//TODO
-		//All Per camera datas
 	};
+	static Pool<ThreadCommand> threadCommandMemoryPool;
+	static Pool<FrameResCamera> perCameraDataMemPool;
+	static std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResourcesAfterFlush;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResources;
+public:
+
 	static CBufferPool cameraCBufferPool;
 	static std::vector<std::unique_ptr<FrameResource>> mFrameResources;
 	static FrameResource* mCurrFrameResource;

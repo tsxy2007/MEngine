@@ -20,7 +20,7 @@ void MObject::AddPtr(PtrLink* ptr)
 
 void MObject::Destroy()
 {
-	mtx.lock();
+	std::lock_guard<std::mutex> lck(mtx);
 	if (this == nullptr)
 	{
 		return;
@@ -31,19 +31,17 @@ void MObject::Destroy()
 	}
 	allPtrs.clear();
 	delete this;
-	mtx.unlock();
 }
 
 MObject::~MObject()
 {
 	if (allPtrs.size() <= 0) return;
-	mtx.lock();
+	std::lock_guard<std::mutex> lck(mtx);
 	for (int i = 0; i < allPtrs.size(); ++i)
 	{
 		allPtrs[i]->mPtr = nullptr;
 	}
 	allPtrs.clear();
-	mtx.unlock();
 }
 
 void MObject::RemovePtr(PtrLink* ptr)
@@ -70,9 +68,8 @@ PtrLink::PtrLink(MObject* ptr) :
 	MObject* obj = (MObject*)(mPtr);
 	if (obj != nullptr)
 	{
-		MObject::mtx.lock();
+		std::lock_guard<std::mutex> lck(MObject::mtx);
 		obj->AddPtr(this);
-		MObject::mtx.unlock();
 	}
 }
 
@@ -86,9 +83,8 @@ PtrLink::PtrLink(const PtrLink& link) :
 {
 	if (mPtr != nullptr)
 	{
-		MObject::mtx.lock();
+		std::lock_guard<std::mutex> lck(MObject::mtx);
 		mPtr ->AddPtr(this);
-		MObject::mtx.unlock();
 	}
 }
 
@@ -99,9 +95,8 @@ PtrLink& PtrLink::operator= (const PtrLink& link)
 	mPtr = link.mPtr;
 	if (mPtr != nullptr)
 	{
-		MObject::mtx.lock();
+		std::lock_guard<std::mutex> lck(MObject::mtx);
 		mPtr->AddPtr(this);
-		MObject::mtx.unlock();
 	}
 
 	return *this;
@@ -112,9 +107,8 @@ PtrLink::PtrLink(const PtrLink&& link) :
 {
 	if (mPtr != nullptr)
 	{
-		MObject::mtx.lock();
+		std::lock_guard<std::mutex> lck(MObject::mtx);
 		mPtr->AddPtr(this);
-		MObject::mtx.unlock();
 	}
 }
 
@@ -125,9 +119,8 @@ PtrLink& PtrLink::operator= (const PtrLink&& link)
 	mPtr = link.mPtr;
 	if (mPtr != nullptr)
 	{
-		MObject::mtx.lock();
+		std::lock_guard<std::mutex> lck(MObject::mtx);
 		mPtr->AddPtr(this);
-		MObject::mtx.unlock();
 	}
 
 	return *this;
@@ -140,9 +133,8 @@ PtrLink& PtrLink::operator=(MObject* ptr)
 	mPtr = ptr;
 	if (mPtr != nullptr)
 	{
-		MObject::mtx.lock();
+		std::lock_guard<std::mutex> lck(MObject::mtx);
 		mPtr->AddPtr(this);
-		MObject::mtx.unlock();
 	}
 	return *this;
 }

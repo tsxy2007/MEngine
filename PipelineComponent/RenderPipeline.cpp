@@ -17,13 +17,15 @@ void ExecuteThreadCommand(std::vector<ID3D12CommandList*>& executableCommands, C
 	}
 
 }
-RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* directCommandList)
+RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* directCommandList) : renderPathComponents(3)
 {
 	//TODO
 	//Init All Events Here
 	Init<TestComponent>();
+	
 	//TODO
 	//Init Path
+	//renderPathComponents[0].push_back((PipelineComponent*)components[0]);
 	for (UINT i = 0; i < components.GetObjectCount(); ++i)
 	{
 		PipelineComponent* pcPtr = (PipelineComponent*)components[i];
@@ -36,6 +38,10 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 			if (ite != componentsLink.end())
 			{
 				dependComponents->emplace_back(ite->second);
+			}
+			else
+			{
+				throw "Non Exsis depended class!";
 			}
 		}
 		dependMap.insert_or_assign(pcPtr, std::move(dependComponents));
@@ -57,14 +63,49 @@ void RenderPipeline::RenderCamera(
 		Camera* cam = allCameras[camIndex];
 		std::vector<PipelineComponent*>& waitingComponents = renderPathComponents[(UINT)cam->GetRenderingPath()];
 		allPipelineTasks.clear();
+		renderTextureMarks.Clear();
+		for (UINT i = 0; i < waitingComponents.size(); ++i)
+		{
+			PipelineComponent* component = waitingComponents[i];
+			std::vector<TemporalRTCommand>& descriptors = component->SendRenderTextureRequire();
+			//Allocate Temporal Render Texture
+			component->allTempRT.resize(descriptors.size());
+			for (UINT j = 0; j < descriptors.size(); ++j)
+			{
+				TemporalRTCommand& command = descriptors[j];
+				if (command.type == TemporalRTCommand::Create)
+				{
+					//Alread contained
+					if (tempRTAllocator.GetUsingData(command.uID) != nullptr)
+					{
+						throw "Alread Created Render Texture!";
+					}
+					RenderTextureMark mark = { command.uID, j, command.descriptor, i, i };
+					renderTextureMarks.Add(command.uID, mark);
+				}
+				else
+				{
+					RenderTextureMark* markPtr = renderTextureMarks[command.uID];
+					if (markPtr == nullptr)
+					{
+						throw "No Such Render Texture!";
+					}
+					markPtr->endComponent = i;
+				}
+			}
+
+		}
+		for (UINT i = 0; i < renderTextureMarks.values.size(); ++i)
+		{
+			RenderTextureMark& mark = renderTextureMarks.values[i].value;
+			waitingComponents[mark.startComponent]->loadRTCommands.push_back({ mark.id, mark.rtIndex, mark.desc });
+			waitingComponents[mark.endComponent]->unLoadRTCommands.emplace_back(mark.id);
+		}
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{ 
 			PipelineComponent* component = waitingComponents[i];
 			component->threadCommand = InitThreadCommand(device, cam, resource, component);
-			std::vector<RenderTextureDescriptor>& descriptors = component->SendRenderTextureRequire();
-			//Allocate Temporal Render Texture
-			component->allTempRT.resize(descriptors.size());
-			tempRTAllocator.GetRenderTextures(device, descriptors.data(), component->allTempRT.data(), component->allTempRT.size());
+			component->ExecuteTempRTCommand(device, &tempRTAllocator);
 			allPipelineTasks.insert_or_assign(component, std::move(component->RenderEvent(device, resource->taskFlow, component->threadCommand)));
 		}
 		//Build events dependency

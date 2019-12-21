@@ -81,3 +81,58 @@ void Loop(F&& function)
 {
 	LoopClass<F, count - 1>::Do(std::move(function));
 }
+template <typename K, typename V>
+class Dictionary
+{
+public:
+	struct KVPair
+	{
+		K key;
+		V value;
+	};
+	std::unordered_map<K, UINT> keyDicts;
+	std::vector<KVPair> values;
+	void Reserve(UINT capacity);
+	V* operator[](K& key);
+
+	void Add(K& key, V& value);
+	void Remove(K& key);
+
+	void Clear();
+};
+template <typename K, typename V>
+void Dictionary<K,V>::Reserve(UINT capacity)
+{
+	keyDicts.reserve(capacity);
+	values.reserve(capacity);
+}
+template <typename K, typename V>
+V* Dictionary<K,V>::operator[](K& key)
+{
+	auto&& ite = keyDicts.find(key);
+	if (ite == keyDicts.end()) return nullptr;
+	return &values[ite->second].value;
+}
+template <typename K, typename V>
+void Dictionary<K, V>::Add(K& key, V& value)
+{
+	keyDicts.insert_or_assign(key, std::move(values.size()));
+	values.push_back({ std::move(key), std::move(value) });
+}
+template <typename K, typename V>
+void Dictionary<K, V>::Remove(K& key)
+{
+	auto&& ite = keyDicts.find(key);
+	if (ite == keyDicts.end()) return;
+	KVPair& p = values[ite->second];
+	p = values[values.size() - 1];
+	keyDicts[p.key] = ite->second;
+	values.erase(values.end() - 1);
+	keyDicts.erase(ite->first);
+}
+template <typename K, typename V>
+void Dictionary<K, V>::Clear()
+{
+	keyDicts.clear();
+	values.clear();
+}

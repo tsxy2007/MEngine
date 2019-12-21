@@ -101,6 +101,7 @@ public:
 	ObjectPtr<DescriptorHeap> bindlessTextureHeap;
 	ObjectPtr<DescriptorHeap> uavTextureHeap;
 	ObjectPtr<IndirectDrawer> indirectDrawer;
+	std::unique_ptr<RenderPipeline> rp;
 	std::unordered_map<std::string, std::unique_ptr<FMaterial>> mMaterials;
 	std::vector<ObjectPtr<Texture>> mTextures;
 	ObjectPtr<Mesh> boxMesh;
@@ -127,6 +128,7 @@ public:
 	StoragePSOContainer mainRTPsoContainer;
 	StoragePSOContainer mirrorRTPsoContainter;
 	StorageComputeShader testComputeShader;
+	FrameResource* lastResource = nullptr;
 };
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
@@ -208,6 +210,7 @@ bool CrateApp::Initialize()
 	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
 	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 	// Wait until initialization is complete.
+	rp = std::make_unique<RenderPipeline>(md3dDevice.Get(), mCommandList.Get());
 	FlushCommandQueue();
 	return true;
 }
@@ -224,6 +227,7 @@ void CrateApp::Update(const GameTimer& gt)
 
 	// Cycle through the circular frame resource array.
 	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
+	lastResource = FrameResource::mCurrFrameResource;
 	FrameResource::mCurrFrameResource = FrameResource::mFrameResources[mCurrFrameResourceIndex].get();
 
 	// Has the GPU finished processing the commands of the current frame resource?
@@ -317,8 +321,6 @@ void CrateApp::Draw(const GameTimer& gt)
 	FrameResource::mCurrFrameResource->ReleaseThreadCommand(mainCamera.operator->(), separateThreadCommand);
 	ID3D12GraphicsCommandList* mCommandList = mainThreadCommand->GetCmdList();
 	taskFlow.clear();
-	std::vector<Camera*> cam(1);
-	cam[0] = mainCamera.operator->();
 	ConstBufferElement* camBuffer = &FrameResource::mCurrFrameResource->cameraCBs[mainCamera->GetInstanceID()];
 	PSOContainer* separatePSO = (PSOContainer*)&mirrorRTPsoContainter;
 	DrawRenderTextureCommand func = { this, camBuffer, separatePSO };
@@ -390,8 +392,9 @@ void CrateApp::Draw(const GameTimer& gt)
 	// Swap the back and front buffers
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-	
-
+	std::vector<Camera*> cam(1);
+	cam[0] = mainCamera.operator->();
+	//rp->RenderCamera(md3dDevice.Get(), mCommandQueue.Get(), lastResource, FrameResource::mCurrFrameResource, cam, taskFlowExecutor, mFence.Get(), mCurrentFence);
 }
 
 void CrateApp::OnMouseDown(WPARAM btnState, int x, int y)

@@ -10,6 +10,14 @@ class Camera;
 class RenderPipeline final
 {
 private:
+	struct RenderTextureMark
+	{
+		UINT id;
+		UINT rtIndex;
+		RenderTextureDescriptor desc;
+		UINT startComponent;
+		UINT endComponent;
+	};
 	UINT initCount = 0;
 	AlignedTuple<TestComponent> components; //TODO All Event Placement
 	TempRTAllocator tempRTAllocator;
@@ -17,6 +25,7 @@ private:
 	std::unordered_map<std::string, PipelineComponent*> componentsLink;
 	std::unordered_map<PipelineComponent*, std::vector<PipelineComponent*>*> dependMap;
 	std::vector<std::vector<PipelineComponent*>> renderPathComponents;
+	Dictionary<UINT, RenderTextureMark> renderTextureMarks;
 	bool commandListFlag = false;
 	template<typename T, typename ... Args>
 	void Init(Args... args)

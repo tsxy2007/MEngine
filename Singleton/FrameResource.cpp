@@ -1,7 +1,8 @@
 #include "FrameResource.h"
 #include "../Common/Camera.h"
 std::vector<std::unique_ptr<FrameResource>> FrameResource::mFrameResources;
-Pool<ThreadCommand> FrameResource::threadCommandMemoryPool(20);
+Pool<ThreadCommand> FrameResource::threadCommandMemoryPool(100);
+Pool<FrameResource::FrameResCamera> FrameResource::perCameraDataMemPool(50);
 std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> FrameResource::needClearResourcesAfterFlush;
 FrameResource* FrameResource::mCurrFrameResource = nullptr;
 CBufferPool FrameResource::cameraCBufferPool(sizeof(PassConstants), 256);
@@ -42,7 +43,7 @@ void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* c
 
 void FrameResource::OnLoadCamera(Camera* targetCamera, ID3D12Device* device)
 {
-	perCameraDatas[targetCamera] = new FrameResCamera();
+	perCameraDatas[targetCamera] = perCameraDataMemPool.New();
 	ConstBufferElement constBuffer = cameraCBufferPool.GetBuffer(device);
 	cameraCBs[targetCamera->GetInstanceID()] = constBuffer;
 }
@@ -57,7 +58,7 @@ void FrameResource::OnUnloadCamera(Camera* targetCamera)
 	ConstBufferElement& constBuffer = cameraCBs[targetCamera->GetInstanceID()];
 	cameraCBufferPool.Release({ constBuffer.buffer, constBuffer.element });
 	cameraCBs.erase(targetCamera->GetInstanceID());
-	delete data;
+	perCameraDataMemPool.Delete(data);
 }
 
 void FrameResource::ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources)
