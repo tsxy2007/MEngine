@@ -19,32 +19,36 @@ private:
 		UINT endComponent;
 	};
 	UINT initCount = 0;
-	AlignedTuple<TestComponent> components; //TODO All Event Placement
+	std::vector<PipelineComponent*> components;
 	TempRTAllocator tempRTAllocator;
 	std::unordered_map<PipelineComponent*, tf::Task> allPipelineTasks;
 	std::unordered_map<std::string, PipelineComponent*> componentsLink;
 	std::unordered_map<PipelineComponent*, std::vector<PipelineComponent*>*> dependMap;
 	std::vector<std::vector<PipelineComponent*>> renderPathComponents;
 	Dictionary<UINT, RenderTextureMark> renderTextureMarks;
-	bool commandListFlag = false;
+	std::future<void> waiter;
+	bool taskFlowFlag = false;
 	template<typename T, typename ... Args>
 	void Init(Args... args)
 	{
-		T* ptr = (T*)components[initCount];
-		initCount++;
-		componentsLink[std::string(typeid(T).name())] = ptr;
-		new (ptr)T(args...);
+		T* ptr = new T(args...);
+		components.emplace_back(ptr);
+		componentsLink.insert_or_assign(typeid(T).name(), ptr);
 	}
 public:
-	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* directCommandList);
+	RenderPipeline(ID3D12Device* device);
 	//~RenderPipeline();
 	void RenderCamera(
 		ID3D12Device* device,
+		ID3D12Resource* backBufferResource,
+		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle,
 		ID3D12CommandQueue* commandQueue, 
 		FrameResource* lastResource,
 		FrameResource* resource,
 		std::vector<Camera*>& allCameras, 
 		tf::Executor& executor,
 		ID3D12Fence* fence,
-		UINT64& fenceIndex);
+		UINT64& fenceIndex,
+		bool executeLastFrame,
+		IDXGISwapChain* swap);
 };

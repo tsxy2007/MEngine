@@ -1,6 +1,8 @@
 #include "RenderPipeline.h"
 #include "../Common/Camera.h"
 #include "../PipelineComponent/ThreadCommand.h"
+#include "PrepareComponent.h"
+#include "GBufferComponent.h"
 //ThreadCommand* threadCommand;
 
 ThreadCommand* InitThreadCommand(ID3D12Device* device, Camera* cam, FrameResource* resource, PipelineComponent* comp)
@@ -17,18 +19,20 @@ void ExecuteThreadCommand(std::vector<ID3D12CommandList*>& executableCommands, C
 	}
 
 }
-RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* directCommandList) : renderPathComponents(3)
+RenderPipeline::RenderPipeline(ID3D12Device* device) : renderPathComponents(3)
 {
 	//TODO
 	//Init All Events Here
-	Init<TestComponent>();
-	
+	Init<PrepareComponent>();
+	Init<GBufferComponent>();
+
 	//TODO
 	//Init Path
-	//renderPathComponents[0].push_back((PipelineComponent*)components[0]);
-	for (UINT i = 0; i < components.GetObjectCount(); ++i)
+	renderPathComponents[0].push_back(components[0]);
+	renderPathComponents[0].push_back(components[1]);
+	for (UINT i = 0; i < components.size(); ++i)
 	{
-		PipelineComponent* pcPtr = (PipelineComponent*)components[i];
+		PipelineComponent* pcPtr = components[i];
 		std::vector<std::string> dependNames = pcPtr->GetDependedEvent();
 		std::vector<PipelineComponent*>* dependComponents = new std::vector<PipelineComponent*>;
 		dependComponents->reserve(dependNames.size());
@@ -41,7 +45,7 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 			}
 			else
 			{
-				throw "Non Exsis depended class!";
+				throw "Non Exist depended class!";
 			}
 		}
 		dependMap.insert_or_assign(pcPtr, std::move(dependComponents));
@@ -50,26 +54,32 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 
 void RenderPipeline::RenderCamera(
 	ID3D12Device* device,
+	ID3D12Resource* backBufferResource,
+	D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle,
 	ID3D12CommandQueue* commandQueue,
 	FrameResource* lastResource,
 	FrameResource* resource,
 	std::vector<Camera*>& allCameras,
 	tf::Executor& executor,
 	ID3D12Fence* fence,
-	UINT64& fenceIndex)
+	UINT64& fenceIndex,
+	bool lastFrame,
+	IDXGISwapChain* swapChain)
 {
+	tf::Task maskFinishTask;
+	tf::Task lastMaskFinishTask;
+	
 	for (UINT camIndex = 0; camIndex < allCameras.size(); ++camIndex)
 	{
 		Camera* cam = allCameras[camIndex];
+		
 		std::vector<PipelineComponent*>& waitingComponents = renderPathComponents[(UINT)cam->GetRenderingPath()];
-		allPipelineTasks.clear();
 		renderTextureMarks.Clear();
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
 			std::vector<TemporalRTCommand>& descriptors = component->SendRenderTextureRequire();
 			//Allocate Temporal Render Texture
-			component->allTempRT.resize(descriptors.size());
 			for (UINT j = 0; j < descriptors.size(); ++j)
 			{
 				TemporalRTCommand& command = descriptors[j];
@@ -95,19 +105,37 @@ void RenderPipeline::RenderCamera(
 			}
 
 		}
+		
 		for (UINT i = 0; i < renderTextureMarks.values.size(); ++i)
 		{
 			RenderTextureMark& mark = renderTextureMarks.values[i].value;
 			waitingComponents[mark.startComponent]->loadRTCommands.push_back({ mark.id, mark.rtIndex, mark.desc });
 			waitingComponents[mark.endComponent]->unLoadRTCommands.emplace_back(mark.id);
 		}
+		
+		PipelineComponent::EventData data;
+		data.camera = cam;
+		data.device = device;
+		data.backBuffer = backBufferResource;
+		data.resource = resource;
+		data.backBufferHandle = backBufferHandle;
+
+		maskFinishTask = resource->taskFlow.emplace([]()->void {
+			//TODO
+			//Post Work Here
+		});
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
-		{ 
+		{
 			PipelineComponent* component = waitingComponents[i];
 			component->threadCommand = InitThreadCommand(device, cam, resource, component);
 			component->ExecuteTempRTCommand(device, &tempRTAllocator);
-			allPipelineTasks.insert_or_assign(component, std::move(component->RenderEvent(device, resource->taskFlow, component->threadCommand)));
+			tf::Task currentTask = component->RenderEvent(data, resource->taskFlow, component->threadCommand);
+			if (!lastMaskFinishTask.empty())
+				lastMaskFinishTask.precede(currentTask);
+			currentTask.precede(maskFinishTask);
+			allPipelineTasks.insert_or_assign(component, currentTask);
 		}
+		lastMaskFinishTask = maskFinishTask;
 		//Build events dependency
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{
@@ -127,18 +155,23 @@ void RenderPipeline::RenderCamera(
 				}
 			}
 		}
+		
 	}
-	resource->waiter = executor.run(resource->taskFlow);
 	if (lastResource != nullptr)
 	{
-		lastResource->waiter.wait();
+		waiter.wait();
+	}
+	waiter = executor.run(resource->taskFlow);
+	if (lastResource != nullptr)
+	{
 		lastResource->taskFlow.clear();
 		//Final Execute
-		if (lastResource->executableCommandList.size() > 0)
+		if (lastFrame && lastResource->executableCommandList.size() > 0)
 			commandQueue->ExecuteCommandLists(lastResource->executableCommandList.size(), lastResource->executableCommandList.data());
 		//Finalize Frame
 		lastResource->executableCommandList.clear();
 		lastResource->UpdateAfterFrame(fenceIndex, commandQueue, fence);
 	}
+	ThrowIfFailed(swapChain->Present(0, 0));
 	tempRTAllocator.CumulateReleaseAfterFrame();
 }

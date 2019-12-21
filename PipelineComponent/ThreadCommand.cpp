@@ -4,6 +4,10 @@ void ThreadCommand::ResetCommand()
 	ThrowIfFailed(cmdAllocator->Reset());
 	ThrowIfFailed(cmdList->Reset(cmdAllocator.Get(), nullptr));
 }
+void ThreadCommand::CloseCommand()
+{
+	cmdList->Close();
+}
 ThreadCommand::ThreadCommand(ID3D12Device* device)
 {
 	ThrowIfFailed(device->CreateCommandAllocator(

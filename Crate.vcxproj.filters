@@ -255,6 +255,12 @@
     <ClInclude Include="PipelineComponent\IPerCameraResource.h">
       <Filter>Header Files\PipelineComponent</Filter>
     </ClInclude>
+    <ClInclude Include="PipelineComponent\PrepareComponent.h">
+      <Filter>Header Files\PipelineComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineComponent\GBufferComponent.h">
+      <Filter>Header Files\PipelineComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\DescriptorHeap.cpp">
@@ -375,6 +381,12 @@
       <Filter>Source Files\PipelineComponent</Filter>
     </ClCompile>
     <ClCompile Include="PipelineComponent\IPerCameraResource.cpp">
+      <Filter>Source Files\PipelineComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineComponent\PrepareComponent.cpp">
+      <Filter>Source Files\PipelineComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineComponent\GBufferComponent.cpp">
       <Filter>Source Files\PipelineComponent</Filter>
     </ClCompile>
   </ItemGroup>

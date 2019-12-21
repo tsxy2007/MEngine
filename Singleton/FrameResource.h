@@ -82,5 +82,4 @@ public:
 	//Rendering Events
 	std::vector<ID3D12CommandList*> executableCommandList;
 	tf::Taskflow taskFlow;
-	std::future<void> waiter;
 };

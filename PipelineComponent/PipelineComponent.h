@@ -89,19 +89,17 @@ protected:
 		return GetResource<Func>(std::move(func), data, thisClassPtr);
 	}
 public:
+	struct EventData
+	{
+		ID3D12Device* device;
+		ID3D12Resource* backBuffer;
+		Camera* camera;
+		FrameResource* resource;
+		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
+	};
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire() = 0;
 	virtual bool NeedCommandList() const = 0;
-	virtual tf::Task RenderEvent(ID3D12Device* device, tf::Taskflow& taskFlow, ThreadCommand* commandList) = 0;
+	virtual tf::Task RenderEvent(EventData& data, tf::Taskflow& taskFlow, ThreadCommand* commandList) = 0;
 	virtual std::vector<std::string> GetDependedEvent() = 0;
 	virtual ~PipelineComponent() {}
-};
-
-class TestComponent : public PipelineComponent
-{
-public:
-	std::vector<TemporalRTCommand> sb;
-	virtual bool NeedCommandList() const { return false; }
-	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire() { return sb; }
-	virtual tf::Task RenderEvent(ID3D12Device* device, tf::Taskflow& taskFlow, ThreadCommand* commandList) { tf::Task t; return t; }
-	virtual std::vector<std::string> GetDependedEvent() { std::vector<std::string>  t; return t; }
 };

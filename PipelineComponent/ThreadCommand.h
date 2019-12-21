@@ -14,4 +14,5 @@ public:
 	inline ID3D12GraphicsCommandList* GetCmdList() const { return cmdList.Get(); }
 	ThreadCommand(ID3D12Device* device);
 	void ResetCommand();
+	void CloseCommand();
 };

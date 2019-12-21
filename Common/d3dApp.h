@@ -64,8 +64,6 @@ protected:
 
 	ID3D12Resource* CurrentBackBuffer()const;
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView()const;
-	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView()const;
-
 	void CalculateFrameStats();
 
     void LogAdapters();
@@ -99,17 +97,10 @@ protected:
     UINT64 mCurrentFence = 0;
 	
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mDirectCmdListAlloc;
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> mCommandList;
-
 	static const int SwapChainBufferCount = 2;
 	int mCurrBackBuffer = 0;
     Microsoft::WRL::ComPtr<ID3D12Resource> mSwapChainBuffer[SwapChainBufferCount];
-    Microsoft::WRL::ComPtr<ID3D12Resource> mDepthStencilBuffer;
-
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mRtvHeap;
-    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvHeap;
-
     D3D12_VIEWPORT mScreenViewport; 
     D3D12_RECT mScissorRect;
 
@@ -121,7 +112,6 @@ protected:
 	std::wstring mMainWndCaption = L"d3d App";
 	D3D_DRIVER_TYPE md3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
     DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-    DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	int mClientWidth = 800;
 	int mClientHeight = 600;
 };

@@ -34,8 +34,10 @@
     <ClInclude Include="Common\Pool.h" />
     <ClInclude Include="LogicComponent\Transform.h" />
     <ClInclude Include="PipelineComponent\CullTask.h" />
+    <ClInclude Include="PipelineComponent\GBufferComponent.h" />
     <ClInclude Include="PipelineComponent\IPerCameraResource.h" />
     <ClInclude Include="PipelineComponent\PipelineComponent.h" />
+    <ClInclude Include="PipelineComponent\PrepareComponent.h" />
     <ClInclude Include="PipelineComponent\RenderPipeline.h" />
     <ClInclude Include="PipelineComponent\TempRTAllocator.h" />
     <ClInclude Include="PipelineComponent\ThreadCommand.h" />
@@ -104,8 +106,10 @@
     <ClCompile Include="CrateApp.cpp" />
     <ClCompile Include="LogicComponent\Transform.cpp" />
     <ClCompile Include="PipelineComponent\CullTask.cpp" />
+    <ClCompile Include="PipelineComponent\GBufferComponent.cpp" />
     <ClCompile Include="PipelineComponent\IPerCameraResource.cpp" />
     <ClCompile Include="PipelineComponent\PipelineComponent.cpp" />
+    <ClCompile Include="PipelineComponent\PrepareComponent.cpp" />
     <ClCompile Include="PipelineComponent\RenderPipeline.cpp" />
     <ClCompile Include="PipelineComponent\TempRTAllocator.cpp" />
     <ClCompile Include="PipelineComponent\ThreadCommand.cpp" />
