@@ -119,9 +119,6 @@ public:
 	POINT mLastMousePos;
 	//ThreadCommand* mainThreadCommand;
 	//ThreadCommand* separateThreadCommand;
-	tf::Executor taskFlowExecutor;
-	//tf::Taskflow taskFlow;
-	std::mutex mtx;
 
 	//StoragePSOContainer mainRTPsoContainer;
 	//StoragePSOContainer mirrorRTPsoContainter;
@@ -154,12 +151,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 CrateApp::CrateApp(HINSTANCE hInstance)
 	: D3DApp(hInstance)
 {
+	JobSystem::Initialize(10);
 }
 
 CrateApp::~CrateApp()
 {
 	if (md3dDevice != nullptr)
 		FlushCommandQueue();
+	JobSystem::Dispose();
 }
 
 bool CrateApp::Initialize()
@@ -304,7 +303,6 @@ void CrateApp::Draw(const GameTimer& gt)
 		lastResource, 
 		FrameResource::mCurrFrameResource, 
 		cam,
-		taskFlowExecutor,
 		mFence.Get(),
 		mCurrentFence,
 		lastFrameExecute, mSwapChain.Get());

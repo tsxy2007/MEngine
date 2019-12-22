@@ -32,6 +32,11 @@
     <ClInclude Include="Common\MetaLib.h" />
     <ClInclude Include="Common\MQueue.h" />
     <ClInclude Include="Common\Pool.h" />
+    <ClInclude Include="JobSystem\ConcurrentQueue.h" />
+    <ClInclude Include="JobSystem\JobBucket.h" />
+    <ClInclude Include="JobSystem\JobHandle.h" />
+    <ClInclude Include="JobSystem\JobNode.h" />
+    <ClInclude Include="JobSystem\JobSystem.h" />
     <ClInclude Include="LogicComponent\Transform.h" />
     <ClInclude Include="PipelineComponent\CullTask.h" />
     <ClInclude Include="PipelineComponent\GBufferComponent.h" />
@@ -104,6 +109,10 @@
     <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="CrateApp.cpp" />
+    <ClCompile Include="JobSystem\JobBucket.cpp" />
+    <ClCompile Include="JobSystem\JobHandle.cpp" />
+    <ClCompile Include="JobSystem\JobNode.cpp" />
+    <ClCompile Include="JobSystem\JobSystem.cpp" />
     <ClCompile Include="LogicComponent\Transform.cpp" />
     <ClCompile Include="PipelineComponent\CullTask.cpp" />
     <ClCompile Include="PipelineComponent\GBufferComponent.cpp" />

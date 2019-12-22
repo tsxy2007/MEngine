@@ -1,4 +1,8 @@
-﻿  d3dApp.cpp
+﻿  Camera.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+  d3dApp.cpp
 c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
 c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
@@ -13,16 +17,54 @@ c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warni
   c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
   c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\crateapp.cpp(175): warning C4101: “geoGen”: 未引用的局部变量
-c:\users\user\source\repos\crate\crateapp.cpp(209): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\user\source\repos\crate\crateapp.cpp(174): warning C4101: “geoGen”: 未引用的局部变量
+c:\users\user\source\repos\crate\crateapp.cpp(208): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+  JobBucket.cpp
+  JobHandle.cpp
+  JobNode.cpp
+  JobSystem.cpp
+c:\users\user\source\repos\crate\jobsystem\jobsystem.cpp(32): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+  CullTask.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\singleton\mathlib.h(24): warning C4305: “初始化”: 从“double”到“float”截断
+c:\users\user\source\repos\crate\singleton\mathlib.h(25): warning C4305: “初始化”: 从“double”到“float”截断
+  GBufferComponent.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+  IPerCameraResource.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+  PipelineComponent.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+  PrepareComponent.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\preparecomponent.cpp(5): warning C4099: “PrepareRunnable”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\pipelinecomponent\preparecomponent.cpp(4): note: 参见“PrepareRunnable”的声明
   RenderPipeline.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
 c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
   c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
   c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(170): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(152): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(158): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4244: “=”: 从“_Ty”转换到“_Ty2”，可能丢失数据
           with
           [
@@ -186,5 +228,40 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
               _Keyty=const unsigned int &,
               _Mappedty=unsigned __int64
           ]
+  IndirectDrawer.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+c:\users\user\source\repos\crate\rendercomponent\indirectdrawer.cpp(45): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  Mesh.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+  MeshRenderer.cpp
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+  Skybox.cpp
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+  UploadBuffer.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\rendercomponent\uploadbuffer.cpp(17): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\uploadbuffer.cpp(18): warning C4267: “=”: 从“size_t”转换到“UINT”，可能丢失数据
+  FrameResource.cpp
+c:\users\user\source\repos\crate\taskflow\utility\passive_vector.hpp(173): warning C4003: 类函数宏的调用“max”参数不足
+c:\users\user\source\repos\crate\singleton\frameresource.h(43): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(42): note: 参见“FrameResource”的声明
   正在生成代码...
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Debug\Crate.exe

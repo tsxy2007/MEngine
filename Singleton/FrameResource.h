@@ -7,8 +7,8 @@
 #include <functional>
 #include "../PipelineComponent/ThreadCommand.h"
 #include "../Common/Pool.h"
+#include "../JobSystem/JobSystem.h"
 #include "../PipelineComponent/IPerCameraResource.h"
-#include "../taskflow/taskflow.hpp"
 class Camera;
 class IPerCameraResource;
 struct Vertex
@@ -81,5 +81,4 @@ public:
     UINT64 Fence = 0;
 	//Rendering Events
 	std::vector<ID3D12CommandList*> executableCommandList;
-	tf::Taskflow taskFlow;
 };

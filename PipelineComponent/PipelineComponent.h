@@ -1,10 +1,10 @@
 #pragma once
-#include "../taskflow/taskflow.hpp"
 #include <vector>
 #include "../RenderComponent/RenderTexture.h"
 #include "../PipelineComponent/IPerCameraResource.h"
 #include "../Common/Camera.h"
 #include <unordered_map>
+#include "../JobSystem/JobSystem.h"
 class ThreadCommand;
 class FrameResource;
 class RenderPipeline;
@@ -31,9 +31,11 @@ struct TemporalRTCommand
 		}
 	}
 };
+class PerCameraRenderingEvent;
 class PipelineComponent
 {
 	friend class RenderPipeline;
+	friend class PerCameraRenderingEvent;
 private:
 	static std::mutex mtx;
 	ThreadCommand* threadCommand;//thread command cache
@@ -99,7 +101,7 @@ public:
 	};
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire() = 0;
 	virtual bool NeedCommandList() const = 0;
-	virtual tf::Task RenderEvent(EventData& data, tf::Taskflow& taskFlow, ThreadCommand* commandList) = 0;
+	virtual JobHandle RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList) = 0;
 	virtual std::vector<std::string> GetDependedEvent() = 0;
 	virtual ~PipelineComponent() {}
 };

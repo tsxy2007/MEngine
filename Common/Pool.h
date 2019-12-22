@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <mutex>
 template <typename T>
 class Pool
 {
@@ -7,6 +8,7 @@ private:
 	std::vector<T*> allPtrs;
 	std::vector<void*> allocatedPtrs;
 	int capacity;
+	std::mutex mtx;
 	void AllocateMemory()
 	{
 		using Storage = std::aligned_storage_t<sizeof(T), alignof(T)>;
@@ -28,6 +30,7 @@ public:
 	template <typename... Args>
 	T* New(Args... args)
 	{
+		std::lock_guard<std::mutex> lck(mtx);
 		if (allPtrs.size() <= 0)
 			AllocateMemory();
 		T* value = allPtrs[allPtrs.size() - 1];
@@ -38,8 +41,9 @@ public:
 
 	void Delete(T* ptr)
 	{
-		allPtrs.push_back(ptr);
 		ptr->~T();
+		std::lock_guard<std::mutex> lck(mtx);
+		allPtrs.push_back(ptr);
 	}
 
 	~Pool()

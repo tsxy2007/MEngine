@@ -16,15 +16,15 @@ struct PrepareRunnable
 	}
 };
 
-tf::Task PrepareComponent::RenderEvent(EventData& data, tf::Taskflow& taskFlow, ThreadCommand* tCmd)
+JobHandle PrepareComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
 {
 	PrepareRunnable runnable =
 	{
 		this,
-		tCmd,
+		commandList,
 		data
 	};
-	tf::Task tsk = taskFlow.emplace(runnable);
+	JobHandle tsk = taskFlow.GetTask< PrepareRunnable>(std::move(runnable));
 	return tsk;
 }
 

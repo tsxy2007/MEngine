@@ -37,6 +37,12 @@
     <Filter Include="Header Files\LogicComponent">
       <UniqueIdentifier>{b44114fe-3994-4b68-8e55-962e859eef9b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\JobSystem">
+      <UniqueIdentifier>{518692fa-c4fb-46bc-a419-a10a484e10b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\JobSystem">
+      <UniqueIdentifier>{9f8b9eaa-1fea-4c75-8f52-ecffb698c49c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\DescriptorHeap.h">
@@ -261,6 +267,21 @@
     <ClInclude Include="PipelineComponent\GBufferComponent.h">
       <Filter>Header Files\PipelineComponent</Filter>
     </ClInclude>
+    <ClInclude Include="JobSystem\JobSystem.h">
+      <Filter>Header Files\JobSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="JobSystem\ConcurrentQueue.h">
+      <Filter>Header Files\JobSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="JobSystem\JobBucket.h">
+      <Filter>Header Files\JobSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="JobSystem\JobHandle.h">
+      <Filter>Header Files\JobSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="JobSystem\JobNode.h">
+      <Filter>Header Files\JobSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\DescriptorHeap.cpp">
@@ -388,6 +409,18 @@
     </ClCompile>
     <ClCompile Include="PipelineComponent\GBufferComponent.cpp">
       <Filter>Source Files\PipelineComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="JobSystem\JobSystem.cpp">
+      <Filter>Source Files\JobSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="JobSystem\JobBucket.cpp">
+      <Filter>Source Files\JobSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="JobSystem\JobHandle.cpp">
+      <Filter>Source Files\JobSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="JobSystem\JobNode.cpp">
+      <Filter>Source Files\JobSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

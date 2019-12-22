@@ -17,14 +17,14 @@ public:
 		tcmd->CloseCommand();
 	}
 };
-tf::Task GBufferComponent::RenderEvent(EventData& data, tf::Taskflow& taskFlow, ThreadCommand* tCmd)
+JobHandle GBufferComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
 {
 	GBufferRunnable runnable
 	{
 		data,
-		tCmd
+		commandList
 	};
-	tf::Task tsk = taskFlow.emplace(runnable);
+	JobHandle tsk = taskFlow.GetTask<GBufferRunnable>(std::move(runnable));
 	return tsk;
 }
 std::vector<std::string> GBufferComponent::GetDependedEvent()

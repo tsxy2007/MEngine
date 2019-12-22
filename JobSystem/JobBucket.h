@@ -1,0 +1,26 @@
+#pragma once
+#include <vector>
+#include "JobHandle.h"
+#include "../Common/Pool.h"
+class JobSystem;
+class JobThreadRunnable;
+class JobBucket
+{
+	friend class JobSystem;
+	friend class JobNode;
+	friend class JobHandle;
+	friend class JobThreadRunnable;
+private:
+	static Pool<JobNode> jobNodePool;
+	std::vector<JobNode*> jobNodesVec;
+public:
+	template <typename Func>
+	JobHandle GetTask(Func&& func)
+	{
+		JobNode* node = jobNodePool.New();
+		jobNodesVec.emplace_back(node);
+		node->Create<Func>(std::move(func));
+		JobHandle retValue(node);
+		return retValue;
+	}
+};
