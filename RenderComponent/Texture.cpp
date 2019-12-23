@@ -34,3 +34,10 @@ void Texture::GetResourceViewDescriptor(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc
 		break;
 	}
 }
+
+void Texture::BindToDescriptorHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	GetResourceViewDescriptor(srvDesc);
+	device->CreateShaderResourceView(Resource.Get(), &srvDesc, targetHeap->hCPU(index));
+}

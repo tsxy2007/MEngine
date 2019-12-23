@@ -13,17 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\TaskFlow">
-      <UniqueIdentifier>{e0d874fb-4d09-43cc-add3-2a7d61fb3511}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\PipelineComponent">
       <UniqueIdentifier>{0f083510-e60c-4209-8fca-4c404db37de6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\PipelineComponent">
       <UniqueIdentifier>{996991c6-45f7-4c38-ae4c-50a344c802e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Taskflow">
-      <UniqueIdentifier>{ac25d8ac-b7ae-4df2-9498-379032ac3371}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\RenderComponent">
       <UniqueIdentifier>{f820d0f2-ad84-4cfe-aafc-6f921d95426d}</UniqueIdentifier>
@@ -92,105 +86,6 @@
     </ClInclude>
     <ClInclude Include="Common\MQueue.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\architecture.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\architecture\arm.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\utility\backoff.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\compiler\clang.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\compiler\comp_detected.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\compiler.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\error\error.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\core\flow_builder.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\compiler\gcc.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\utility\generic_allocator.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\core\graph.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\os\ios.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\os\macos.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\architecture\mips.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\compiler\msvc.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\core\notifier.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\utility\object_pool.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\core\observer.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\os.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\os\os_detected.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\utility\passive_vector.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\architecture\ppc.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\utility\singular_allocator.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\core\spmc_queue.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\stringify.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\taskflow.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\core\taskflow.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\core\topology.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\utility\traits.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\version_number.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\predef\architecture\x86.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\core\executor.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
-    </ClInclude>
-    <ClInclude Include="taskflow\core\task.hpp">
-      <Filter>Header Files\TaskFlow</Filter>
     </ClInclude>
     <ClInclude Include="PipelineComponent\ThreadCommand.h">
       <Filter>Header Files\PipelineComponent</Filter>
@@ -340,24 +235,6 @@
     </ClCompile>
     <ClCompile Include="RenderComponent\ComputeShader.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="taskflow\core\executor.cpp">
-      <Filter>Source Files\Taskflow</Filter>
-    </ClCompile>
-    <ClCompile Include="taskflow\core\flow_builder.cpp">
-      <Filter>Source Files\Taskflow</Filter>
-    </ClCompile>
-    <ClCompile Include="taskflow\core\graph.cpp">
-      <Filter>Source Files\Taskflow</Filter>
-    </ClCompile>
-    <ClCompile Include="taskflow\core\observer.cpp">
-      <Filter>Source Files\Taskflow</Filter>
-    </ClCompile>
-    <ClCompile Include="taskflow\core\task.cpp">
-      <Filter>Source Files\Taskflow</Filter>
-    </ClCompile>
-    <ClCompile Include="taskflow\core\taskflow.cpp">
-      <Filter>Source Files\Taskflow</Filter>
     </ClCompile>
     <ClCompile Include="Singleton\PSOContainer.cpp">
       <Filter>Source Files\RenderComponent</Filter>

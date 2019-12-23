@@ -65,39 +65,6 @@
     <ClInclude Include="Singleton\PSOContainer.h" />
     <ClInclude Include="Singleton\ShaderCompiler.h" />
     <ClInclude Include="Singleton\ShaderID.h" />
-    <ClInclude Include="taskflow\core\executor.hpp" />
-    <ClInclude Include="taskflow\core\flow_builder.hpp" />
-    <ClInclude Include="taskflow\core\graph.hpp" />
-    <ClInclude Include="taskflow\core\notifier.hpp" />
-    <ClInclude Include="taskflow\core\observer.hpp" />
-    <ClInclude Include="taskflow\core\spmc_queue.hpp" />
-    <ClInclude Include="taskflow\core\task.hpp" />
-    <ClInclude Include="taskflow\core\taskflow.hpp" />
-    <ClInclude Include="taskflow\core\topology.hpp" />
-    <ClInclude Include="taskflow\error\error.hpp" />
-    <ClInclude Include="taskflow\predef\architecture.hpp" />
-    <ClInclude Include="taskflow\predef\architecture\arm.hpp" />
-    <ClInclude Include="taskflow\predef\architecture\mips.hpp" />
-    <ClInclude Include="taskflow\predef\architecture\ppc.hpp" />
-    <ClInclude Include="taskflow\predef\architecture\x86.hpp" />
-    <ClInclude Include="taskflow\predef\compiler.hpp" />
-    <ClInclude Include="taskflow\predef\compiler\clang.hpp" />
-    <ClInclude Include="taskflow\predef\compiler\comp_detected.hpp" />
-    <ClInclude Include="taskflow\predef\compiler\gcc.hpp" />
-    <ClInclude Include="taskflow\predef\compiler\msvc.hpp" />
-    <ClInclude Include="taskflow\predef\os.hpp" />
-    <ClInclude Include="taskflow\predef\os\ios.hpp" />
-    <ClInclude Include="taskflow\predef\os\macos.hpp" />
-    <ClInclude Include="taskflow\predef\os\os_detected.hpp" />
-    <ClInclude Include="taskflow\predef\stringify.hpp" />
-    <ClInclude Include="taskflow\predef\version_number.hpp" />
-    <ClInclude Include="taskflow\taskflow.hpp" />
-    <ClInclude Include="taskflow\utility\backoff.hpp" />
-    <ClInclude Include="taskflow\utility\generic_allocator.hpp" />
-    <ClInclude Include="taskflow\utility\object_pool.hpp" />
-    <ClInclude Include="taskflow\utility\passive_vector.hpp" />
-    <ClInclude Include="taskflow\utility\singular_allocator.hpp" />
-    <ClInclude Include="taskflow\utility\traits.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\Camera.cpp" />
@@ -140,12 +107,6 @@
     <ClCompile Include="Singleton\PSOContainer.cpp" />
     <ClCompile Include="Singleton\ShaderCompiler.cpp" />
     <ClCompile Include="Singleton\ShaderID.cpp" />
-    <ClCompile Include="taskflow\core\executor.cpp" />
-    <ClCompile Include="taskflow\core\flow_builder.cpp" />
-    <ClCompile Include="taskflow\core\graph.cpp" />
-    <ClCompile Include="taskflow\core\observer.cpp" />
-    <ClCompile Include="taskflow\core\task.cpp" />
-    <ClCompile Include="taskflow\core\taskflow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Crate.rc" />

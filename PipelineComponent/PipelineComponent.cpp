@@ -22,3 +22,16 @@ void PipelineComponent::ExecuteTempRTCommand(ID3D12Device* device, TempRTAllocat
 	}
 	unLoadRTCommands.clear();
 }
+
+bool TemporalRTCommand::operator=(const TemporalRTCommand& other) const
+{
+	bool eq = type == other.type && uID == other.uID;
+	if (type == Create)
+	{
+		return eq && descriptor == other.descriptor;
+	}
+	else
+	{
+		return eq;
+	}
+}

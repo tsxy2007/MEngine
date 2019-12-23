@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include "MObject.h"
-
+#include "../Common/DescriptorHeap.h"
 class Texture : public MObject
 {
 public:
@@ -16,6 +16,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
 	TextureType mType;
+	void GetResourceViewDescriptor(D3D12_SHADER_RESOURCE_VIEW_DESC& desc);
 public:
 
 	std::string Name;
@@ -37,6 +38,6 @@ public:
 		std::wstring filePath,
 		TextureType type = Tex2D
 	);
-	void GetResourceViewDescriptor(D3D12_SHADER_RESOURCE_VIEW_DESC& desc);
+	void BindToDescriptorHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device);
 };
 

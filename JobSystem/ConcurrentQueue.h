@@ -1,5 +1,6 @@
 #pragma once
 #include <mutex>
+#include <atomic>
 template <typename T>
 class ConcurrentQueue
 {
@@ -11,7 +12,9 @@ private:
 	Element* arr;
 	int64_t capacity;
 	int64_t start = 0;
-	int64_t end = 0;
+	std::atomic<int64_t> end = 0;
+	std::atomic<int64_t> runEnd = 0;
+
 	std::mutex mtx;// Pop must be single thread
 public:
 	ConcurrentQueue(int64_t capa) : capacity(capa)
@@ -41,24 +44,27 @@ public:
 		arr = newArr;
 		capacity = newCapacity;
 		end = 0;
+		runEnd = 0;
 		start = 0;
 	}
 
 	void Push(const T& value)
 	{
-		std::lock_guard<std::mutex> lck(mtx);
-		int64_t currentEnd = end++;
+		int64_t currentEnd = runEnd.fetch_add(1, std::memory_order_relaxed);
 		arr[currentEnd % capacity].value = value;
+		end.fetch_add(1, std::memory_order_relaxed);
 	}
 
 	bool TryPop(T* value)
 	{
-		std::lock_guard<std::mutex> lck(mtx);
-		int64_t currentStart = start++;
-		if (end - currentStart <= 0)
+		int64_t currentStart;
 		{
-			start--;
-			return false;
+			std::lock_guard<std::mutex> lck(mtx);
+			if (end - start <= 0)
+			{
+				return false;
+			}
+			currentStart = start++;
 		}
 		*value = arr[currentStart % capacity].value;
 		return true;

@@ -23,4 +23,13 @@ public:
 		JobHandle retValue(node);
 		return retValue;
 	}
+	template <typename Func>
+	JobHandle GetTask(Func& func)
+	{
+		JobNode* node = jobNodePool.New();
+		jobNodesVec.emplace_back(node);
+		node->Create<Func>(std::move(func));
+		JobHandle retValue(node);
+		return retValue;
+	}
 };

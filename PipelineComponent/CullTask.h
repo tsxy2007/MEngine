@@ -1,7 +1,6 @@
 #pragma once
 #include "../RenderComponent/MeshRenderer.h"
 #include "../Singleton/MathLib.h"
-#include "../taskflow/taskflow.hpp"
 
 class CullTask
 {
@@ -16,12 +15,12 @@ private:
 	std::vector<CullingResult> cullingResult;
 	DirectX::XMVECTOR cameraCullingPlanes[6];
 	//JobHandler waitingHandler;
-	tf::Task waitingTask;
+	//tf::Task waitingTask;
 public:
 	std::vector<CullingResult>* GetCullingResult();
-	tf::Task& GetTask() { return waitingTask; }
-	void ScheduleCullingJob(
+	//tf::Task& GetTask() { return waitingTask; }
+	/*void ScheduleCullingJob(
 		std::vector<MeshRenderer*>* targets,
 		DirectX::XMVECTOR* cullingPlanes,
-		tf::Taskflow& flow);
+		tf::Taskflow& flow);*/
 };

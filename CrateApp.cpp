@@ -124,6 +124,7 @@ public:
 	//StoragePSOContainer mirrorRTPsoContainter;
 	//StorageComputeShader testComputeShader;
 	FrameResource* lastResource = nullptr;
+	std::unique_ptr<ThreadCommand> directThreadCommand;
 };
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
@@ -167,6 +168,8 @@ bool CrateApp::Initialize()
 	if (!D3DApp::Initialize())
 		return false;
 	ShaderID::Init();
+	directThreadCommand = std::make_unique<ThreadCommand, ID3D12Device*>(md3dDevice.Get());
+	directThreadCommand->ResetCommand();
 	// Reset the command list to prep for initialization commands.
 	ShaderCompiler::Init(md3dDevice.Get());
 	LoadTextures();
@@ -181,7 +184,12 @@ bool CrateApp::Initialize()
 	//BuildPSOs();
 	// Execute the initialization commands.
 	// Wait until initialization is complete.
-	rp = std::make_unique<RenderPipeline>(md3dDevice.Get());
+	rp = std::make_unique<RenderPipeline>(md3dDevice.Get(), directThreadCommand->GetCmdList());
+	directThreadCommand->CloseCommand();
+	ID3D12CommandList* lst = directThreadCommand->GetCmdList();
+	mCommandQueue->ExecuteCommandLists(1, &lst);
+	FlushCommandQueue();
+	directThreadCommand = nullptr;
 	return true;
 }
 
@@ -295,17 +303,19 @@ void CrateApp::Draw(const GameTimer& gt)
 	mCommandQueue->ExecuteCommandLists(1, (ID3D12CommandList**)mCommandList.GetAddressOf());*/
 	cam[0] = mainCamera.operator->();
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-	rp->RenderCamera(
-		md3dDevice.Get(),
-		CurrentBackBuffer(), 
-		CurrentBackBufferView(), 
-		mCommandQueue.Get(),
-		lastResource, 
-		FrameResource::mCurrFrameResource, 
-		cam,
-		mFence.Get(),
-		mCurrentFence,
-		lastFrameExecute, mSwapChain.Get());
+	RenderPipelineData data;
+	data.device = md3dDevice.Get();
+	data.backBufferHandle = CurrentBackBufferView();
+	data.backBufferResource = CurrentBackBuffer();
+	data.commandQueue = mCommandQueue.Get();
+	data.lastResource = lastResource;
+	data.resource = FrameResource::mCurrFrameResource;
+	data.allCameras = &cam;
+	data.fence = mFence.Get();
+	data.fenceIndex = &mCurrentFence;
+	data.executeLastFrame = lastFrameExecute;
+	data.swap = mSwapChain.Get();
+	rp->RenderCamera(data);
 	lastFrameExecute = true;
 }
 
@@ -485,8 +495,8 @@ void CrateApp::BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Me
 		md3dDevice.Get(),
 		mCommandList.Get(),
 		subMeshs
-	);*/
-
+	);
+	*/
 }
 void CrateApp::BuildFrameResources()
 {

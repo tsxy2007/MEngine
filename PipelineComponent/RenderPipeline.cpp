@@ -19,7 +19,7 @@ void ExecuteThreadCommand(std::vector<ID3D12CommandList*>& executableCommands, C
 	}
 
 }
-RenderPipeline::RenderPipeline(ID3D12Device* device) : renderPathComponents(3)
+RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) : renderPathComponents(3)
 {
 	
 	//TODO
@@ -53,26 +53,15 @@ RenderPipeline::RenderPipeline(ID3D12Device* device) : renderPathComponents(3)
 	}
 }
 
-void RenderPipeline::RenderCamera(
-	ID3D12Device* device,
-	ID3D12Resource* backBufferResource,
-	D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle,
-	ID3D12CommandQueue* commandQueue,
-	FrameResource* lastResource,
-	FrameResource* resource,
-	std::vector<Camera*>& allCameras,
-	ID3D12Fence* fence,
-	UINT64& fenceIndex,
-	bool lastFrame,
-	IDXGISwapChain* swapChain)
+void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 {
 	std::vector <JobBucket>& bucketArray = buckets[bucketsFlag];
 	bucketsFlag = !bucketsFlag;
-	bucketArray.resize(allCameras.size());
-	for (UINT camIndex = 0; camIndex < allCameras.size(); ++camIndex)
+	bucketArray.resize(renderData.allCameras->size());
+	for (UINT camIndex = 0; camIndex < renderData.allCameras->size(); ++camIndex)
 	{
 		JobBucket& bucket = bucketArray[camIndex];
-		Camera* cam = allCameras[camIndex];
+		Camera* cam = (*renderData.allCameras)[camIndex];
 		std::vector<PipelineComponent*>& waitingComponents = renderPathComponents[(UINT)cam->GetRenderingPath()];
 		renderTextureMarks.Clear();
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
@@ -115,15 +104,15 @@ void RenderPipeline::RenderCamera(
 
 		PipelineComponent::EventData data;
 		data.camera = cam;
-		data.device = device;
-		data.backBuffer = backBufferResource;
-		data.resource = resource;
-		data.backBufferHandle = backBufferHandle;
+		data.device = renderData.device;
+		data.backBuffer = renderData.backBufferResource;
+		data.resource = renderData.resource;
+		data.backBufferHandle = renderData.backBufferHandle;
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
-			component->threadCommand = InitThreadCommand(device, cam, resource, component);
-			component->ExecuteTempRTCommand(device, &tempRTAllocator);
+			component->threadCommand = InitThreadCommand(renderData.device, cam, renderData.resource, component);
+			component->ExecuteTempRTCommand(renderData.device, &tempRTAllocator);
 			
 			JobHandle currentTask = component->RenderEvent(data, bucket, component->threadCommand);
 			allPipelineTasks.insert_or_assign(component, currentTask);
@@ -132,7 +121,7 @@ void RenderPipeline::RenderCamera(
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
-			ExecuteThreadCommand(resource->executableCommandList, cam, component->threadCommand);
+			ExecuteThreadCommand(renderData.resource->executableCommandList, cam, component->threadCommand);
 			auto&& ite = dependMap.find(component);
 			if (ite != dependMap.end())
 			{
@@ -148,22 +137,18 @@ void RenderPipeline::RenderCamera(
 			}
 		}
 	}
-	//Sleep(1);
 	JobSystem::ExecuteBucket(bucketArray.data(), bucketArray.size());
 
-	if (lastResource != nullptr)
+	if (renderData.lastResource != nullptr)
 	{
 		//Final Execute
-		if (lastFrame && lastResource->executableCommandList.size() > 0)
-			commandQueue->ExecuteCommandLists(lastResource->executableCommandList.size(), lastResource->executableCommandList.data());
+		if (renderData.executeLastFrame && renderData.lastResource->executableCommandList.size() > 0)
+			renderData.commandQueue->ExecuteCommandLists(renderData.lastResource->executableCommandList.size(), renderData.lastResource->executableCommandList.data());
 		//Finalize Frame
-		lastResource->executableCommandList.clear();
-		lastResource->UpdateAfterFrame(fenceIndex, commandQueue, fence);
+		renderData.lastResource->executableCommandList.clear();
+		renderData.lastResource->UpdateAfterFrame(*renderData.fenceIndex, renderData.commandQueue, renderData.fence);
 	}
 	
-	ThrowIfFailed(swapChain->Present(0, 0));
-
+	ThrowIfFailed(renderData.swap->Present(0, 0));
 	tempRTAllocator.CumulateReleaseAfterFrame();
-	
-	
 }

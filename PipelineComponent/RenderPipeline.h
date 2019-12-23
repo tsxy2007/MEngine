@@ -7,6 +7,20 @@
 #include "../JobSystem/JobSystem.h"
 class FrameResource;
 class Camera;
+struct RenderPipelineData
+{
+	ID3D12Device* device;
+	ID3D12Resource* backBufferResource;
+	D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
+	ID3D12CommandQueue* commandQueue;
+	FrameResource* lastResource;
+	FrameResource* resource;
+	std::vector<Camera*>* allCameras;
+	ID3D12Fence* fence;
+	UINT64* fenceIndex;
+	bool executeLastFrame;
+	IDXGISwapChain* swap;
+};
 class RenderPipeline final
 {
 private:
@@ -36,18 +50,7 @@ private:
 		componentsLink.insert_or_assign(typeid(T).name(), ptr);
 	}
 public:
-	RenderPipeline(ID3D12Device* device);
+	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 	//~RenderPipeline();
-	void RenderCamera(
-		ID3D12Device* device,
-		ID3D12Resource* backBufferResource,
-		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle,
-		ID3D12CommandQueue* commandQueue, 
-		FrameResource* lastResource,
-		FrameResource* resource,
-		std::vector<Camera*>& allCameras, 
-		ID3D12Fence* fence,
-		UINT64& fenceIndex,
-		bool executeLastFrame,
-		IDXGISwapChain* swap);
+	void RenderCamera(RenderPipelineData& data);
 };

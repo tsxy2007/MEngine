@@ -24,7 +24,7 @@ JobHandle PrepareComponent::RenderEvent(EventData& data, JobBucket& taskFlow, Th
 		commandList,
 		data
 	};
-	JobHandle tsk = taskFlow.GetTask< PrepareRunnable>(std::move(runnable));
+	JobHandle tsk = taskFlow.GetTask(runnable);
 	return tsk;
 }
 

@@ -68,6 +68,9 @@ private:
 	DescriptorHeap rtvHeap;
 	DescriptorHeap dsvHeap;
 	RenderTextureType mType; 
+	void GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
+	void GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
+	void GetColorUAVDesc(D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, UINT targetMipLevel);
 public:
 	virtual ~RenderTexture();
 	RenderTextureType GetType() const { return mType; }
@@ -86,9 +89,9 @@ public:
 	ID3D12Resource* GetColorResource() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE GetColorDescriptor(UINT slice);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthDescriptor(UINT slice);
-	void GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
-	void GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
-	void GetColorUAVDesc(D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, UINT targetMipLevel);
+	void BindColorBufferToHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device);
+	void BindDepthBufferToHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device);
+	void BindUAVToHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device, UINT targetMipLevel);
 	void ClearRenderTarget(ID3D12GraphicsCommandList* commandList, UINT slice, bool clearColor, bool clearDepth);
 	DXGI_FORMAT GetColorFormat() const;
 	DXGI_FORMAT GetDepthFormat() const;

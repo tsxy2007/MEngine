@@ -1,6 +1,6 @@
 #include "CullTask.h"
 using namespace DirectX;
-void CullTask::ScheduleCullingJob(std::vector<MeshRenderer*>* targets, DirectX::XMVECTOR* cullingPlanes, tf::Taskflow& flow)
+/*void CullTask::ScheduleCullingJob(std::vector<MeshRenderer*>* targets, DirectX::XMVECTOR* cullingPlanes, tf::Taskflow& flow)
 {
 	waitingBoundingBox = targets;
 	memcpy(cameraCullingPlanes, cullingPlanes, sizeof(DirectX::XMVECTOR) * 6);
@@ -22,7 +22,7 @@ void CullTask::ScheduleCullingJob(std::vector<MeshRenderer*>* targets, DirectX::
 		}
 	};
 	waitingTask = flow.emplace(std::move(cullingFunc));
-}
+}*/
 
 std::vector<CullTask::CullingResult>* CullTask::GetCullingResult()
 {

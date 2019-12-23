@@ -18,18 +18,7 @@ struct TemporalRTCommand
 	CommandType type;
 	UINT uID;
 	RenderTextureDescriptor descriptor;
-	bool operator=(const TemporalRTCommand& other) const
-	{
-		bool eq = type == other.type && uID == other.uID;
-		if (type == Create)
-		{
-			return eq && descriptor == other.descriptor;
-		}
-		else
-		{
-			return eq;
-		}
-	}
+	bool operator=(const TemporalRTCommand& other) const;
 };
 class PerCameraRenderingEvent;
 class PipelineComponent
