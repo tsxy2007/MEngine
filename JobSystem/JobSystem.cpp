@@ -3,7 +3,7 @@
 #include "ConcurrentQueue.h"
 #include <condition_variable>
 #include <atomic>
-
+int JobSystem::mThreadCount(0);
 ConcurrentQueue<JobNode*> executingNode(100);
 std::vector<std::thread*> allThreads;
 std::atomic<int> bucketMissionCount;
@@ -42,9 +42,16 @@ void JobSystem::UpdateNewBucket()
 	}
 	bucket->jobNodesVec.clear();
 	currentBucketPos++;
-	for (int64_t i = 0; i < executingNode.GetSize(); ++i) {
+	if (executingNode.GetSize() < mThreadCount) {
+		for (int64_t i = 0; i < executingNode.GetSize(); ++i) {
+			std::lock_guard<std::mutex> lck(JobNode::threadMtx);
+			cv.notify_one();
+		}
+	}
+	else
+	{
 		std::lock_guard<std::mutex> lck(JobNode::threadMtx);
-		cv.notify_one();
+		cv.notify_all();
 	}
 }
 
@@ -79,6 +86,7 @@ public:
 void JobSystem::Initialize(int threadCount)
 {
 	if (JobSystemInitialized) return;
+	mThreadCount = threadCount;
 	JobSystemInitialized = true;
 	allThreads.resize(threadCount);
 
