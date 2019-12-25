@@ -1,2 +1,2 @@
 #include "JobBucket.h"
-Pool<JobNode> JobBucket::jobNodePool(100);
+ConcurrentPool<JobNode> JobBucket::jobNodePool(100);

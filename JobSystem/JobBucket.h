@@ -11,7 +11,7 @@ class JobBucket
 	friend class JobHandle;
 	friend class JobThreadRunnable;
 private:
-	static Pool<JobNode> jobNodePool;
+	static ConcurrentPool<JobNode> jobNodePool;
 	std::vector<JobNode*> jobNodesVec;
 public:
 	template <typename Func>

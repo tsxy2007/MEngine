@@ -16,13 +16,6 @@ TempRTAllocator::~TempRTAllocator()
 		delete v.value;
 	}
 }
-
-TempRTAllocator::UsingTempRT* TempRTAllocator::GetUsingData(UINT id)
-{
-	UsingTempRT* ptr = usingRT[id];
-	return ptr;
-}
-
 RenderTexture* TempRTAllocator::GetRenderTextures(ID3D12Device* device, UINT id, RenderTextureDescriptor& descriptor)
 {
 
@@ -41,7 +34,7 @@ RenderTexture* TempRTAllocator::GetRenderTextures(ID3D12Device* device, UINT id,
 		UsingTempRT usingRTData;
 		usingRTData.rt = data.rt;
 		usingRTData.desc = descriptor;
-		usingRT.Add(id, usingRTData);
+		usingRT.insert_or_assign(id, usingRTData);
 		RenderTexture* result = data.rt.operator->();
 		datas->erase(datas->end() - 1);
 		return result;
@@ -51,22 +44,33 @@ RenderTexture* TempRTAllocator::GetRenderTextures(ID3D12Device* device, UINT id,
 		UsingTempRT usingRTData;
 		usingRTData.rt = new RenderTexture(device, descriptor.width, descriptor.height, descriptor.colorFormat, (int)descriptor.depthFormat != 0, descriptor.type, descriptor.depthSlice, 1);;
 		usingRTData.desc = descriptor;
-		usingRT.Add(id, usingRTData);
+		usingRT.insert_or_assign(id, usingRTData);
 		return usingRTData.rt.operator->();
 	}
+}
+bool TempRTAllocator::Contains(UINT id)
+{
+	return usingRT.find(id) != usingRT.end();
 }
 
 void TempRTAllocator::ReleaseRenderTexutre(UINT id)
 {
-	UsingTempRT* rt = usingRT[id];
-	if (rt != nullptr)
+	auto&& ite = usingRT.find(id);
+	if (ite != usingRT.end())
 	{
-		std::vector<TempRTData>** datasPtr = waitingRT[rt->desc];
+		std::vector<TempRTData>** datasPtr = waitingRT[ite->second.desc];
+		
 		if (datasPtr != nullptr)
 		{
-			(*datasPtr)->push_back({ rt->rt, id });
+			std::vector<TempRTData>* data = *datasPtr;
+			TempRTData rtData;
+			rtData.rt = ite->second.rt;
+			rtData.containedFrame = 0;
+			data->emplace_back(rtData);
+			int size = data->size();
+			size = data->size();
 		}
-		usingRT.Remove(id);
+		usingRT.erase(id);
 	}
 }
 

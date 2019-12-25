@@ -12,7 +12,7 @@ protected:
 	PassConstants currentCameraData;
 	std::vector<TemporalRTCommand> useless;
 	virtual bool NeedCommandList() const { return true; }
-	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire() { return useless; }
+	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt) { return useless; }
 	virtual JobHandle RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList);
 	virtual std::vector<std::string> GetDependedEvent()
 	{

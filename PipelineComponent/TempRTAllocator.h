@@ -17,11 +17,11 @@ private:
 		UINT containedFrame;
 	};
 	Dictionary<RenderTextureDescriptor, std::vector<TempRTData>*> waitingRT;
-	Dictionary<UINT, UsingTempRT> usingRT;
+	std::unordered_map<UINT, UsingTempRT> usingRT;
 public:
 	TempRTAllocator();
 	~TempRTAllocator();
-	UsingTempRT* GetUsingData(UINT id);
+	bool Contains(UINT id);
 	RenderTexture* GetRenderTextures(ID3D12Device* device, UINT id, RenderTextureDescriptor& descriptors);
 	void ReleaseRenderTexutre(UINT id);
 	void CumulateReleaseAfterFrame();

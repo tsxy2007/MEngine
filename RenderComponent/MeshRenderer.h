@@ -29,7 +29,7 @@ public:
 		DirectX::XMFLOAT3 initPosition,
 		DirectX::XMVECTOR initQuaternion,
 		DirectX::XMFLOAT3 localScale,
-		ObjectPtr<Mesh> initMesh,
+		ObjectPtr<Mesh>& initMesh,
 		std::vector<ObjectPtr<Material>>& allMaterials
 	);
 	void Draw(

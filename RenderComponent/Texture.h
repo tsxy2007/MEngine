@@ -38,6 +38,6 @@ public:
 		std::wstring filePath,
 		TextureType type = Tex2D
 	);
-	void BindToDescriptorHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device);
+	void BindToDescriptorHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
 };
 

@@ -9,7 +9,7 @@ RenderTexture* PipelineComponent::GetTempRT(UINT index)
 
 void PipelineComponent::ExecuteTempRTCommand(ID3D12Device* device, TempRTAllocator* allocator)
 {
-	allTempRT.resize(allTempRT.size());
+	allTempRT.resize(loadRTCommands.size());
 	for (UINT i = 0; i < loadRTCommands.size(); ++i)
 	{
 		LoadTempRTCommand& cmd = loadRTCommands[i];

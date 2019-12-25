@@ -84,14 +84,16 @@ public:
 		int depthCount,
 		int mipCount
 	);
+	UINT GetWidth() { return mWidth; }
+	UINT GetHeight() { return mHeight; }
 	void SetViewport(ID3D12GraphicsCommandList* commandList);
 	ID3D12Resource* GetDepthResource() const;
 	ID3D12Resource* GetColorResource() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE GetColorDescriptor(UINT slice);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthDescriptor(UINT slice);
-	void BindColorBufferToHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device);
-	void BindDepthBufferToHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device);
-	void BindUAVToHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device, UINT targetMipLevel);
+	void BindColorBufferToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
+	void BindDepthBufferToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
+	void BindUAVToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device, UINT targetMipLevel);
 	void ClearRenderTarget(ID3D12GraphicsCommandList* commandList, UINT slice, bool clearColor, bool clearDepth);
 	DXGI_FORMAT GetColorFormat() const;
 	DXGI_FORMAT GetDepthFormat() const;

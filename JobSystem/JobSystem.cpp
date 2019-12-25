@@ -117,6 +117,7 @@ void JobSystem::ExecuteBucket(JobBucket** bucket, int bucketCount)
 void JobSystem::ExecuteBucket(JobBucket* bucket, int bucketCount)
 {
 	Wait();
+	JobBucket::jobNodePool.UpdateSwitcher();
 	currentBucketPos = 0;
 	buckets.resize(bucketCount);
 	for (int i = 0; i < bucketCount; ++i)

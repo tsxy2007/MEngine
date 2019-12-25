@@ -359,19 +359,19 @@ mDepthFormat(DXGI_FORMAT_D24_UNORM_S8_UINT)
 	}
 }
 
-void RenderTexture::BindColorBufferToHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device)
+void RenderTexture::BindColorBufferToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	GetColorViewDesc(srvDesc);
 	device->CreateShaderResourceView(mColorResource.Get(), &srvDesc, targetHeap->hCPU(index));
 }
-void RenderTexture::BindDepthBufferToHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device)
+void RenderTexture::BindDepthBufferToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	GetDepthViewDesc(srvDesc);
 	device->CreateShaderResourceView(mDepthResource.Get(), &srvDesc, targetHeap->hCPU(index));
 }
-void RenderTexture::BindUAVToHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device, UINT targetMipLevel)
+void RenderTexture::BindUAVToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device, UINT targetMipLevel)
 {
 	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	GetColorUAVDesc(uavDesc, targetMipLevel);

@@ -61,9 +61,11 @@ struct RenderItem
 	UINT StartIndexLocation = 0;
 	int BaseVertexLocation = 0;
 };
+#include "LogicComponent/World.h"
 class CrateApp : public D3DApp
 {
 public:
+	typedef std::aligned_storage_t<sizeof(World), alignof(World)> WorldStorage;
 	CrateApp(HINSTANCE hInstance);
 	CrateApp(const CrateApp& rhs) = delete;
 	CrateApp& operator=(const CrateApp& rhs) = delete;
@@ -125,6 +127,7 @@ public:
 	//StorageComputeShader testComputeShader;
 	FrameResource* lastResource = nullptr;
 	std::unique_ptr<ThreadCommand> directThreadCommand;
+	WorldStorage worldPtr;
 };
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
@@ -160,6 +163,7 @@ CrateApp::~CrateApp()
 	if (md3dDevice != nullptr)
 		FlushCommandQueue();
 	JobSystem::Dispose();
+	((World*)&worldPtr)->~World();
 }
 
 bool CrateApp::Initialize()
@@ -184,6 +188,7 @@ bool CrateApp::Initialize()
 	//BuildPSOs();
 	// Execute the initialization commands.
 	// Wait until initialization is complete.
+	new (&worldPtr)World(directThreadCommand->GetCmdList(), md3dDevice.Get());
 	rp = std::make_unique<RenderPipeline>(md3dDevice.Get(), directThreadCommand->GetCmdList());
 	directThreadCommand->CloseCommand();
 	ID3D12CommandList* lst = directThreadCommand->GetCmdList();
@@ -214,6 +219,7 @@ void CrateApp::Update(const GameTimer& gt)
 	FrameResource::mCurrFrameResource->UpdateBeforeFrame(mFence.Get());
 	UpdateMaterialCBs(gt);
 	mainCamera->SetLens(0.333333 * MathHelper::Pi, AspectRatio(), 1.5, 100);
+	((World*)&worldPtr)->Update(FrameResource::mCurrFrameResource);
 	//mainRenderer->UpdateObjectBuffer(FrameResource::mCurrFrameResource);
 	//mainRenderer1->UpdateObjectBuffer(FrameResource::mCurrFrameResource);
 	//mainCamera->UploadCameraBuffer(FrameResource::mCurrFrameResource, mMainPassCB);
@@ -315,6 +321,9 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.fenceIndex = &mCurrentFence;
 	data.executeLastFrame = lastFrameExecute;
 	data.swap = mSwapChain.Get();
+	data.world = (World*)&worldPtr;
+	data.world->windowWidth = mClientWidth;
+	data.world->windowHeight = mClientHeight;
 	rp->RenderCamera(data);
 	lastFrameExecute = true;
 }

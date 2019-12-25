@@ -7,6 +7,7 @@
 #include "../JobSystem/JobSystem.h"
 class FrameResource;
 class Camera;
+class World;
 struct RenderPipelineData
 {
 	ID3D12Device* device;
@@ -20,6 +21,7 @@ struct RenderPipelineData
 	UINT64* fenceIndex;
 	bool executeLastFrame;
 	IDXGISwapChain* swap;
+	World* world;
 };
 class RenderPipeline final
 {

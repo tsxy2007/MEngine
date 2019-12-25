@@ -6,7 +6,7 @@ MeshRenderer::MeshRenderer(
 	XMFLOAT3 initPosition,
 	XMVECTOR initQuaternion,
 	XMFLOAT3 localScale,
-	ObjectPtr<Mesh> initMesh,
+	ObjectPtr<Mesh>& initMesh,
 	std::vector<ObjectPtr<Material>>& allMaterials
 ) : MObject(), mMaterials(allMaterials.size()), mesh(initMesh)
 {

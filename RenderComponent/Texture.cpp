@@ -35,7 +35,7 @@ void Texture::GetResourceViewDescriptor(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc
 	}
 }
 
-void Texture::BindToDescriptorHeap(ObjectPtr<DescriptorHeap>& targetHeap, UINT index, ID3D12Device* device)
+void Texture::BindToDescriptorHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	GetResourceViewDescriptor(srvDesc);

@@ -3,6 +3,7 @@
 #include "../PipelineComponent/ThreadCommand.h"
 #include "PrepareComponent.h"
 #include "GBufferComponent.h"
+#include "../LogicComponent/World.h"
 //ThreadCommand* threadCommand;
 
 ThreadCommand* InitThreadCommand(ID3D12Device* device, Camera* cam, FrameResource* resource, PipelineComponent* comp)
@@ -58,16 +59,23 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 	std::vector <JobBucket>& bucketArray = buckets[bucketsFlag];
 	bucketsFlag = !bucketsFlag;
 	bucketArray.resize(renderData.allCameras->size());
+	PipelineComponent::EventData data;
+	data.device = renderData.device;
+	data.backBuffer = renderData.backBufferResource;
+	data.resource = renderData.resource;
+	data.backBufferHandle = renderData.backBufferHandle;
+	data.world = renderData.world;
 	for (UINT camIndex = 0; camIndex < renderData.allCameras->size(); ++camIndex)
 	{
 		JobBucket& bucket = bucketArray[camIndex];
 		Camera* cam = (*renderData.allCameras)[camIndex];
+		data.camera = cam;
 		std::vector<PipelineComponent*>& waitingComponents = renderPathComponents[(UINT)cam->GetRenderingPath()];
 		renderTextureMarks.Clear();
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
-			std::vector<TemporalRTCommand>& descriptors = component->SendRenderTextureRequire();
+			std::vector<TemporalRTCommand>& descriptors = component->SendRenderTextureRequire(data);
 			//Allocate Temporal Render Texture
 			for (UINT j = 0; j < descriptors.size(); ++j)
 			{
@@ -75,7 +83,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 				if (command.type == TemporalRTCommand::Create)
 				{
 					//Alread contained
-					if (tempRTAllocator.GetUsingData(command.uID) != nullptr)
+					if (tempRTAllocator.Contains(command.uID))
 					{
 						throw "Alread Created Render Texture!";
 					}
@@ -102,12 +110,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 			waitingComponents[mark.endComponent]->unLoadRTCommands.emplace_back(mark.id);
 		}
 
-		PipelineComponent::EventData data;
-		data.camera = cam;
-		data.device = renderData.device;
-		data.backBuffer = renderData.backBufferResource;
-		data.resource = renderData.resource;
-		data.backBufferHandle = renderData.backBufferHandle;
+		
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];

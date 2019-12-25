@@ -98,6 +98,7 @@ private:
 	float mFovY = 0.0f;
 	float mNearWindowHeight = 0.0f;
 	float mFarWindowHeight = 0.0f;
+	
 
 	bool mViewDirty = true;
 

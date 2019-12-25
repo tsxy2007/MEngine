@@ -9,6 +9,7 @@ class ThreadCommand;
 class FrameResource;
 class RenderPipeline;
 class TempRTAllocator;
+class World;
 struct TemporalRTCommand
 {
 	enum CommandType
@@ -86,9 +87,10 @@ public:
 		ID3D12Resource* backBuffer;
 		Camera* camera;
 		FrameResource* resource;
+		World* world;
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
 	};
-	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire() = 0;
+	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt) = 0;
 	virtual bool NeedCommandList() const = 0;
 	virtual JobHandle RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList) = 0;
 	virtual std::vector<std::string> GetDependedEvent() = 0;

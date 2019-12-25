@@ -32,7 +32,13 @@ public:
 	void ResizeAndClear(int64_t newCapacity)
 	{
 		//std::lock_guard<std::mutex> lck(mtx);
-		if (newCapacity <= capacity) return;
+		if (newCapacity <= capacity)
+		{
+			end = 0;
+			runEnd = 0;
+			start = 0;
+			return;
+		}
 		int64_t  doubleCapa = capacity * 2;
 		newCapacity = newCapacity > doubleCapa ? newCapacity : doubleCapa;
 		Element* newArr = (Element*)malloc(sizeof(Element) * newCapacity);
@@ -51,7 +57,7 @@ public:
 	void Push(const T& value)
 	{
 		int64_t currentEnd = runEnd.fetch_add(1, std::memory_order_relaxed);
-		arr[currentEnd % capacity].value = value;
+		arr[currentEnd  % capacity].value = value;
 		end.fetch_add(1, std::memory_order_relaxed);
 	}
 
