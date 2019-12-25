@@ -70,7 +70,7 @@ private:
 
 	Array unusedObjects[2];
 	std::mutex mtx;
-	bool objectSwitcher = false;
+	bool objectSwitcher = true;
 public:
 	void UpdateSwitcher()
 	{
@@ -125,14 +125,18 @@ public:
 		if (initCapacity < 3) initCapacity = 3;
 		unusedObjects[0].objs = new Storage*[initCapacity];
 		unusedObjects[0].capacity = initCapacity;
-		unusedObjects[0].count = initCapacity;
-		for (unsigned int i = 0; i < initCapacity; ++i)
+		unusedObjects[0].count = initCapacity / 2;
+		for (unsigned int i = 0; i < unusedObjects[0].count; ++i)
 		{
 			unusedObjects[0].objs[i] = (Storage*)malloc(sizeof(Storage));
 		}
 		unusedObjects[1].objs = new Storage*[initCapacity];
 		unusedObjects[1].capacity = initCapacity;
-		unusedObjects[1].count = 0;
+		unusedObjects[1].count = initCapacity / 2;
+		for (unsigned int i = 0; i < unusedObjects[1].count; ++i)
+		{
+			unusedObjects[1].objs[i] = (Storage*)malloc(sizeof(Storage));
+		}
 	}
 	~ConcurrentPool()
 	{
