@@ -5,7 +5,7 @@
 #include "GBufferComponent.h"
 #include "../LogicComponent/World.h"
 //ThreadCommand* threadCommand;
-
+RenderPipeline* RenderPipeline::current(nullptr);
 ThreadCommand* InitThreadCommand(ID3D12Device* device, Camera* cam, FrameResource* resource, PipelineComponent* comp)
 {
 	if (comp->NeedCommandList())
@@ -22,36 +22,21 @@ void ExecuteThreadCommand(std::vector<ID3D12CommandList*>& executableCommands, C
 }
 RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) : renderPathComponents(3)
 {
-	
+	current = this;
 	//TODO
 	//Init All Events Here
 	Init<PrepareComponent>();
 	Init<GBufferComponent>();
 
+
+	for (UINT i = 0; i < components.size(); ++i)
+	{
+		components[i]->Initialize();
+	}
 	//TODO
 	//Init Path
 	renderPathComponents[0].push_back(components[0]);
 	renderPathComponents[0].push_back(components[1]);
-	for (UINT i = 0; i < components.size(); ++i)
-	{
-		PipelineComponent* pcPtr = components[i];
-		std::vector<std::string> dependNames = pcPtr->GetDependedEvent();
-		std::vector<PipelineComponent*>* dependComponents = new std::vector<PipelineComponent*>;
-		dependComponents->reserve(dependNames.size());
-		for (UINT j = 0; j < dependNames.size(); ++j)
-		{
-			auto&& ite = componentsLink.find(dependNames[j]);
-			if (ite != componentsLink.end())
-			{
-				dependComponents->emplace_back(ite->second);
-			}
-			else
-			{
-				throw "Non Exist depended class!";
-			}
-		}
-		dependMap.insert_or_assign(pcPtr, std::move(dependComponents));
-	}
 }
 
 void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
@@ -116,28 +101,12 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 			PipelineComponent* component = waitingComponents[i];
 			component->threadCommand = InitThreadCommand(renderData.device, cam, renderData.resource, component);
 			component->ExecuteTempRTCommand(renderData.device, &tempRTAllocator);
-			
-			JobHandle currentTask = component->RenderEvent(data, bucket, component->threadCommand);
-			allPipelineTasks.insert_or_assign(component, currentTask);
+			component->RenderEvent(data, bucket, component->threadCommand);
 		}
-		//Build events dependency
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
 			ExecuteThreadCommand(renderData.resource->executableCommandList, cam, component->threadCommand);
-			auto&& ite = dependMap.find(component);
-			if (ite != dependMap.end())
-			{
-				JobHandle& task = allPipelineTasks[component];
-				for (UINT j = 0; j < ite->second->size(); ++j)
-				{
-					auto&& dependIte = allPipelineTasks.find((*ite->second)[j]);
-					if (dependIte != allPipelineTasks.end())
-					{
-						dependIte->second.Precede(task);
-					}
-				}
-			}
 		}
 	}
 	JobSystem::ExecuteBucket(bucketArray.data(), bucketArray.size());
@@ -154,4 +123,12 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 	
 	ThrowIfFailed(renderData.swap->Present(0, 0));
 	tempRTAllocator.CumulateReleaseAfterFrame();
+}
+
+RenderPipeline::~RenderPipeline()
+{
+	for (UINT i = 0; i < components.size(); ++i)
+	{
+		components[i]->Dispose();
+	}
 }

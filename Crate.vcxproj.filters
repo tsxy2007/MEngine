@@ -180,6 +180,9 @@
     <ClInclude Include="LogicComponent\World.h">
       <Filter>Header Files\LogicComponent</Filter>
     </ClInclude>
+    <ClInclude Include="RenderComponent\CommandSignature.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\DescriptorHeap.cpp">
@@ -304,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="LogicComponent\World.cpp">
       <Filter>Source Files\LogicComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\CommandSignature.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

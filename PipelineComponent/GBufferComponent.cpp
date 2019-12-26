@@ -27,7 +27,7 @@ std::vector<TemporalRTCommand>& GBufferComponent::SendRenderTextureRequire(Event
 	tempRTRequire[0].descriptor.height = evt.world->windowHeight;
 	return tempRTRequire;
 }
-JobHandle GBufferComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
+void GBufferComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
 {
 	GBufferRunnable runnable
 	{
@@ -36,18 +36,13 @@ JobHandle GBufferComponent::RenderEvent(EventData& data, JobBucket& taskFlow, Th
 		commandList,
 		GetTempRT(0)
 	};
-	JobHandle tsk = taskFlow.GetTask(runnable);
-	return tsk;
-}
-std::vector<std::string> GBufferComponent::GetDependedEvent()
-{
-	std::vector<std::string> depending = {};
-	return depending;
+	taskFlow.GetTask(runnable);
+//	return tsk;
 }
 
-GBufferComponent::GBufferComponent() : 
-	tempRTRequire(1)
+void GBufferComponent::Initialize()
 {
+	tempRTRequire.resize(1);
 	TemporalRTCommand& cmd = tempRTRequire[0];
 	cmd.type = TemporalRTCommand::Create;
 	cmd.uID = ShaderID::PropertyToID("_CameraRT");

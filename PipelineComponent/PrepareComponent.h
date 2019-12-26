@@ -13,10 +13,7 @@ protected:
 	std::vector<TemporalRTCommand> useless;
 	virtual bool NeedCommandList() const { return true; }
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt) { return useless; }
-	virtual JobHandle RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList);
-	virtual std::vector<std::string> GetDependedEvent()
-	{
-		std::vector<std::string> useless;
-		return useless;
-	}
+	virtual void RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList);
+	virtual void Initialize() {};
+	virtual void Dispose() {};
 };

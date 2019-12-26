@@ -6,15 +6,8 @@
 #include "Mesh.h"
 #include "../Singleton/FrameResource.h"
 #include "../Singleton/PSOContainer.h"
+#include "CommandSignature.h"
 class DescriptorHeap;
-struct MultiDrawCommand
-{
-	D3D12_GPU_VIRTUAL_ADDRESS objectCBufferAddress; // Object Constant Buffer Address
-	D3D12_GPU_VIRTUAL_ADDRESS materialBufferAddress; // Object Constant Buffer Address
-	D3D12_VERTEX_BUFFER_VIEW vertexBuffer;			// Vertex Buffer Address
-	D3D12_INDEX_BUFFER_VIEW indexBuffer;			//Index Buffer Address
-	D3D12_DRAW_INDEXED_ARGUMENTS drawArgs;			//Draw Arguments
-};
 struct MeshCommand
 {
 	Mesh* mesh;
@@ -28,7 +21,7 @@ struct CullShaderData
 class IndirectDrawer : public MObject
 {
 private:
-	Microsoft::WRL::ComPtr<ID3D12CommandSignature> mCommandSignature;
+	CommandSignature cmdSig;
 	Shader* mShader;
 	std::vector<MeshCommand> allMeshCommands;
 	UploadBuffer materialBuffers;

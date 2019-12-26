@@ -42,7 +42,7 @@ void IndirectDrawer::Draw(
 	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	mShader->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer.operator->(), cameraBuffer->element);
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(indirectDrawBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
-	commandList->ExecuteIndirect(mCommandSignature.Get(), allMeshCommands.size(), indirectDrawBuffer.Get(), 0, indirectDrawBuffer.Get(), sizeof(MultiDrawCommand) * allMeshCommands.size());
+	commandList->ExecuteIndirect(cmdSig.GetSignature(), allMeshCommands.size(), indirectDrawBuffer.Get(), 0, indirectDrawBuffer.Get(), sizeof(MultiDrawCommand) * allMeshCommands.size());
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(indirectDrawBuffer.Get(), D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 }
 
@@ -57,28 +57,13 @@ IndirectDrawer::IndirectDrawer(
 	ID3D12GraphicsCommandList* commandList
 ) : MObject(),
 mShader(targetShader),
-allMeshCommands(commandCount)
+allMeshCommands(commandCount), 
+cmdSig(targetShader, device)
 {
 	memcpy(allMeshCommands.data(), commands, sizeof(MeshCommand) * commandCount);
-	D3D12_COMMAND_SIGNATURE_DESC desc = {};
-	D3D12_INDIRECT_ARGUMENT_DESC indDesc[5];
 	csConstBuffer.Create(device, 1, true, sizeof(CullShaderData), false);
 	CullShaderData data = { commandCount };
 	csConstBuffer.CopyData(0, &data);
-	ZeroMemory(indDesc, 5 * sizeof(D3D12_INDIRECT_ARGUMENT_DESC));
-	indDesc[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW;
-	indDesc[0].ConstantBufferView.RootParameterIndex = targetShader->GetPropertyRootSigPos(ShaderID::GetPerObjectBufferID());
-	indDesc[1].Type = D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW;
-	indDesc[1].ConstantBufferView.RootParameterIndex = targetShader->GetPropertyRootSigPos(ShaderID::GetPerMaterialBufferID());
-	indDesc[2].Type = D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW;
-	indDesc[2].VertexBuffer.Slot = 0;
-	indDesc[3].Type = D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW;
-	indDesc[4].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
-	desc.ByteStride = sizeof(MultiDrawCommand);
-	desc.NodeMask = 0;
-	desc.NumArgumentDescs = 5;
-	desc.pArgumentDescs = indDesc;
-	device->CreateCommandSignature(&desc, targetShader->GetSignature(), IID_PPV_ARGS(&mCommandSignature));
 	indirectDataBuffer.Create(device, commandCount, false, sizeof(MultiDrawCommand), true);
 	materialBuffers.Create(device, materialCount, true, materialBufferStride, false);
 	objectBuffers.Create(device, commandCount, true, objectBufferStride, false);

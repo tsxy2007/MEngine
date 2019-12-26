@@ -26,6 +26,7 @@ struct RenderPipelineData
 class RenderPipeline final
 {
 private:
+	static RenderPipeline* current;
 	struct RenderTextureMark
 	{
 		UINT id;
@@ -37,22 +38,21 @@ private:
 	UINT initCount = 0;
 	std::vector<PipelineComponent*> components;
 	TempRTAllocator tempRTAllocator;
-	std::unordered_map<PipelineComponent*, JobHandle> allPipelineTasks;
 	std::unordered_map<std::string, PipelineComponent*> componentsLink;
-	std::unordered_map<PipelineComponent*, std::vector<PipelineComponent*>*> dependMap;
 	std::vector<std::vector<PipelineComponent*>> renderPathComponents;
 	Dictionary<UINT, RenderTextureMark> renderTextureMarks;
 	std::vector<JobBucket> buckets[2];
 	bool bucketsFlag = false;
-	template<typename T, typename ... Args>
-	void Init(Args... args)
+	template<typename T>
+	void Init()
 	{
-		T* ptr = new T(args...);
+		T* ptr = new T();
 		components.emplace_back(ptr);
 		componentsLink.insert_or_assign(typeid(T).name(), ptr);
 	}
 public:
 	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
-	//~RenderPipeline();
+	~RenderPipeline();
 	void RenderCamera(RenderPipelineData& data);
+	static PipelineComponent* GetComponent(std::string typeName);
 };

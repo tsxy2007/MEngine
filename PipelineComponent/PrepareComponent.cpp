@@ -16,7 +16,7 @@ struct PrepareRunnable
 	}
 };
 
-JobHandle PrepareComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
+void PrepareComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
 {
 	PrepareRunnable runnable =
 	{
@@ -25,7 +25,6 @@ JobHandle PrepareComponent::RenderEvent(EventData& data, JobBucket& taskFlow, Th
 		data
 	};
 	JobHandle tsk = taskFlow.GetTask(runnable);
-	return tsk;
 }
 
 PassConstants const* PrepareComponent::GetCameraData()
