@@ -24,7 +24,6 @@ public:
 		tcmd->ResetCommand();
 		ID3D12GraphicsCommandList* commandList = tcmd->GetCmdList();
 		rt->ClearRenderTarget(commandList, 0, true, true);
-		rt->SetViewport(commandList);
 		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 		/*	UINT64 n64RequiredSize = 0u;
 		UINT   nNumSubresources = 1u;
@@ -45,7 +44,7 @@ public:
 		commandList->CopyTextureRegion(&Dst, 0, 0, 0, &Src, nullptr);*/
 		//commandList->ClearRenderTargetView(backBufferHandle, DirectX::Colors::LightSteelBlue, 0, nullptr);
 		postProcessingShader->BindRootSignature(commandList);
-		Graphics::Blit(commandList, device, backBufferHandle, gbufferContainer, postProcessingShader, 0);
+		Graphics::Blit(commandList, device, backBufferHandle, gbufferContainer, rt->GetWidth(), rt->GetHeight(), postProcessingShader, 0);
 		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 		tcmd->CloseCommand();
 	}

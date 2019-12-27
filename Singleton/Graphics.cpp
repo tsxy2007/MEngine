@@ -46,13 +46,18 @@ void Graphics::Blit(
 	ID3D12Device* device,
 	D3D12_CPU_DESCRIPTOR_HANDLE renderTarget,
 	PSOContainer* container,
+	UINT width, UINT height,
 	Shader* shader, UINT pass)
 {
+	D3D12_VIEWPORT mViewport = { 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f };
+	D3D12_RECT mScissorRect = { 0, 0, (int)width, (int)height };
 	PSODescriptor psoDesc;
 	psoDesc.meshLayoutIndex = fullScreenMesh->GetLayoutIndex();
 	psoDesc.shaderPass = pass;
 	psoDesc.shaderPtr = shader;
 	commandList->OMSetRenderTargets(1, &renderTarget, true, nullptr);
+	commandList->RSSetViewports(1, &mViewport);
+	commandList->RSSetScissorRects(1, &mScissorRect);
 	float colors[4] = { 0,1,1,1 };
 	commandList->ClearRenderTargetView(renderTarget, colors, 0, nullptr);
 	commandList->SetPipelineState(container->GetState(psoDesc, device));
