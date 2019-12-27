@@ -250,7 +250,7 @@ mDepthFormat(DXGI_FORMAT_D24_UNORM_S8_UINT)
 		&texDesc,
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
 		&colorClear,
-		IID_PPV_ARGS(mColorResource.GetAddressOf())));
+		IID_PPV_ARGS(&mColorResource)));
 
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;

@@ -183,6 +183,9 @@
     <ClInclude Include="RenderComponent\CommandSignature.h">
       <Filter>Header Files\RenderComponent</Filter>
     </ClInclude>
+    <ClInclude Include="Singleton\Graphics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\DescriptorHeap.cpp">
@@ -310,6 +313,9 @@
     </ClCompile>
     <ClCompile Include="RenderComponent\CommandSignature.cpp">
       <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton\Graphics.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

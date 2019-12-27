@@ -16,7 +16,7 @@ private:
 	static std::mutex threadMtx;
 	std::atomic<unsigned int> targetDepending = 0;
 	std::vector<JobNode*> dependingEvent;
-	char stackArr[64];
+	char stackArr[256];
 	void* ptr = nullptr;
 	void(*destructorFunc)(void*) = nullptr;
 	void(*executeFunc)(void*);
@@ -24,7 +24,7 @@ private:
 	void Create(Func&& func)
 	{
 		using Storage = std::aligned_storage_t<sizeof(Func), alignof(Func)>;
-		if (sizeof(Storage) >= 64)	//Create in heap
+		if (sizeof(Storage) >= 256)	//Create in heap
 		{
 			ptr = new Func(std::move(func));
 			destructorFunc = [](void* currPtr)->void

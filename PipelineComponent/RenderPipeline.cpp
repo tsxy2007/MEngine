@@ -28,10 +28,9 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 	Init<PrepareComponent>();
 	Init<GBufferComponent>();
 
-
 	for (UINT i = 0; i < components.size(); ++i)
 	{
-		components[i]->Initialize();
+		components[i]->Initialize(device, commandList);
 	}
 	//TODO
 	//Init Path
@@ -130,5 +129,6 @@ RenderPipeline::~RenderPipeline()
 	for (UINT i = 0; i < components.size(); ++i)
 	{
 		components[i]->Dispose();
+		delete components[i];
 	}
 }

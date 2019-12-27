@@ -21,6 +21,7 @@
 #include "RenderComponent/IndirectDrawer.h"
 #include "RenderComponent/RenderTexture.h"
 #include "PipelineComponent/RenderPipeline.h"
+#include "Singleton/Graphics.h"
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -190,6 +191,7 @@ bool CrateApp::Initialize()
 	// Wait until initialization is complete.
 	new (&worldPtr)World(directThreadCommand->GetCmdList(), md3dDevice.Get());
 	rp = std::make_unique<RenderPipeline>(md3dDevice.Get(), directThreadCommand->GetCmdList());
+	Graphics::Initialize(md3dDevice.Get(), directThreadCommand->GetCmdList());
 	directThreadCommand->CloseCommand();
 	ID3D12CommandList* lst = directThreadCommand->GetCmdList();
 	mCommandQueue->ExecuteCommandLists(1, &lst);
@@ -206,6 +208,7 @@ void CrateApp::OnResize()
 
 void CrateApp::Update(const GameTimer& gt)
 {
+	if (mClientHeight < 1 || mClientWidth < 1) return;
 	OnKeyboardInput(gt);
 	UpdateCamera(gt);
 
@@ -237,6 +240,7 @@ void CrateApp::Update(const GameTimer& gt)
 std::vector<Camera*> cam(1);
 void CrateApp::Draw(const GameTimer& gt)
 {
+	if (mClientHeight < 1 || mClientWidth < 1) return;
 	/*mainThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(mainCamera.operator->(), md3dDevice.Get());
 	separateThreadCommand = FrameResource::mCurrFrameResource->GetNewThreadCommand(mainCamera.operator->(), md3dDevice.Get());
 	FrameResource::mCurrFrameResource->ReleaseThreadCommand(mainCamera.operator->(), mainThreadCommand);
@@ -324,7 +328,8 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.world = (World*)&worldPtr;
 	data.world->windowWidth = mClientWidth;
 	data.world->windowHeight = mClientHeight;
-	rp->RenderCamera(data);
+		rp->RenderCamera(data);
+	
 	lastFrameExecute = true;
 }
 

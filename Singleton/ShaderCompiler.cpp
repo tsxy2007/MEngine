@@ -23,6 +23,49 @@ ComputeShader* ShaderCompiler::GetComputeShader(std::string name)
 	return mComputeShaders[name];
 }
 
+void GetPostProcessShader(ID3D12Device* device)
+{
+	//ZWrite
+	D3D12_DEPTH_STENCIL_DESC dsDesc;
+	dsDesc.DepthEnable = FALSE;
+	dsDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	dsDesc.StencilEnable = FALSE;
+	dsDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+	dsDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+	const D3D12_DEPTH_STENCILOP_DESC defaultStencilOp =
+	{ D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
+	dsDesc.FrontFace = defaultStencilOp;
+	dsDesc.BackFace = defaultStencilOp;
+	//Cull
+	D3D12_RASTERIZER_DESC cullDesc;
+	cullDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	cullDesc.CullMode = D3D12_CULL_MODE_NONE;
+	cullDesc.FrontCounterClockwise = FALSE;
+	cullDesc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+	cullDesc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+	cullDesc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+	cullDesc.DepthClipEnable = FALSE;
+	cullDesc.MultisampleEnable = FALSE;
+	cullDesc.AntialiasedLineEnable = FALSE;
+	cullDesc.ForcedSampleCount = 0;
+	cullDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+	std::vector<Pass> allPasses(1);
+	Pass& p = allPasses[0];
+	p.fragment = "frag";
+	p.vertex = "vert";
+	p.filePath = L"Shaders\\PostProcess.hlsl";
+	p.name = "PostProcess";
+	p.rasterizeState = cullDesc;
+	p.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	p.depthStencilState = dsDesc;
+	p.psShader = nullptr;
+	p.vsShader = nullptr;
+	std::vector<ShaderVariable> var(0);
+	Shader* opaqueShader = new Shader(allPasses, var, device);
+	ShaderCompiler::AddShader("PostProcess", opaqueShader);
+}
+
 void GetOpaqueStandardShader(ID3D12Device* device)
 {
 	D3D12_DEPTH_STENCIL_DESC dsDesc;
@@ -163,5 +206,6 @@ void ShaderCompiler::Init(ID3D12Device* device)
 	GetOpaqueStandardShader(device);
 	GetSkyboxShader(device);
 	GetCullingShader(device);
+	GetPostProcessShader(device);
 }
 

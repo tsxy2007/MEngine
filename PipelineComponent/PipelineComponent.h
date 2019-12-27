@@ -90,7 +90,7 @@ public:
 		World* world;
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
 	};
-	virtual void Initialize() = 0;
+	virtual void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) = 0;
 	virtual void Dispose() = 0;
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt) = 0;
 	virtual bool NeedCommandList() const = 0;
