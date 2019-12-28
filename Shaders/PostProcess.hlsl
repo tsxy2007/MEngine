@@ -9,7 +9,14 @@ struct v2f
 	float4 position    : SV_POSITION;
     float2 uv : TEXCOORD;
 };
+Texture2D<float4> _MainTex : register(t0, space0);
 
+SamplerState pointWrapSampler  : register(s0);
+SamplerState pointClampSampler  : register(s1);
+SamplerState linearWrapSampler  : register(s2);
+SamplerState linearClampSampler  : register(s3);
+SamplerState anisotropicWrapSampler  : register(s4);
+SamplerState anisotropicClampSampler  : register(s5);
 v2f vert(appdata v)
 {
     v2f o;
@@ -20,5 +27,7 @@ v2f vert(appdata v)
 
 float4 frag(v2f i) : SV_TARGET
 {
-    return float4(i.uv,0,1);
+    float4 color = _MainTex.SampleLevel(pointClampSampler, saturate(i.uv), 0);
+    color.xyz = dot(color.xyz, 0.3333333);
+    return color;
 }

@@ -42,7 +42,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 {
 	std::vector <JobBucket>& bucketArray = buckets[bucketsFlag];
 	bucketsFlag = !bucketsFlag;
-	bucketArray.resize(renderData.allCameras->size());
+	bucketArray.resize(renderData.allCameras->size() + 1);
 	PipelineComponent::EventData data;
 	data.device = renderData.device;
 	data.backBuffer = renderData.backBufferResource;
@@ -94,7 +94,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 			waitingComponents[mark.endComponent]->unLoadRTCommands.emplace_back(mark.id);
 		}
 
-		
+
 		for (UINT i = 0; i < waitingComponents.size(); ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
@@ -108,6 +108,14 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 			ExecuteThreadCommand(renderData.resource->executableCommandList, cam, component->threadCommand);
 		}
 	}
+	ThreadCommand* commandList = renderData.resource->commmonThreadCommand;
+	bucketArray[renderData.allCameras->size()].GetTask([=]()->void
+	{
+		commandList->ResetCommand();
+		UploadBuffer::UploadData(commandList->GetCmdList());
+		commandList->CloseCommand();
+	});
+	renderData.resource->executableCommandList.emplace_back(commandList->GetCmdList());
 	JobSystem::ExecuteBucket(bucketArray.data(), bucketArray.size());
 
 	if (renderData.lastResource != nullptr)
@@ -119,7 +127,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 		renderData.lastResource->executableCommandList.clear();
 		renderData.lastResource->UpdateAfterFrame(*renderData.fenceIndex, renderData.commandQueue, renderData.fence);
 	}
-	
+
 	ThrowIfFailed(renderData.swap->Present(0, 0));
 	tempRTAllocator.CumulateReleaseAfterFrame();
 }
@@ -131,4 +139,5 @@ RenderPipeline::~RenderPipeline()
 		components[i]->Dispose();
 		delete components[i];
 	}
+
 }

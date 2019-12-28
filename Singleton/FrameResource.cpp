@@ -13,6 +13,7 @@ FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCo
 	objectCBs.reserve(50);
 	needClearResources.reserve(10);
 	needClearResourcesAfterFlush.reserve(10);
+	commmonThreadCommand = new ThreadCommand(device);
 }
 
 void FrameResource::UpdateBeforeFrame(ID3D12Fence* mFence)
@@ -94,4 +95,12 @@ FrameResource::~FrameResource()
 {
 	if (mCurrFrameResource == this)
 		mCurrFrameResource = nullptr;
+	for (auto ite = perCameraResources.begin(); ite != perCameraResources.end(); ++ite)
+	{
+		if (ite->second != nullptr)
+		{
+			delete ite->second;
+		}
+	}
+	delete commmonThreadCommand;
 }

@@ -11,8 +11,8 @@ void Graphics::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* comma
 	std::array<DirectX::XMFLOAT3, 3> vertex;
 	std::array<DirectX::XMFLOAT2, 3> uv;
 	vertex[0] = { -3, -1, 1 };
-	vertex[1] = { 1, 3, 1 };
-	vertex[2] = { 1, -1, 1 };
+	vertex[1] = { 1, -1, 1 };
+	vertex[2] = { 1, 3, 1 };
 	uv[0] = { -1, 1 };
 	uv[1] = { 1, 1 };
 	uv[2] = { 1, -1 };
@@ -41,10 +41,13 @@ void Graphics::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* comma
 
 }
 
+
 void Graphics::Blit(
 	ID3D12GraphicsCommandList* commandList,
 	ID3D12Device* device,
-	D3D12_CPU_DESCRIPTOR_HANDLE renderTarget,
+	D3D12_CPU_DESCRIPTOR_HANDLE* renderTarget,
+	UINT renderTargetCount,
+	D3D12_CPU_DESCRIPTOR_HANDLE* depthTarget,
 	PSOContainer* container,
 	UINT width, UINT height,
 	Shader* shader, UINT pass)
@@ -55,11 +58,9 @@ void Graphics::Blit(
 	psoDesc.meshLayoutIndex = fullScreenMesh->GetLayoutIndex();
 	psoDesc.shaderPass = pass;
 	psoDesc.shaderPtr = shader;
-	commandList->OMSetRenderTargets(1, &renderTarget, true, nullptr);
+	commandList->OMSetRenderTargets(renderTargetCount, renderTarget, true, depthTarget);
 	commandList->RSSetViewports(1, &mViewport);
 	commandList->RSSetScissorRects(1, &mScissorRect);
-	float colors[4] = { 0,1,1,1 };
-	commandList->ClearRenderTargetView(renderTarget, colors, 0, nullptr);
 	commandList->SetPipelineState(container->GetState(psoDesc, device));
 	commandList->IASetVertexBuffers(0, 1, &fullScreenMesh->VertexBufferView());
 	commandList->IASetIndexBuffer(&fullScreenMesh->IndexBufferView(0));

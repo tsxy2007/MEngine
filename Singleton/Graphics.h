@@ -9,7 +9,9 @@ public:
 	static void Blit(
 		ID3D12GraphicsCommandList* commandList,
 		ID3D12Device* device,
-		D3D12_CPU_DESCRIPTOR_HANDLE renderTarget,
+		D3D12_CPU_DESCRIPTOR_HANDLE* renderTarget,
+		UINT renderTargetCount,
+		D3D12_CPU_DESCRIPTOR_HANDLE* depthTarget,
 		PSOContainer* container,
 		UINT width, UINT height,
 		Shader* shader, UINT pass);

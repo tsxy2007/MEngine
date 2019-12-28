@@ -1,4 +1,8 @@
-﻿  Graphics.cpp
+﻿  GBufferComponent.cpp
+d:\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  d:\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+d:\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  d:\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
 d:\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
 d:\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
   c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明

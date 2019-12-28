@@ -9,8 +9,9 @@
 #include "../Common/Pool.h"
 #include "../JobSystem/JobSystem.h"
 #include "../PipelineComponent/IPerCameraResource.h"
+#include <mutex>
 class Camera;
-class IPerCameraResource;
+class PipelineComponent;
 struct Vertex
 {
     DirectX::XMFLOAT3 Pos;
@@ -51,8 +52,9 @@ private:
 	static Pool<FrameResCamera> perCameraDataMemPool;
 	static std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResourcesAfterFlush;
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResources;
+	std::unordered_map<PipelineComponent*, IPerCameraResource*> perCameraResources;
 public:
-
+	ThreadCommand* commmonThreadCommand;
 	static CBufferPool cameraCBufferPool;
 	static std::vector<std::unique_ptr<FrameResource>> mFrameResources;
 	static FrameResource* mCurrFrameResource;
@@ -81,4 +83,21 @@ public:
     UINT64 Fence = 0;
 	//Rendering Events
 	std::vector<ID3D12CommandList*> executableCommandList;
+	std::mutex mtx;
+	template <typename Func>
+	IPerCameraResource* GetResource(PipelineComponent* targetComponent, const Func& func)
+	{
+		auto&& ite = perCameraResources.find(targetComponent);
+		if (ite == perCameraResources.end())
+		{
+			std::lock_guard<std::mutex> lck(mtx);
+			if (ite == perCameraResources.end())
+			{
+				IPerCameraResource* newComp = func();
+				perCameraResources.insert_or_assign(targetComponent, newComp);
+				return newComp;
+			}
+		}
+		return ite->second;
+	}
 };

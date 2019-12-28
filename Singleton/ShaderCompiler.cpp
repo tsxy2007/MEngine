@@ -61,7 +61,14 @@ void GetPostProcessShader(ID3D12Device* device)
 	p.depthStencilState = dsDesc;
 	p.psShader = nullptr;
 	p.vsShader = nullptr;
-	std::vector<ShaderVariable> var(0);
+	//Properties
+	std::vector<ShaderVariable> var(1);
+	ShaderVariable& v = var[0];
+	v.name = "_MainTex";
+	v.registerPos = 0;
+	v.space = 0;
+	v.tableSize = 1;
+	v.type = ShaderVariable::DescriptorHeap;
 	Shader* opaqueShader = new Shader(allPasses, var, device);
 	ShaderCompiler::AddShader("PostProcess", opaqueShader);
 }

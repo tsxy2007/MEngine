@@ -8,11 +8,7 @@ struct PrepareRunnable
 	PipelineComponent::EventData data;
 	void operator()()
 	{
-		threadCommand->ResetCommand();
-		auto cmdList = threadCommand->GetCmdList();
 		data.camera->UploadCameraBuffer(data.resource, ths->currentCameraData);
-		UploadBuffer::UploadData(cmdList);
-		threadCommand->CloseCommand();
 	}
 };
 
