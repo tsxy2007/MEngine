@@ -68,3 +68,25 @@ void Graphics::Blit(
 	SubMesh& subMesh = fullScreenMesh->GetSubmesh(0);
 	commandList->DrawIndexedInstanced(subMesh.indexCount, 1, 0, 0, 0);
 }
+/*	UINT64 n64RequiredSize = 0u;
+UINT   nNumSubresources = 1u;
+D3D12_PLACED_SUBRESOURCE_FOOTPRINT stTxtLayouts = {};
+UINT64 n64TextureRowSizes = 0u;
+UINT   nTextureRowNum = 0u;
+D3D12_RESOURCE_DESC destDesc = backBuffer->GetDesc();
+device->GetCopyableFootprints(&destDesc
+	, 0
+	, nNumSubresources
+	, 0
+	, &stTxtLayouts
+	, &nTextureRowNum
+	, &n64TextureRowSizes
+	, &n64RequiredSize);
+CD3DX12_TEXTURE_COPY_LOCATION Dst(backBuffer, 0);
+CD3DX12_TEXTURE_COPY_LOCATION Src(rt->GetColorResource(), stTxtLayouts);
+commandList->CopyTextureRegion(&Dst, 0, 0, 0, &Src, nullptr);*/
+//commandList->ClearRenderTargetView(backBufferHandle, DirectX::Colors::LightSteelBlue, 0, nullptr);
+
+//sky->Draw()
+//postProcessingShader->BindRootSignature(commandList);
+//Graphics::Blit(commandList, device, &backBufferHandle, 1, nullptr, gbufferContainer, rt->GetWidth(), rt->GetHeight(), postProcessingShader, 0);

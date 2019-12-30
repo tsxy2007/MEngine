@@ -1,5 +1,11 @@
 #include "Skybox.h"
-
+#include "Shader.h"
+#include <mutex>
+#include "../Singleton/ShaderCompiler.h"
+#include "../Singleton/ShaderID.h"
+#include "MeshRenderer.h"
+#include "../Common/Camera.h"
+#include "../Singleton/PSOContainer.h"
 std::unique_ptr<Mesh> Skybox::fullScreenMesh = nullptr;
 void Skybox::Draw(
 	int targetPass,

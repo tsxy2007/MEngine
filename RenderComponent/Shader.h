@@ -2,7 +2,7 @@
 #include "../Common/d3dUtil.h"
 #include <vector>
 #include <string>
-#include "MObject.h"
+#include "../Common/MObject.h"
 struct Pass
 {
 	std::string name;
@@ -42,7 +42,8 @@ public:
 	Shader(
 		std::vector<Pass> passPaths,
 		std::vector<ShaderVariable> allShaderVariables,
-		ID3D12Device* device
+		ID3D12Device* device,
+		bool useShaderCache
 	);
 	void GetPassPSODesc(UINT pass, D3D12_GRAPHICS_PIPELINE_STATE_DESC* targetPSO);
 	ShaderVariable GetVariable(std::string name);

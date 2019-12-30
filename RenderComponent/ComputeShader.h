@@ -32,7 +32,8 @@ public:
 		std::wstring compilePath,
 		std::vector<std::string>& kernelName,
 		std::vector<ComputeShaderVariable>& allShaderVariables,
-		ID3D12Device* device);
+		ID3D12Device* device,
+		bool useCache);
 	size_t VariableLength() const { return mVariablesVector.size(); }
 	void BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* heap);
 	void SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset);

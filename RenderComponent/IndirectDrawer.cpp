@@ -1,6 +1,6 @@
 #include "IndirectDrawer.h"
 #include "../Singleton/ShaderID.h"
-#include "../Common/DescriptorHeap.h"
+#include "../RenderComponent/DescriptorHeap.h"
 #include "../Singleton/ShaderCompiler.h"
 #include "../RenderComponent/ComputeShader.h"
 using namespace Microsoft::WRL;

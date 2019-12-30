@@ -2,8 +2,8 @@
 #include "../Common/d3dUtil.h"
 #include <string>
 #include <vector>
-#include "MObject.h"
-#include "../Common/DescriptorHeap.h"
+#include "../Common/MObject.h"
+#include "../RenderComponent/DescriptorHeap.h"
 class Texture : public MObject
 {
 public:

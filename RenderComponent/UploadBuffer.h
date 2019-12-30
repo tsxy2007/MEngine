@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Common/d3dUtil.h"
-#include "../RenderComponent/MObject.h"
+#include "../Common/MObject.h"
 #include <mutex>
 class UploadBuffer : public MObject
 {

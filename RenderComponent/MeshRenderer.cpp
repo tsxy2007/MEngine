@@ -1,22 +1,21 @@
 #include "MeshRenderer.h"
+#include "../Singleton/PSOContainer.h"
+#include "../Singleton/ShaderID.h"
+#include "../Singleton/FrameResource.h"
+#include "../LogicComponent/Transform.h"
 using namespace DirectX;
 CBufferPool MeshRenderer::objectPool(sizeof(ObjectConstants), 256);
 MeshRenderer::MeshRenderer(
+	Transform* trans,
 	ID3D12Device* device,
-	XMFLOAT3 initPosition,
-	XMVECTOR initQuaternion,
-	XMFLOAT3 localScale,
 	ObjectPtr<Mesh>& initMesh,
 	std::vector<ObjectPtr<Material>>& allMaterials
-) : MObject(), mMaterials(allMaterials.size()), mesh(initMesh)
+) : Component(trans), mMaterials(allMaterials.size()), mesh(initMesh)
 {
 	for (int i = 0; i < allMaterials.size(); ++i)
 	{
 		mMaterials[i] = allMaterials[i];
 	}
-	transform.SetLocalScale(localScale);
-	transform.SetRotation(initQuaternion);
-	transform.SetPosition(initPosition);
 	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
 	{
 		FrameResource* ptr = FrameResource::mFrameResources[i].get();
@@ -88,7 +87,7 @@ void MeshRenderer::GetIndirectArgument(
 void MeshRenderer::UpdateObjectBuffer(FrameResource* resource)
 {
 	ObjectConstants buffer;
-	XMStoreFloat4x4(&buffer.objectToWorld, transform.GetLocalToWorldMatrix());
+	//XMStoreFloat4x4(&buffer.objectToWorld, transform.GetLocalToWorldMatrix());
 	ConstBufferElement ele = resource->objectCBs[GetInstanceID()];
 	ele.buffer->CopyData(ele.element, &buffer);
 }

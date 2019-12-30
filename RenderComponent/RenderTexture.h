@@ -1,7 +1,7 @@
 #pragma once
-#include "MObject.h"
+#include "../Common/MObject.h"
 #include "../Common/d3dUtil.h"
-#include "../Common/DescriptorHeap.h"
+#include "../RenderComponent/DescriptorHeap.h"
 enum class CubeMapFace : int
 {
 	PositiveX = 0,
@@ -22,12 +22,16 @@ enum class RenderTextureType : int
 
 struct RenderTextureDescriptor
 {
+	enum DepthType
+	{
+		None, Depth, DepthStencil
+	};
 	UINT width;
 	UINT height;
 	UINT depthSlice;
 	RenderTextureType type;
 	DXGI_FORMAT colorFormat;
-	DXGI_FORMAT depthFormat;
+	DepthType depthType;
 	bool operator==(const RenderTextureDescriptor& other) const;
 
 	bool operator==(RenderTextureDescriptor&& other) const;
@@ -48,7 +52,7 @@ namespace std
 		size_t operator()(const RenderTextureDescriptor& o) const
 		{
 			hash<UINT> ulongHash;
-			return ulongHash(o.width) ^ ulongHash(o.height) ^ ulongHash(o.depthSlice) ^ ulongHash((UINT)o.type) ^ ulongHash((UINT)o.colorFormat) ^ ulongHash((UINT)o.depthFormat);
+			return ulongHash(o.width) ^ ulongHash(o.height) ^ ulongHash(o.depthSlice) ^ ulongHash((UINT)o.type) ^ ulongHash((UINT)o.colorFormat) ^ ulongHash((UINT)o.depthType);
 		}
 	};
 }
@@ -79,7 +83,7 @@ public:
 		UINT width,
 		UINT height,
 		DXGI_FORMAT format,
-		bool useDepth,
+		UINT depthByte,
 		RenderTextureType type,
 		int depthCount,
 		int mipCount

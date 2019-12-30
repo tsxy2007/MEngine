@@ -1,13 +1,10 @@
 #pragma once
-#include "Shader.h"
-#include "../Singleton/ShaderCompiler.h"
-#include "../Singleton/ShaderID.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "MeshRenderer.h"
-#include <mutex>
-#include "../Common/Camera.h"
+class PSOContainer;
+class FrameResource;
+class ConstBufferElement;
 class Skybox : public MObject
 {
 private:

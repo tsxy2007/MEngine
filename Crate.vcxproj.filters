@@ -39,9 +39,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\DescriptorHeap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Common\d3dApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -106,9 +103,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderComponent\Material.h">
-      <Filter>Header Files\RenderComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent\MObject.h">
       <Filter>Header Files\RenderComponent</Filter>
     </ClInclude>
     <ClInclude Include="Singleton\PSOContainer.h">
@@ -186,11 +180,17 @@
     <ClInclude Include="Singleton\Graphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LogicComponent\Component.h">
+      <Filter>Header Files\LogicComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\DescriptorHeap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Common\DescriptorHeap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Common\GameTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -201,9 +201,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CrateApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\MObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Singleton\ShaderID.cpp">
@@ -315,6 +312,15 @@
       <Filter>Source Files\RenderComponent</Filter>
     </ClCompile>
     <ClCompile Include="Singleton\Graphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LogicComponent\Component.cpp">
+      <Filter>Source Files\LogicComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\DescriptorHeap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\MObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

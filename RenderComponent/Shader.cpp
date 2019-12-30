@@ -1,8 +1,9 @@
 #include "Shader.h"
 #include "../Singleton/ShaderID.h"
 #include "Texture.h"
-#include "../Common/DescriptorHeap.h"
+#include "../RenderComponent/DescriptorHeap.h"
 #include "UploadBuffer.h"
+#include <fstream>
 using namespace std;
 using Microsoft::WRL::ComPtr;
 Shader::~Shader()
@@ -34,10 +35,45 @@ void Shader::GetPassPSODesc(UINT pass, D3D12_GRAPHICS_PIPELINE_STATE_DESC* targe
 	targetPSO->DepthStencilState = p.depthStencilState;
 }
 
+ComPtr<ID3DBlob> CompileShader(std::wstring& path, std::string& functionName, std::string&& standard, D3D_SHADER_MACRO* macros, bool useCache)
+{
+	//std::fstream fs;
+	std::wstring filePath = path + L".hlsl";
+	/*std::wstring wstr(functionName.size() + 1, L' ');
+	wstr[0] = L'_';
+	for (int i = 0; i < functionName.size(); ++i)
+	{
+		wstr[i + 1] = functionName[i];
+	}
+	std::wstring cachePath = path + wstr + L".shaderCache";
+	fs.open(cachePath, ios::in);*/
+	ComPtr<ID3DBlob> result;
+	if(!useCache /*|| !fs*/)
+	{ 
+	//	fs.close();
+	//	fs.open(cachePath, ios::out);
+		result = d3dUtil::CompileShader(filePath, macros, functionName, standard);
+	//	fs.write((char*)result->GetBufferPointer(), result->GetBufferSize());
+	//	fs.close();
+	}
+	else
+	{
+	/*	fs.seekg(0, fs.end);
+		size_t shaderSize = fs.tellg();
+		fs.seekg(0, 0);
+		ThrowIfFailed(D3DCreateBlob(shaderSize, result.GetAddressOf()));
+		fs.read((char*)result->GetBufferPointer(), shaderSize);
+		size_t flag = fs.tellg();
+		fs.close();*/
+	}
+	return result;
+}
+
 Shader::Shader(
 	std::vector<Pass> passPaths,
 	std::vector<ShaderVariable> allShaderVariables,
-	ID3D12Device* device
+	ID3D12Device* device,
+	bool useShaderCache
 )
 {
 	//Create Pass
@@ -46,9 +82,9 @@ Shader::Shader(
 	{
 		Pass& p = passPaths[i];
 		if (p.vsShader == nullptr)
-			p.vsShader = d3dUtil::CompileShader(p.filePath, nullptr, p.vertex, "vs_5_1");
+			p.vsShader = CompileShader(p.filePath, p.vertex, "vs_5_1", nullptr, useShaderCache);// d3dUtil::CompileShader(p.filePath, nullptr, p.vertex, "vs_5_1");
 		if (p.psShader == nullptr)
-			p.psShader = d3dUtil::CompileShader(p.filePath, nullptr, p.fragment, "ps_5_1");
+			p.psShader = CompileShader(p.filePath, p.fragment, "ps_5_1", nullptr, useShaderCache);// d3dUtil::CompileShader(p.filePath, nullptr, p.fragment, "ps_5_1");
 		allPasses.push_back(std::move(p));
 	}
 	mVariablesDict.reserve(allShaderVariables.size() + 2);

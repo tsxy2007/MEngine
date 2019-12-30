@@ -12,7 +12,7 @@
 #define CAMERA_H
 
 #include "d3dUtil.h"
-#include "../RenderComponent/MObject.h"
+#include "../Common/MObject.h"
 #include "../RenderComponent/CBufferPool.h"
 #include "../RenderComponent/UploadBuffer.h"
 #include "../Singleton/FrameResource.h"

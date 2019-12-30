@@ -54,7 +54,7 @@ void GetPostProcessShader(ID3D12Device* device)
 	Pass& p = allPasses[0];
 	p.fragment = "frag";
 	p.vertex = "vert";
-	p.filePath = L"Shaders\\PostProcess.hlsl";
+	p.filePath = L"Shaders\\PostProcess";
 	p.name = "PostProcess";
 	p.rasterizeState = cullDesc;
 	p.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -69,7 +69,7 @@ void GetPostProcessShader(ID3D12Device* device)
 	v.space = 0;
 	v.tableSize = 1;
 	v.type = ShaderVariable::DescriptorHeap;
-	Shader* opaqueShader = new Shader(allPasses, var, device);
+	Shader* opaqueShader = new Shader(allPasses, var, device, false);
 	ShaderCompiler::AddShader("PostProcess", opaqueShader);
 }
 
@@ -91,7 +91,7 @@ void GetOpaqueStandardShader(ID3D12Device* device)
 	Pass& p = allPasses[0];
 	p.fragment = "PS";
 	p.vertex = "VS";
-	p.filePath = L"Shaders\\Default.hlsl";
+	p.filePath = L"Shaders\\Default";
 	p.name = "OpaqueStandard";
 	p.rasterizeState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	p.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -101,7 +101,7 @@ void GetOpaqueStandardShader(ID3D12Device* device)
 	Pass& sp = allPasses[1];
 	sp.fragment = "PS_PureColor";
 	sp.vertex = "VS";
-	sp.filePath = L"Shaders\\Default.hlsl";
+	sp.filePath = L"Shaders\\Default";
 	sp.name = "OpaqueStandardPureColor";
 	sp.rasterizeState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	sp.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -135,7 +135,7 @@ void GetOpaqueStandardShader(ID3D12Device* device)
 	var[4].space = 0;
 	var[4].name = "cubemap";
 	var[4].tableSize = 1;
-	Shader* opaqueShader = new Shader(allPasses, var, device);
+	Shader* opaqueShader = new Shader(allPasses, var, device, false);
 	ShaderCompiler::AddShader("OpaqueStandard", opaqueShader);
 
 }
@@ -158,7 +158,7 @@ void GetSkyboxShader(ID3D12Device* device)
 	Pass& p = allPasses[0];
 	p.fragment = "frag";
 	p.vertex = "vert";
-	p.filePath = L"Shaders\\Skybox.hlsl";
+	p.filePath = L"Shaders\\Skybox";
 	p.name = "Skybox";
 	p.rasterizeState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	p.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -176,7 +176,7 @@ void GetSkyboxShader(ID3D12Device* device)
 	var[1].space = 0;
 	var[1].name = "cubemap";
 	var[1].tableSize = 1;
-	Shader* skyboxShader = new Shader(allPasses, var, device);
+	Shader* skyboxShader = new Shader(allPasses, var, device, false);
 	ShaderCompiler::AddShader("Skybox", skyboxShader);
 }
 
@@ -202,7 +202,7 @@ void GetCullingShader(ID3D12Device* device)
 	vars[3].registerPos = 2;
 	vars[3].space = 0;
 	vars[3].type = ComputeShaderVariable::RWStructuredBuffer;
-	ComputeShader* cs = new ComputeShader(L"Shaders\\Cull.compute", kernelNames, vars, device);
+	ComputeShader* cs = new ComputeShader(L"Shaders\\Cull", kernelNames, vars, device, false);
 	ShaderCompiler::AddComputeShader("Cull", cs);
 }
 

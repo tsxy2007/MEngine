@@ -1,5 +1,5 @@
 #pragma once
-#include "../RenderComponent/MObject.h"
+#include "../Common/MObject.h"
 #include "../RenderComponent/RenderTexture.h"
 #include "../Common/MetaLib.h"
 class TempRTAllocator

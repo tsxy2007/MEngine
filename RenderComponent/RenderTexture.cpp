@@ -27,7 +27,7 @@ bool RenderTextureDescriptor::operator==(const RenderTextureDescriptor& other) c
 		depthSlice == other.depthSlice &&
 		type == other.type &&
 		colorFormat == other.colorFormat &&
-		depthFormat == other.depthFormat;
+		depthType == other.depthType;
 }
 
 bool RenderTextureDescriptor::operator==(RenderTextureDescriptor&& other) const
@@ -38,7 +38,7 @@ bool RenderTextureDescriptor::operator==(RenderTextureDescriptor&& other) const
 		depthSlice == other.depthSlice &&
 		type == other.type &&
 		colorFormat == other.colorFormat &&
-		depthFormat == other.depthFormat;
+		depthType == other.depthType;
 }
 
 bool RenderTextureDescriptor::operator!=(const RenderTextureDescriptor& other) const
@@ -49,7 +49,7 @@ bool RenderTextureDescriptor::operator!=(const RenderTextureDescriptor& other) c
 		depthSlice != other.depthSlice &&
 		type != other.type &&
 		colorFormat != other.colorFormat &&
-		depthFormat != other.depthFormat;
+		depthType != other.depthType;
 }
 
 bool RenderTextureDescriptor::operator!=(RenderTextureDescriptor&& other) const
@@ -60,7 +60,7 @@ bool RenderTextureDescriptor::operator!=(RenderTextureDescriptor&& other) const
 		depthSlice != other.depthSlice &&
 		type != other.type &&
 		colorFormat != other.colorFormat &&
-		depthFormat != other.depthFormat;
+		depthType != other.depthType;
 }
 void RenderTexture::GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc)
 {
@@ -199,7 +199,7 @@ RenderTexture::RenderTexture(
 	UINT width,
 	UINT height,
 	DXGI_FORMAT format,
-	bool useDepth,
+	UINT depthByte,
 	RenderTextureType type,
 	int depthCount,
 	int mipCount
@@ -209,8 +209,7 @@ mWidth(width),
 mHeight(height),
 mFormat(format),
 mViewport({ 0.0f, 0.0f, (float)width, (float)height, 0.0f, 1.0f }),
-mScissorRect({ 0, 0, (int)width, (int)height }),
-mDepthFormat(DXGI_FORMAT_D24_UNORM_S8_UINT)
+mScissorRect({ 0, 0, (int)width, (int)height })
 {
 	UINT arraySize;
 	switch (type)
@@ -296,9 +295,20 @@ mDepthFormat(DXGI_FORMAT_D24_UNORM_S8_UINT)
 		break;
 	}
 
+	if (depthByte == 0)
+	{
+		mDepthFormat = DXGI_FORMAT_UNKNOWN;
+	}
+	else if (depthByte <= 16)
+	{
+		mDepthFormat = DXGI_FORMAT_D16_UNORM;
+	}
+	else
+	{
+		mDepthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	}
 
-
-	if (useDepth)
+	if (depthByte > 0)
 	{
 		dsvHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, arraySize, false);
 		D3D12_RESOURCE_DESC depthStencilDesc;

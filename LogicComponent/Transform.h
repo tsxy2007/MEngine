@@ -1,13 +1,17 @@
 #pragma once
 #include <DirectXMath.h>
-class Transform
+#include "../Common/MObject.h"
+#include "../LogicComponent/Component.h"
+class Transform : public MObject
 {
+	friend class Component;
 private:
 	DirectX::XMFLOAT3 up;
 	DirectX::XMFLOAT3 forward;
 	DirectX::XMFLOAT3 right;
 	DirectX::XMFLOAT3 localScale;
 	DirectX::XMFLOAT3 position;
+	std::vector<Component> allComponents;
 public:
 	DirectX::XMFLOAT3 GetPosition() const { return position; }
 	DirectX::XMFLOAT3 GetForward() const { return forward; }
@@ -19,4 +23,5 @@ public:
 	void SetLocalScale(DirectX::XMFLOAT3 localScale);
 	DirectX::XMMATRIX GetLocalToWorldMatrix();
 	DirectX::XMMATRIX GetWorldToLocalMatrix();
+	Transform();
 };

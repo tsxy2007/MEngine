@@ -1,14 +1,64 @@
 #include "ComputeShader.h"
 #include "../Singleton/ShaderID.h"
 #include "UploadBuffer.h"
-#include "../Common/DescriptorHeap.h"
-using namespace std;
+#include "../RenderComponent/DescriptorHeap.h"
+#include "../Common/d3dUtil.h"
+#include <fstream>
+
 using Microsoft::WRL::ComPtr;
+ComPtr<ID3DBlob> Compile(std::wstring& path, std::string& kernelName, D3D_SHADER_MACRO* m, bool useCache)
+{
+	//std::fstream fs;
+	std::wstring filePath = path + L".compute";
+/*	std::wstring kernelLFilePath(kernelName.size() + 1, L'_');
+	kernelLFilePath[0] = L'_';
+	for (int i = 0; i < kernelName.size(); ++i)
+	{
+		kernelLFilePath[1 + i] = kernelName[i];
+	}
+	std::wstring cachePath = path + kernelLFilePath + L".computeCache";*/
+	//fs.open(cachePath, std::ios::in | std::ios::binary);
+	ComPtr<ID3DBlob> blob = nullptr;
+	//useCache = false;
+	if (!useCache/* || !fs*/)
+	{
+		//fs.close();
+	//	fs.open(cachePath, std::ios::out | std::ios::binary);
+	//	fs.clear();
+	//	fs.seekg(0, std::ios::beg);
+		blob = d3dUtil::CompileShader(filePath, m, kernelName, "cs_5_1");
+		//fs.write((char*)blob->GetBufferPointer(), blob->GetBufferSize());
+	//	fs.close();
+	}
+	else
+	{
+		/*
+		fs.seekg(0, fs.end);
+		size_t sz = fs.tellg();
+		fs.clear();
+		fs.seekg(0, std::ios::beg);
+		ThrowIfFailed(D3DCreateBlob(sz, blob.GetAddressOf()));
+		fs.read((char*)blob->GetBufferPointer(), sz);
+		ComPtr<ID3DBlob> testOne = d3dUtil::CompileShader(filePath, m, kernelName, "cs_5_1");
+		size_t value = false;
+		
+		for (size_t i = 0; i < testOne->GetBufferSize(); ++i)
+		{
+			char* c = (char*)blob->GetBufferPointer() + i;
+			char* cc = (char*)testOne->GetBufferPointer() + i;
+			if (*c != *cc) 
+				value = true;
+		}*/
+	}
+	return blob;
+}
+using namespace std;
 ComputeShader::ComputeShader(
 	wstring compilePath,
 	vector<std::string>& kernelName,
 	vector<ComputeShaderVariable>& allShaderVariables,
-	ID3D12Device* device) : csShaders(kernelName.size()), pso(kernelName.size())
+	ID3D12Device* device,
+	bool useCache) : csShaders(kernelName.size()), pso(kernelName.size())
 {
 	mVariablesDict.reserve(allShaderVariables.size() + 2);
 	mVariablesVector.reserve(allShaderVariables.size());
@@ -85,9 +135,10 @@ ComputeShader::ComputeShader(
 		serializedRootSig->GetBufferPointer(),
 		serializedRootSig->GetBufferSize(),
 		IID_PPV_ARGS(mRootSignature.GetAddressOf())));
-	for (int i = 0; i < kernelName.size(); ++i)
+	UINT kernelSize = kernelName.size();
+	for (int i = 0; i < kernelSize; ++i)
 	{
-		csShaders[i] = d3dUtil::CompileShader(compilePath, nullptr, kernelName[i], "cs_5_1");
+		csShaders[i] = Compile(compilePath, kernelName[i], nullptr, useCache);//d3dUtil::CompileShader(compilePath + L".compute", nullptr, kernelName[i], "cs_5_1");
 		D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
 		psoDesc.pRootSignature = mRootSignature.Get();
 		psoDesc.CS =
@@ -98,6 +149,7 @@ ComputeShader::ComputeShader(
 		psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 		ThrowIfFailed(device->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&pso[i])));
 	}
+	int i = 5;
 }
 
 void ComputeShader::BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* heap)

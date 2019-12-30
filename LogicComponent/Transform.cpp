@@ -18,6 +18,12 @@ void Transform::SetPosition(XMFLOAT3 position)
 	this->position = position;
 }
 
+Transform::Transform():
+	MObject()
+{
+
+}
+
 void Transform::SetLocalScale(XMFLOAT3 localScale)
 {
 	this->localScale = localScale;

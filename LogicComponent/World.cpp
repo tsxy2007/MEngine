@@ -1,7 +1,10 @@
 #include "World.h"
 #include "../Common/GeometryGenerator.h"
-#include "../Common/d3dUtil.h"
 #include "../Singleton/ShaderCompiler.h"
+#include "../Singleton/ShaderID.h"
+#include "../Singleton/FrameResource.h"
+#include "../RenderComponent/Material.h"
+#include "../RenderComponent/Mesh.h"
 using namespace DirectX;
 #pragma region  TEST_BUILDING_AREA
 void BuildMaterials(ObjectPtr<UploadBuffer>& materialPropertyBuffer, ID3D12Device* device, ObjectPtr<Material>& opaqueMaterial, ObjectPtr<DescriptorHeap>& bindlessTextureHeap)
@@ -59,27 +62,10 @@ void BuildTexture(ObjectPtr<Texture>& texs, ID3D12GraphicsCommandList* cmdList, 
 #pragma endregion
 World::World(ID3D12GraphicsCommandList* cmdList, ID3D12Device* device)
 {
-	GeometryGenerator geoGen;
-	heap = new DescriptorHeap();
-	heap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
-	BuildShapeGeometry(geoGen.CreateBox(1, 1, 1, 1), boxMesh, cmdList, device);
-	BuildMaterials(materialBuffer, device, testMat, heap);
-	BuildTexture(mainTexture, cmdList, device);
-	DirectX::XMFLOAT3 pos = { 0,0,0 };
-	DirectX::XMVECTOR rotation = { 0,0,0,1 };
-	DirectX::XMFLOAT3 scale = { 1,1,1 };
-	std::vector<ObjectPtr<Material>> mats = { testMat };
-	testBox = new MeshRenderer(
-		device,
-		pos,
-		rotation,
-		scale,
-		boxMesh,
-		mats
-	);
+
 }
 
 void World::Update(FrameResource* resource)
 {
-	testBox->UpdateObjectBuffer(resource);
+	
 }

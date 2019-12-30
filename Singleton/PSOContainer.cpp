@@ -36,7 +36,7 @@ ID3D12PipelineState* PSOContainer::GetState(PSODescriptor& desc, ID3D12Device* d
 		opaquePsoDesc.DSVFormat = depthFormat;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> result = nullptr;
 		ThrowIfFailed(device->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(result.GetAddressOf())));
-		allPSOState[desc] = result;
+		allPSOState.insert_or_assign(desc, result);
 		return result.Get();
 	};
 	return ite->second.Get();

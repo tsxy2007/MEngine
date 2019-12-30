@@ -5,7 +5,7 @@
 #include "Texture.h"
 #include <vector>
 #include <memory>
-#include "../Common/DescriptorHeap.h"
+#include "../RenderComponent/DescriptorHeap.h"
 class Material : public MObject
 {
 private:

@@ -1,6 +1,6 @@
 #pragma once
 #include "../Common/d3dUtil.h"
-#include "MObject.h"
+#include "../Common/MObject.h"
 #include "UploadBuffer.h"
 #include "Shader.h"
 #include "Mesh.h"
