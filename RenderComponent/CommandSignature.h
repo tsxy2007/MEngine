@@ -10,6 +10,8 @@ struct MultiDrawCommand
 	D3D12_DRAW_INDEXED_ARGUMENTS drawArgs;			//Draw Arguments
 	//Size = 72 byte
 	//int arr[18]
+	MultiDrawCommand& operator=(const MultiDrawCommand& cmd);
+	MultiDrawCommand& operator=(MultiDrawCommand&& cmd);
 };
 
 class CommandSignature

@@ -50,7 +50,7 @@ public:
 	}
 };
 
-template <typename F, int count>
+template <typename F, unsigned int count>
 struct LoopClass
 {
 	static void Do(F&& f)
@@ -69,15 +69,14 @@ struct LoopClass<F, 0>
 	}
 };
 
-template <typename F>
-struct LoopClass<F, -1>
+template <typename F, unsigned int count>
+void InnerLoop(F& function)
 {
-	static void Do(F&& f) {}
-};
+	LoopClass<F, count - 1>::Do(std::move(function));
+}
 
-
-template <typename F, int count>
-void Loop(F&& function)
+template <typename F, unsigned int count>
+void InnerLoop(F&& function)
 {
 	LoopClass<F, count - 1>::Do(std::move(function));
 }

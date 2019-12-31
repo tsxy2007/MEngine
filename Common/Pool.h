@@ -1,7 +1,14 @@
 #pragma once
 #include <vector>
-#include <mutex>
 #include <atomic>
+#include <mutex>
+template <typename T>
+class Storage
+{
+	static const size_t alignedSize = sizeof(T) + (alignof(T) - ((sizeof(T) - 1) % alignof(T)) ) - 1;
+	char c[alignedSize];
+};
+
 template <typename T>
 class Pool
 {
@@ -9,11 +16,10 @@ private:
 	std::vector<T*> allPtrs;
 	std::vector<void*> allocatedPtrs;
 	int capacity;
-	std::mutex mtx;
 	void AllocateMemory()
 	{
-		using Storage = std::aligned_storage_t<sizeof(T), alignof(T)>;
-		Storage* ptr = reinterpret_cast<Storage*>(malloc(sizeof(Storage) * capacity));
+		using StorageT = Storage<T>;
+		StorageT* ptr = reinterpret_cast<StorageT*>(malloc(sizeof(StorageT) * capacity));
 		for (int i = 0; i < capacity; ++i)
 		{
 			allPtrs.push_back(reinterpret_cast<T*>(ptr + i));
@@ -31,7 +37,6 @@ public:
 	template <typename... Args>
 	T* New(Args... args)
 	{
-		std::lock_guard<std::mutex> lck(mtx);
 		if (allPtrs.size() <= 0)
 			AllocateMemory();
 		T* value = allPtrs[allPtrs.size() - 1];
@@ -43,7 +48,6 @@ public:
 	void Delete(T* ptr)
 	{
 		ptr->~T();
-		std::lock_guard<std::mutex> lck(mtx);
 		allPtrs.push_back(ptr);
 	}
 
@@ -60,10 +64,10 @@ template <typename T>
 class ConcurrentPool
 {
 private:
-	typedef std::aligned_storage_t<sizeof(T), alignof(T)> Storage;
+	typedef Storage<T> StorageT;
 	struct Array
 	{
-		Storage** objs;
+		StorageT** objs;
 		std::atomic<int64_t> count;
 		int64_t capacity;
 	};
@@ -91,15 +95,15 @@ public:
 				if (currentCount >= arr->capacity)
 				{
 					int64_t newCapacity = arr->capacity * 2;
-					Storage** newArray = new Storage*[newCapacity];
-					memcpy(newArray, arr->objs, sizeof(Storage*) * arr->capacity);
+					StorageT** newArray = new StorageT*[newCapacity];
+					memcpy(newArray, arr->objs, sizeof(StorageT*) * arr->capacity);
 					delete arr->objs;
 					arr->objs = newArray;
 					arr->capacity = newCapacity;
 				}
 			}
 		}
-		arr->objs[currentCount] = (Storage*)targetPtr;
+		arr->objs[currentCount] = (StorageT*)targetPtr;
 	}
 	template <typename ... Args>
 	T* New(Args... args)
@@ -114,7 +118,7 @@ public:
 		}
 		else
 		{
-			t = (T*)malloc(sizeof(Storage));
+			t = (T*)malloc(sizeof(StorageT));
 		}
 		new (t)T(args...);
 		return t;
@@ -123,19 +127,19 @@ public:
 	ConcurrentPool(unsigned int initCapacity)
 	{
 		if (initCapacity < 3) initCapacity = 3;
-		unusedObjects[0].objs = new Storage*[initCapacity];
+		unusedObjects[0].objs = new StorageT*[initCapacity];
 		unusedObjects[0].capacity = initCapacity;
 		unusedObjects[0].count = initCapacity / 2;
 		for (unsigned int i = 0; i < unusedObjects[0].count; ++i)
 		{
-			unusedObjects[0].objs[i] = (Storage*)malloc(sizeof(Storage));
+			unusedObjects[0].objs[i] = (StorageT*)malloc(sizeof(StorageT));
 		}
-		unusedObjects[1].objs = new Storage*[initCapacity];
+		unusedObjects[1].objs = new StorageT*[initCapacity];
 		unusedObjects[1].capacity = initCapacity;
 		unusedObjects[1].count = initCapacity / 2;
 		for (unsigned int i = 0; i < unusedObjects[1].count; ++i)
 		{
-			unusedObjects[1].objs[i] = (Storage*)malloc(sizeof(Storage));
+			unusedObjects[1].objs[i] = (StorageT*)malloc(sizeof(StorageT));
 		}
 	}
 	~ConcurrentPool()

@@ -12,11 +12,11 @@ D3D12_VERTEX_BUFFER_VIEW Mesh::VertexBufferView() const
 }
 
 
-D3D12_INDEX_BUFFER_VIEW Mesh::IndexBufferView(int submesh) const
+D3D12_INDEX_BUFFER_VIEW Mesh::IndexBufferView(int submesh)
 {
 	D3D12_INDEX_BUFFER_VIEW ibv;
-	ibv.BufferLocation = dataBuffer->GetGPUVirtualAddress() + VertexBufferByteSize +(*indexOffsets)[submesh];
-	SubMesh& subm = (*mSubMeshes)[submesh];
+	ibv.BufferLocation = dataBuffer->GetGPUVirtualAddress() + VertexBufferByteSize + indexOffsets[submesh];
+	SubMesh& subm = mSubMeshes[submesh];
 	ibv.Format = subm.indexFormat;
 	ibv.SizeInBytes = subm.indexCount * ((subm.indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4);
 	return ibv;
@@ -30,18 +30,7 @@ Mesh::~Mesh()
 		delete dataPtr;
 		dataPtr = nullptr;
 	}
-	if (indexOffsets != nullptr)
-	{
-		delete indexOffsets;
-		indexOffsets = nullptr;
-	}
-	if (mSubMeshes != nullptr)
-	{
-		delete mSubMeshes;
-		mSubMeshes = nullptr;
-	}
 }
-
 
 Mesh::Mesh(
 	int vertexCount,
@@ -55,10 +44,11 @@ Mesh::Mesh(
 	DirectX::XMFLOAT2* uv3,
 	ID3D12Device* device,
 	ID3D12GraphicsCommandList* commandList,
-	std::vector<SubMesh>* subMeshes
-) : dataPtr(nullptr), mVertexCount(vertexCount), mSubMeshes(subMeshes)
+	SubMesh* subMeshes,
+	UINT subMeshCount
+) : MObject(), dataPtr(nullptr), mVertexCount(vertexCount), mSubMeshes(subMeshCount), indexOffsets(subMeshCount)
 {
-
+	memcpy(mSubMeshes.data(), subMeshes, subMeshCount * sizeof(SubMesh));
 	//IndexFormat = indexFormat == DXGI_FORMAT_R16_UINT ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
 	//TODO
 	meshLayoutIndex = MeshLayout::GetMeshLayoutIndex(
@@ -88,10 +78,9 @@ Mesh::Mesh(
 	VertexBufferByteSize = stride * vertexCount;
 	//IndexBufferByteSize = (IndexFormat == DXGI_FORMAT_R16_UINT ? 2 : 4) * indexCount;
 	size_t indexSize = 0;
-	indexOffsets = new std::vector<size_t>(subMeshes->size());
-	for (int i = 0; i < subMeshes->size(); ++i) {
-		(*indexOffsets)[i] = indexSize;
-		indexSize += (*subMeshes)[i].indexCount * (((*subMeshes)[i].indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4);
+	for (int i = 0; i < subMeshCount; ++i) {
+		indexOffsets[i] = indexSize;
+		indexSize += subMeshes[i].indexCount * ((subMeshes[i].indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4);
 	}
 	dataPtr = reinterpret_cast<char*>(malloc(VertexBufferByteSize + indexSize));
 
@@ -175,10 +164,208 @@ Mesh::Mesh(
 		7
 	);
 	char* indexBufferStart = dataPtr + VertexBufferByteSize;
-	for (int i = 0; i < subMeshes->size(); ++i)
+	for (int i = 0; i < subMeshCount; ++i)
 	{
-		memcpy(indexBufferStart + (*indexOffsets)[i], (*subMeshes)[i].indexArrayPtr, (*subMeshes)[i].indexCount * (((*subMeshes)[i].indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4));
+		memcpy(indexBufferStart + indexOffsets[i], subMeshes[i].indexArrayPtr, subMeshes[i].indexCount * ((subMeshes[i].indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4));
 	}
 	dataBuffer = d3dUtil::CreateDefaultBuffer(device, commandList, dataPtr, indexSize + VertexBufferByteSize, uploadBuffer);
 	FrameResource::mCurrFrameResource->ReleaseResourceAfterFlush(uploadBuffer);
+}
+
+
+struct CharPart
+{
+	char* ptr;
+	size_t start;
+	size_t size;
+	bool operator==(std::string& str)
+	{
+		if (str.size() != size) return false;
+		for (size_t i = 0; i < size; ++i)
+		{
+			if (str[i] != ptr[start + i]) return false;
+		}
+		return true;
+	}
+	bool operator!= (std::string& str)
+	{
+		return !operator==(str);
+	}
+	bool operator==(std::string&& str)
+	{
+		if (str.size() != size) return false;
+		for (size_t i = 0; i < size; ++i)
+		{
+			if (str[i] != ptr[start + i]) return false;
+		}
+		return true;
+	}
+	bool operator!= (std::string&& str)
+	{
+		return !operator==(std::move(str));
+	}
+
+	bool CheckPartialEqual(std::string& str, size_t startPos, size_t endPos)
+	{
+		for (size_t i = startPos; i < endPos; ++i)
+		{
+			if (ptr[i + start] != str[i]) return false;
+		}
+		return true;
+	}
+	bool CheckPartialEqual(std::string&& str, size_t startPos, size_t endPos)
+	{
+		for (size_t i = startPos; i < endPos; ++i)
+		{
+			if (ptr[i + start] != str[i]) return false;
+		}
+		return true;
+	}
+	UINT ToUInt()
+	{
+		UINT times = 1;
+		UINT value = 0;
+		int v = start;
+		for (int end = start + size - 1; end >= v; --end)
+		{
+			value += ((UINT)ptr[end] - 48) * times;
+			times *= 10;
+		}
+		return value;
+	}
+	UINT ToUInt(int start, int end)
+	{
+		UINT times = 1;
+		UINT value = 0;
+		for (int i = end - 1; i >= start; --i)
+		{
+			value += ((UINT)ptr[i] - 48) * times;
+			times *= 10;
+		}
+		return value;
+	}
+};
+
+void SplitString(char* targetString, size_t size, std::vector<CharPart>& vec, const char splitFlag = ' ')
+{
+	vec.clear();
+	size_t startPos = 0;
+	for (size_t i = 0; i < size; ++i)
+	{
+		char c = targetString[i];
+		size_t splitSize = i - startPos;
+		if (c == splitFlag && splitSize > 0)
+		{
+			vec.emplace_back<CharPart>({ targetString, startPos, splitSize });
+			startPos = i + 1;
+		}
+	}
+	size_t splitSize = size - startPos;
+	if (splitSize > 0)
+	{
+		vec.emplace_back<CharPart>({ targetString, startPos, splitSize });
+	}
+}
+using namespace DirectX;
+UINT DecodeMesh(
+	std::string& meshPath,
+	DirectX::XMFLOAT3*& positions,
+	DirectX::XMFLOAT3*& normals,
+	DirectX::XMFLOAT4*& tangents,
+	DirectX::XMFLOAT4*& colors,
+	DirectX::XMFLOAT2*& uv,
+	DirectX::XMFLOAT2*& uv2,
+	DirectX::XMFLOAT2*& uv3,
+	DirectX::XMFLOAT2*& uv4,
+	std::vector<std::vector<UINT>>& subMeshes)
+{
+	std::ifstream input(meshPath);
+	char sign[32];
+	std::vector<CharPart> commandParts(5);
+	UINT index = 0;
+	positions = nullptr;
+	normals = nullptr;
+	tangents = nullptr;
+	uv = nullptr;
+	uv2 = nullptr;
+	uv3 = nullptr;
+	uv4 = nullptr;
+	colors = nullptr;
+
+	while (true)
+	{
+		input.getline((char*)sign, 32);
+		UINT commandLength = strlen((char*)sign);
+		if (commandLength == 0)
+			return index;
+		SplitString(sign, commandLength, commandParts);
+		CharPart pt = commandParts[0];
+		CharPart sizeCount = commandParts[1];
+		UINT dataSize = sizeCount.ToUInt();
+		UINT size = sizeCount.size;
+		if (pt.CheckPartialEqual("sub", 0, 3))
+		{
+			UINT subMeshIndex = pt.ToUInt(3, pt.size);
+			if ((1 + subMeshIndex) > subMeshes.size())
+				subMeshes.resize(subMeshIndex + 1);
+			std::vector<UINT>& vec = subMeshes[subMeshIndex];
+			UINT triCount = dataSize / sizeof(int);
+			vec.resize(triCount);
+			input.read((char*)vec.data(), dataSize);
+		}
+		else if (pt == "v")
+		{
+			UINT vertCount = dataSize / sizeof(DirectX::XMFLOAT3);
+			index = vertCount;
+			positions = new DirectX::XMFLOAT3[vertCount];
+			input.read((char*)positions, dataSize);
+		}
+		else if (pt == "n")
+		{
+			//Normal
+			UINT normalCount = dataSize / sizeof(DirectX::XMFLOAT3);
+			normals = new DirectX::XMFLOAT3[normalCount];
+			input.read((char*)normals, dataSize);
+		}
+		else if (pt == "t")
+		{
+			//Tangent
+			UINT tangentCount = dataSize / sizeof(DirectX::XMFLOAT4);
+
+			tangents = new DirectX::XMFLOAT4[tangentCount];
+			input.read((char*)tangents, dataSize);
+		}
+		else if (pt == "uv1")
+		{
+			UINT uvCount = dataSize / sizeof(DirectX::XMFLOAT2);
+			uv = new DirectX::XMFLOAT2[uvCount];
+			input.read((char*)uv, dataSize);
+		}
+		else if (pt == "uv2")
+		{
+			UINT uvCount = dataSize / sizeof(DirectX::XMFLOAT2);
+			uv2 = new DirectX::XMFLOAT2[uvCount];
+			input.read((char*)uv2, dataSize);
+		}
+		else if (pt == "uv3")
+		{
+			UINT uvCount = dataSize / sizeof(DirectX::XMFLOAT2);
+			uv3 = new DirectX::XMFLOAT2[uvCount];
+			input.read((char*)uv3, dataSize);
+		}
+		else if (pt == "uv4")
+		{
+			UINT uvCount = dataSize / sizeof(DirectX::XMFLOAT2);
+			uv4 = new DirectX::XMFLOAT2[uvCount];
+			input.read((char*)uv4, dataSize);
+		}
+		else if (pt == "color")
+		{
+			UINT colorCount = dataSize / sizeof(DirectX::XMFLOAT4);
+			colors = new DirectX::XMFLOAT4[colorCount];
+			input.read((char*)colors, dataSize);
+		}
+		input.get();// \n
+	}
+	return index;
 }

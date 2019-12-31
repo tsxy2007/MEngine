@@ -72,14 +72,12 @@ void MathLib::GetFrustumPlanes(PerspCam& perspCam, XMVECTOR* planes)
 
 bool MathLib::BoxIntersect(DirectX::XMMATRIX& localToWorldMatrix, DirectX::XMVECTOR* planes, DirectX::XMVECTOR position, XMVECTOR localExtent)
 {
-	XMFLOAT4X4 mat;
-	XMStoreFloat4x4(&mat, localToWorldMatrix);
-	XMVECTOR pos;
-	XMVector3TransformCoord(pos, XMMatrixTranspose(localToWorldMatrix));
+	XMMATRIX matrixTranspose = XMMatrixTranspose(localToWorldMatrix);
+	XMVECTOR pos = XMVector3TransformCoord(position, matrixTranspose);
 	for (UINT i = 0; i < 6; ++i)
 	{
 		XMVECTOR plane = planes[i];
-		XMVECTOR absNormal = XMVectorAbs(XMVector3TransformNormal(plane, localToWorldMatrix));
+		XMVECTOR absNormal = XMVectorAbs(XMVector3TransformNormal(plane, matrixTranspose));
 		XMVECTOR result = XMVector3Dot(pos, plane) - XMVector3Dot(absNormal, localExtent);
 		float dist = 0; XMFLOAT4 planeF;
 		XMStoreFloat(&dist, result);

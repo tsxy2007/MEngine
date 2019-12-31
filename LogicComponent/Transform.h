@@ -11,7 +11,7 @@ private:
 	DirectX::XMFLOAT3 right;
 	DirectX::XMFLOAT3 localScale;
 	DirectX::XMFLOAT3 position;
-	std::vector<Component> allComponents;
+	std::vector<Component*> allComponents;
 public:
 	DirectX::XMFLOAT3 GetPosition() const { return position; }
 	DirectX::XMFLOAT3 GetForward() const { return forward; }
@@ -24,4 +24,5 @@ public:
 	DirectX::XMMATRIX GetLocalToWorldMatrix();
 	DirectX::XMMATRIX GetWorldToLocalMatrix();
 	Transform();
+	~Transform();
 };

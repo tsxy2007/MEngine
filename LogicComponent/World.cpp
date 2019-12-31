@@ -30,14 +30,12 @@ void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh
 	}
 
 	std::vector<std::uint16_t> indices = box.GetIndices16();
-	std::vector<SubMesh>* subMeshs = new std::vector<SubMesh>(1);
-	(*subMeshs)[0] =
+	std::vector<SubMesh> subMeshs(1);
+	subMeshs[0] =
 	{
 		DXGI_FORMAT_R16_UINT,
 		(int)indices.size(),
-		(void*)indices.data(),
-		{0,0,0},
-		{1,1,1}
+		(void*)indices.data()
 	};
 	bMesh = new Mesh(
 		box.Vertices.size(),
@@ -51,7 +49,8 @@ void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh
 		nullptr,
 		device,
 		commandList,
-		subMeshs
+		subMeshs.data(),
+		subMeshs.size()
 	);
 
 }

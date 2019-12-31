@@ -51,3 +51,13 @@ XMMATRIX Transform::GetWorldToLocalMatrix()
 	XMVECTOR det = XMMatrixDeterminant(localToWorld);
 	return XMMatrixInverse(&det, localToWorld);
 }
+
+Transform::~Transform()
+{
+	for (auto ite = allComponents.begin(); ite != allComponents.end(); ++ite)
+	{
+		(*ite)->transform = nullptr;
+		(*ite)->Destroy();
+	}
+	allComponents.clear();
+}

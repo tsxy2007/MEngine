@@ -189,6 +189,9 @@
     <ClInclude Include="Common\MObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LogicComponent\SceneTree.h">
+      <Filter>Header Files\LogicComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -322,6 +325,9 @@
     </ClCompile>
     <ClCompile Include="Common\MObject.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LogicComponent\SceneTree.cpp">
+      <Filter>Source Files\LogicComponent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

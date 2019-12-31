@@ -476,7 +476,7 @@ void CrateApp::BuildDescriptorHeaps()
 
 void CrateApp::BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh)
 {
-	std::vector<XMFLOAT3> positions(box.Vertices.size());
+	/*std::vector<XMFLOAT3> positions(box.Vertices.size());
 	std::vector<XMFLOAT3> normals(box.Vertices.size());
 	std::vector<XMFLOAT2> uvs(box.Vertices.size());
 	for (size_t i = 0; i < box.Vertices.size(); ++i)
@@ -487,7 +487,7 @@ void CrateApp::BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Me
 	}
 
 	std::vector<std::uint16_t> indices = box.GetIndices16();
-	std::vector<SubMesh>* subMeshs = new std::vector<SubMesh>(1);
+	std::vector<SubMesh> subMeshs(1);
 	(*subMeshs)[0] =
 	{
 		DXGI_FORMAT_R16_UINT,
@@ -496,7 +496,7 @@ void CrateApp::BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Me
 		{0,0,0},
 		{1,1,1}
 	};
-	/*bMesh = new Mesh(
+	bMesh = new Mesh(
 		box.Vertices.size(),
 		positions.data(),
 		normals.data(),

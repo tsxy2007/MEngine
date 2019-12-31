@@ -5,8 +5,8 @@
 #include "Material.h"
 #include "CBufferPool.h"
 #include "../LogicComponent/Component.h"
-class FrameResource;
 class PSOContainer;
+class UploadBuffer;
 struct IndirectDrawCommand
 {
 	D3D12_GPU_VIRTUAL_ADDRESS objectCBufferAddress; // Object Constant Buffer Address
@@ -16,8 +16,6 @@ struct IndirectDrawCommand
 };
 class MeshRenderer : public Component
 {
-private:
-	static CBufferPool objectPool;
 public:
 	virtual ~MeshRenderer();
 	ObjectPtr<Mesh> mesh;
@@ -34,15 +32,16 @@ public:
 		ID3D12GraphicsCommandList* commandList,
 		ID3D12Device* device,
 		ConstBufferElement* cameraBuffer,
-		FrameResource* currentResource,
+		UploadBuffer* objectBuffer,
+		UINT objectBufferOffset,
 		PSOContainer* container
 	);
 	void GetIndirectArgument(
 		int targetPass,
 		int targetSubMesh,
 		ID3D12Device* device,
-		FrameResource* currentResource,
+		UploadBuffer* objectBuffer,
+		UINT objectBufferOffset,
 		IndirectDrawCommand* command
 	);
-	void UpdateObjectBuffer(FrameResource* resource);
 };

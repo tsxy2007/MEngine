@@ -21,3 +21,16 @@ CommandSignature::CommandSignature(Shader* shader, ID3D12Device* device) :
 	desc.pArgumentDescs = indDesc;
 	ThrowIfFailed(device->CreateCommandSignature(&desc, shader->GetSignature(), IID_PPV_ARGS(&mCommandSignature)));
 }
+
+
+MultiDrawCommand& MultiDrawCommand::operator=(const MultiDrawCommand& cmd)
+{
+	memcpy(this, &cmd, sizeof(MultiDrawCommand));
+	return *this;
+}
+
+MultiDrawCommand& MultiDrawCommand::operator=(MultiDrawCommand&& cmd)
+{
+	memcpy(this, &cmd, sizeof(MultiDrawCommand));
+	return *this;
+}

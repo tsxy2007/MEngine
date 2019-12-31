@@ -17,10 +17,8 @@ void Graphics::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* comma
 	uv[1] = { 1, 1 };
 	uv[2] = { 1, -1 };
 	std::array<INT16, 3> indices = { 0, 1, 2 };
-	std::vector<SubMesh>* subMeshes = new std::vector<SubMesh>(1);
-	SubMesh& sm = (*subMeshes)[0];
-	sm.boundingCenter = { 0,0,0 };
-	sm.boundingExtent = { 1,1,1 };
+	std::vector<SubMesh> subMeshes(1);
+	SubMesh& sm = subMeshes[0];
 	sm.indexCount = 3;
 	sm.indexFormat = DXGI_FORMAT_R16_UINT;
 	sm.indexArrayPtr = indices.data();
@@ -36,7 +34,8 @@ void Graphics::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* comma
 		nullptr,
 		device,
 		commandList,
-		subMeshes
+		subMeshes.data(),
+		subMeshes.size()
 		);
 
 }
