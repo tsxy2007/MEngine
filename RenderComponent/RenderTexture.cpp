@@ -297,9 +297,13 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 	DXGI_FORMAT resourceFormat;
 	switch (depthByte)
 	{
-	case RenderTextureDepthSettings_Depth:
+	case RenderTextureDepthSettings_Depth32:
 		mDepthFormat = DXGI_FORMAT_D32_FLOAT;
 		resourceFormat = DXGI_FORMAT_R32_TYPELESS;
+		break;
+	case RenderTextureDepthSettings_Depth16:
+		mDepthFormat = DXGI_FORMAT_D16_UNORM;
+		resourceFormat = DXGI_FORMAT_R16_TYPELESS;
 		break;
 	case RenderTextureDepthSettings_DepthStencil:
 		mDepthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;

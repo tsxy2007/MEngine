@@ -7,6 +7,7 @@ using namespace DirectX;
 
 Camera::Camera(ID3D12Device* device, CameraRenderPath renderType) : MObject(), renderType(renderType)
 {
+	perCameraResource.reserve(20);
 	SetLens(0.25f*MathHelper::Pi, 1.0f, 1.0f, 1000.0f);
 	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
 	{
@@ -19,6 +20,13 @@ Camera::~Camera()
 	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
 	{
 		FrameResource::mFrameResources[i]->OnUnloadCamera(this);
+	}
+	for (auto ite = perCameraResource.begin(); ite != perCameraResource.end(); ++ite)
+	{
+		if (ite->second != nullptr)
+		{
+			delete ite->second;
+		}
 	}
 }
 

@@ -7,16 +7,46 @@
 #include "../Singleton/ShaderID.h"
 #include "../RenderComponent/DescriptorHeap.h"
 #include "../Singleton/PSOContainer.h"
+#include "../RenderComponent/StructuredBuffer.h"
 PSOContainer* gbufferContainer(nullptr);
 #define ALBEDO_RT(component) (component->GetTempRT(0))
 #define SPECULAR_RT(component) (component->GetTempRT(1))
 #define NORMAL_RT (component) (component->GetTempRT(2))
 #define EMISSION_RT (component) (component->GetTempRT(3))
 #define MOTION_VECTOR_RT (component) (component->GetTempRT(4))
-class GBufferPerCameraResource : public IPerCameraResource
-{
 
-};
+GBufferPerFrameResource::GBufferPerFrameResource(ID3D12Device* device, UINT initIndex) :
+	objectIndex(initIndex)
+{
+	StructuredBufferElement strElement[2];
+	strElement[0].stride = sizeof(MeshRenderer::MeshRendererObjectData);
+	strElement[0].elementCount = initIndex;
+	strElement[1].stride = sizeof(UINT);
+	strElement[1].elementCount = 1;
+	objectBuffer = std::make_unique<StructuredBuffer>(
+		device,
+		strElement,
+		2
+		);
+}
+
+void GBufferPerFrameResource::Resize(UINT targetSize, ID3D12Device* device)
+{
+	if (objectIndex >= targetSize) return;
+	UINT newSize = (UINT)(objectIndex * 1.5);
+	newSize = max(newSize, targetSize);
+	objectIndex = newSize;
+	StructuredBufferElement strElement[2];
+	strElement[0].stride = sizeof(MeshRenderer::MeshRendererObjectData);
+	strElement[0].elementCount = newSize;
+	strElement[1].stride = sizeof(UINT);
+	strElement[1].elementCount = 1;
+	objectBuffer = std::make_unique<StructuredBuffer>(
+		device,
+		strElement,
+		2
+		);
+}
 class GBufferRunnable
 {
 public:
@@ -32,12 +62,12 @@ public:
 		tcmd->ResetCommand();
 		ID3D12GraphicsCommandList* commandList = tcmd->GetCmdList();
 		ID3D12Device* thsDevice = device;
-		GBufferPerCameraResource* frameResource = (GBufferPerCameraResource*)resource->GetResource(component, 
-			[]()->GBufferPerCameraResource*
+		GBufferPerFrameResource* frameResource = (GBufferPerFrameResource*)resource->GetResource(component,
+			[=]()->GBufferPerFrameResource*
 		{
-			return new GBufferPerCameraResource();
+			return new GBufferPerFrameResource(device, max(MeshRenderer::allRendererData.size(), 50));
 		});
-	//	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+		frameResource->Resize(MeshRenderer::allRendererData.size(), device);
 		tcmd->CloseCommand();
 	}
 };
@@ -96,7 +126,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	emissionBuffer.type = TemporalRTCommand::Create;
 	emissionBuffer.uID = ShaderID::PropertyToID("_CameraRenderTarget");
 	emissionBuffer.descriptor.colorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
-	emissionBuffer.descriptor.depthType = RenderTextureDepthSettings_Depth;
+	emissionBuffer.descriptor.depthType = RenderTextureDepthSettings_Depth32;
 	emissionBuffer.descriptor.depthSlice = 1;
 	emissionBuffer.descriptor.type = RenderTextureType::Tex2D;
 

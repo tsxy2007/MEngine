@@ -31,7 +31,6 @@ Mesh::~Mesh()
 		dataPtr = nullptr;
 	}
 }
-
 Mesh::Mesh(
 	int vertexCount,
 	DirectX::XMFLOAT3* positions,
@@ -46,7 +45,7 @@ Mesh::Mesh(
 	ID3D12GraphicsCommandList* commandList,
 	SubMesh* subMeshes,
 	UINT subMeshCount
-) : MObject(), dataPtr(nullptr), mVertexCount(vertexCount), mSubMeshes(subMeshCount), indexOffsets(subMeshCount)
+) : MObject(), dataPtr(nullptr), mVertexCount(vertexCount), mSubMeshes(subMeshCount), indexOffsets(subMeshCount), boundingCenter({0,0,0}), boundingExtent({0.5,0.5,0.5})
 {
 	memcpy(mSubMeshes.data(), subMeshes, subMeshCount * sizeof(SubMesh));
 	//IndexFormat = indexFormat == DXGI_FORMAT_R16_UINT ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
@@ -171,6 +170,7 @@ Mesh::Mesh(
 	dataBuffer = d3dUtil::CreateDefaultBuffer(device, commandList, dataPtr, indexSize + VertexBufferByteSize, uploadBuffer);
 	FrameResource::mCurrFrameResource->ReleaseResourceAfterFlush(uploadBuffer);
 }
+
 
 
 struct CharPart

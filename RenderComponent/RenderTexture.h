@@ -22,7 +22,8 @@ enum class RenderTextureType : int
 enum RenderTextureDepthSettings
 {
 	RenderTextureDepthSettings_None,
-	RenderTextureDepthSettings_Depth,
+	RenderTextureDepthSettings_Depth16,
+	RenderTextureDepthSettings_Depth32,
 	RenderTextureDepthSettings_DepthStencil
 };
 struct RenderTextureDescriptor

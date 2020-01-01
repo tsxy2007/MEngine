@@ -46,13 +46,12 @@ private:
 	struct FrameResCamera
 	{
 		std::vector<ThreadCommand*> threadCommands;
-		PerCameraData camData;
 	};
 	static Pool<ThreadCommand> threadCommandMemoryPool;
 	static Pool<FrameResCamera> perCameraDataMemPool;
 	static std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResourcesAfterFlush;
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResources;
-	std::unordered_map<PipelineComponent*, IPerCameraResource*> perCameraResources;
+	std::unordered_map<PipelineComponent*, IPipelineResource*> perFrameResources;
 public:
 	ThreadCommand* commmonThreadCommand;
 	static CBufferPool cameraCBufferPool;
@@ -72,7 +71,6 @@ public:
     // We cannot reset the allocator until the GPU is done processing the commands.
     // So each frame needs their own allocator.
     //Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CmdListAlloc;
-	std::unordered_map<Camera*, FrameResCamera*> perCameraDatas;
     // We cannot update a cbuffer until the GPU is done processing the commands
     // that reference it.  So each frame needs their own cbuffers.
    // std::unique_ptr<UploadBuffer<FrameConstants>> FrameCB = nullptr;
@@ -83,25 +81,26 @@ public:
     UINT64 Fence = 0;
 	//Rendering Events
 	std::vector<ID3D12CommandList*> executableCommandList;
+	std::unordered_map<Camera*, FrameResCamera*> perCameraDatas;
 	std::mutex mtx;
 	template <typename Func>
-	inline IPerCameraResource* GetResource(PipelineComponent* targetComponent, const Func&& func)
+	inline IPipelineResource* GetResource(PipelineComponent* targetComponent, const Func&& func)
 	{
-		auto&& ite = perCameraResources.find(targetComponent);
-		if (ite == perCameraResources.end())
+		auto&& ite = perFrameResources.find(targetComponent);
+		if (ite == perFrameResources.end())
 		{
 			std::lock_guard<std::mutex> lck(mtx);
-			if (ite == perCameraResources.end())
+			if (ite == perFrameResources.end())
 			{
-				IPerCameraResource* newComp = func();
-				perCameraResources.insert_or_assign(targetComponent, newComp);
+				IPipelineResource* newComp = func();
+				perFrameResources.insert_or_assign(targetComponent, newComp);
 				return newComp;
 			}
 		}
 		return ite->second;
 	}
 	template <typename Func>
-	inline IPerCameraResource* GetResource(PipelineComponent* targetComponent, const Func& func)
+	inline IPipelineResource* GetResource(PipelineComponent* targetComponent, const Func& func)
 	{
 		return GetResource(targetComponent, std::move(func));
 	}

@@ -3,6 +3,8 @@
 #include "../Singleton/ShaderID.h"
 #include "../LogicComponent/Transform.h"
 using namespace DirectX;
+
+std::vector<std::pair<MeshRenderer*, MeshRenderer::MeshRendererObjectData>> MeshRenderer::allRendererData;
 MeshRenderer::MeshRenderer(
 	Transform* trans,
 	ID3D12Device* device,
@@ -14,10 +16,20 @@ MeshRenderer::MeshRenderer(
 	{
 		mMaterials[i] = allMaterials[i];
 	}
+	MeshRendererObjectData data;
+	data.boundingCenter = mesh->boundingCenter;
+	data.boundingExtent = mesh->boundingExtent;
+	data.localToWorld = trans->GetLocalToWorldMatrix();
+	listIndex = allRendererData.size();
+	allRendererData.emplace_back<MeshRenderer*, MeshRenderer::MeshRendererObjectData>(this, std::move(data));
 }
 
 MeshRenderer::~MeshRenderer()
 {
+	auto&& ite = allRendererData.end() - 1;
+	allRendererData[listIndex] = *ite;
+	ite->first->listIndex = listIndex;
+	allRendererData.erase(ite);
 }
 
 void MeshRenderer::Draw(

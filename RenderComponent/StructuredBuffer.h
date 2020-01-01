@@ -1,12 +1,11 @@
 #pragma once
 #include "../Common/d3dUtil.h"
-#include "../Common/MObject.h"
 struct StructuredBufferElement
 {
 	size_t stride;
 	size_t elementCount;
 };
-class StructuredBuffer : public MObject
+class StructuredBuffer
 {
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> mDefaultBuffer;

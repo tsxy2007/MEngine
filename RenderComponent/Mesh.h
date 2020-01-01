@@ -22,9 +22,9 @@ class Mesh : public MObject
 	std::array<int, 8> offsets;
 	std::vector<size_t> indexOffsets;
 	std::vector<SubMesh> mSubMeshes;
+public:
 	DirectX::XMFLOAT3 boundingCenter;
 	DirectX::XMFLOAT3 boundingExtent;
-public:
 	virtual ~Mesh();
 	inline UINT GetLayoutIndex() const { return meshLayoutIndex; }
 	inline UINT GetSubmeshSize() const { return mSubMeshes.size(); }

@@ -6,6 +6,7 @@
 #include "../LogicComponent/World.h"
 //ThreadCommand* threadCommand;
 RenderPipeline* RenderPipeline::current(nullptr);
+std::unordered_map<std::string, PipelineComponent*> RenderPipeline::componentsLink;
 ThreadCommand* InitThreadCommand(ID3D12Device* device, Camera* cam, FrameResource* resource, PipelineComponent* comp)
 {
 	if (comp->NeedCommandList())
@@ -18,8 +19,17 @@ void ExecuteThreadCommand(std::vector<ID3D12CommandList*>& executableCommands, C
 		executableCommands.emplace_back(command->GetCmdList());
 		FrameResource::mCurrFrameResource->ReleaseThreadCommand(cam, command);
 	}
-
 }
+
+PipelineComponent* RenderPipeline::GetComponent(const char* typeName)
+{
+	std::string str(typeName);
+	auto&& ite = componentsLink.find(str);
+	if (ite != componentsLink.end())
+		return ite->second;
+	else return nullptr;
+}
+
 RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) : renderPathComponents(3)
 {
 	current = this;
@@ -28,7 +38,7 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 	Init<PrepareComponent>();
 	Init<GBufferComponent>();
 
-	for (UINT i = 0; i < components.size(); ++i)
+	for (UINT i = 0, size = components.size(); i < size; ++i)
 	{
 		components[i]->Initialize(device, commandList);
 	}
@@ -56,12 +66,13 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 		data.camera = cam;
 		std::vector<PipelineComponent*>& waitingComponents = renderPathComponents[(UINT)cam->GetRenderingPath()];
 		renderTextureMarks.Clear();
-		for (UINT i = 0; i < waitingComponents.size(); ++i)
+		for (UINT i = 0, size = waitingComponents.size(); i < size; ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
 			std::vector<TemporalRTCommand>& descriptors = component->SendRenderTextureRequire(data);
 			//Allocate Temporal Render Texture
-			for (UINT j = 0; j < descriptors.size(); ++j)
+
+			for (UINT j = 0, descriptorSize = descriptors.size(); j < descriptorSize; ++j)
 			{
 				TemporalRTCommand& command = descriptors[j];
 				if (command.type == TemporalRTCommand::Create)
@@ -87,22 +98,22 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 
 		}
 
-		for (UINT i = 0; i < renderTextureMarks.values.size(); ++i)
+		for (UINT i = 0, size = renderTextureMarks.values.size(); i < size; ++i)
 		{
 			RenderTextureMark& mark = renderTextureMarks.values[i].value;
-			waitingComponents[mark.startComponent]->loadRTCommands.push_back({ mark.id, mark.rtIndex, mark.desc });
+			waitingComponents[mark.startComponent]->loadRTCommands.emplace_back(mark.id, mark.rtIndex, mark.desc);
 			waitingComponents[mark.endComponent]->unLoadRTCommands.emplace_back(mark.id);
 		}
 
 
-		for (UINT i = 0; i < waitingComponents.size(); ++i)
+		for (UINT i = 0, size = waitingComponents.size(); i < size; ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
 			component->threadCommand = InitThreadCommand(renderData.device, cam, renderData.resource, component);
 			component->ExecuteTempRTCommand(renderData.device, &tempRTAllocator);
 			component->RenderEvent(data, bucket, component->threadCommand);
 		}
-		for (UINT i = 0; i < waitingComponents.size(); ++i)
+		for (UINT i = 0, size = waitingComponents.size(); i < size; ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
 			ExecuteThreadCommand(renderData.resource->executableCommandList, cam, component->threadCommand);

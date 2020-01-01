@@ -290,9 +290,6 @@
     <ClCompile Include="PipelineComponent\RenderPipeline.cpp">
       <Filter>Source Files\PipelineComponent</Filter>
     </ClCompile>
-    <ClCompile Include="PipelineComponent\IPerCameraResource.cpp">
-      <Filter>Source Files\PipelineComponent</Filter>
-    </ClCompile>
     <ClCompile Include="PipelineComponent\PrepareComponent.cpp">
       <Filter>Source Files\PipelineComponent</Filter>
     </ClCompile>

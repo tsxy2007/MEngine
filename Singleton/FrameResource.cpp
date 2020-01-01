@@ -95,7 +95,7 @@ FrameResource::~FrameResource()
 {
 	if (mCurrFrameResource == this)
 		mCurrFrameResource = nullptr;
-	for (auto ite = perCameraResources.begin(); ite != perCameraResources.end(); ++ite)
+	for (auto ite = perFrameResources.begin(); ite != perFrameResources.end(); ++ite)
 	{
 		if (ite->second != nullptr)
 		{

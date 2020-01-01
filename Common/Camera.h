@@ -82,10 +82,31 @@ public:
 	void UpdateViewMatrix();
 	void UploadCameraBuffer(FrameResource* res, PassConstants& mMainPassCB);
 	CameraRenderPath GetRenderingPath() const { return renderType; }
+	template <typename Func>
+	inline IPipelineResource* GetResource(PipelineComponent* targetComponent, const Func&& func)
+	{
+		auto&& ite = perCameraResource.find(targetComponent);
+		if (ite == perCameraResource.end())
+		{
+			std::lock_guard<std::mutex> lck(mtx);
+			if (ite == perCameraResource.end())
+			{
+				IPipelineResource* newComp = func();
+				perCameraResource.insert_or_assign(targetComponent, newComp);
+				return newComp;
+			}
+		}
+		return ite->second;
+	}
+	template <typename Func>
+	inline IPipelineResource* GetResource(PipelineComponent* targetComponent, const Func& func)
+	{
+		return GetResource(targetComponent, std::move(func));
+	}
 private:
-	CameraRenderPath renderType;
-	PerCameraData cameraRenderData;
-	// Camera coordinate system with coordinates relative to world space.
+	std::unordered_map<PipelineComponent*, IPipelineResource*> perCameraResource;
+	std::mutex mtx;
+	CameraRenderPath renderType;	// Camera coordinate system with coordinates relative to world space.
 	DirectX::XMFLOAT3 mPosition = { 0.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 mRight = { 1.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 mUp = { 0.0f, 1.0f, 0.0f };
@@ -105,6 +126,7 @@ private:
 	// Cache View/Proj matrices.
 	DirectX::XMFLOAT4X4 mView = MathHelper::Identity4x4();
 	DirectX::XMFLOAT4X4 mProj = MathHelper::Identity4x4();
+
 };
 
 #endif

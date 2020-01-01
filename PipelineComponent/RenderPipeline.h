@@ -38,7 +38,7 @@ private:
 	UINT initCount = 0;
 	std::vector<PipelineComponent*> components;
 	TempRTAllocator tempRTAllocator;
-	std::unordered_map<std::string, PipelineComponent*> componentsLink;
+	static std::unordered_map<std::string, PipelineComponent*> componentsLink;
 	std::vector<std::vector<PipelineComponent*>> renderPathComponents;
 	Dictionary<UINT, RenderTextureMark> renderTextureMarks;
 	std::vector<JobBucket> buckets[2];
@@ -54,5 +54,5 @@ public:
 	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 	~RenderPipeline();
 	void RenderCamera(RenderPipelineData& data);
-	static PipelineComponent* GetComponent(std::string typeName);
+	static PipelineComponent* GetComponent(const char* typeName);
 };

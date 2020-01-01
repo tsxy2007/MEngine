@@ -92,7 +92,6 @@
     <ClCompile Include="LogicComponent\World.cpp" />
     <ClCompile Include="PipelineComponent\CullTask.cpp" />
     <ClCompile Include="PipelineComponent\GBufferComponent.cpp" />
-    <ClCompile Include="PipelineComponent\IPerCameraResource.cpp" />
     <ClCompile Include="PipelineComponent\PipelineComponent.cpp" />
     <ClCompile Include="PipelineComponent\PrepareComponent.cpp" />
     <ClCompile Include="PipelineComponent\RenderPipeline.cpp" />

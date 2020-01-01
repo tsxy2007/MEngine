@@ -3,7 +3,7 @@ StructuredBuffer::StructuredBuffer(
 	ID3D12Device* device,
 	StructuredBufferElement* elementsArray,
 	UINT elementsCount
-) : MObject(), elements(elementsCount), offsets(elementsCount)
+) : elements(elementsCount), offsets(elementsCount)
 {
 	memcpy(elements.data(), elementsArray, sizeof(StructuredBufferElement) * elementsCount);
 	size_t offst = 0;

@@ -5,10 +5,15 @@ struct PrepareRunnable
 {
 	PrepareComponent* ths;
 	ThreadCommand* threadCommand;
-	PipelineComponent::EventData data;
+	FrameResource* resource;
+	Camera* camera;
 	void operator()()
 	{
-		data.camera->UploadCameraBuffer(data.resource, ths->currentCameraData);
+		CameraData* camData = (CameraData*)camera->GetResource(ths, []()->CameraData*
+		{
+			return new CameraData;
+		});
+		camera->UploadCameraBuffer(resource, camData->passConstants);
 	}
 };
 
@@ -18,12 +23,8 @@ void PrepareComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadC
 	{
 		this,
 		commandList,
-		data
+		data.resource,
+		data.camera
 	};
-	JobHandle tsk = taskFlow.GetTask(runnable);
-}
-
-PassConstants const* PrepareComponent::GetCameraData()
-{
-	return &currentCameraData;
+	taskHandle = taskFlow.GetTask(runnable);
 }

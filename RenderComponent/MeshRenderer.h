@@ -14,12 +14,21 @@ struct IndirectDrawCommand
 	D3D12_INDEX_BUFFER_VIEW indexBuffer;			//Index Buffer Address
 	D3D12_DRAW_INDEXED_ARGUMENTS drawArgs;			//Draw Arguments
 };
+
 class MeshRenderer : public Component
 {
 public:
+	struct MeshRendererObjectData
+	{
+		DirectX::XMMATRIX localToWorld;
+		DirectX::XMFLOAT3 boundingCenter;
+		DirectX::XMFLOAT3 boundingExtent;
+	};
+	static std::vector<std::pair<MeshRenderer*, MeshRendererObjectData>> allRendererData;
 	virtual ~MeshRenderer();
 	ObjectPtr<Mesh> mesh;
 	std::vector<ObjectPtr<Material>> mMaterials;
+	UINT listIndex;
 	MeshRenderer(
 		Transform* trans,
 		ID3D12Device* device,
