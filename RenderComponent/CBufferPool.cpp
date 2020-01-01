@@ -13,7 +13,7 @@ ConstBufferElement CBufferPool::GetBuffer(ID3D12Device* device)
 	if (allPoolValues.size() == 0)
 	{
 		pv.buffer = new UploadBuffer();
-		pv.buffer->Create(device, initElementCount, true, mStride, false);
+		pv.buffer->Create(device, initElementCount, true, mStride);
 		pv.pool = new std::vector<UINT>(initElementCount);
 		for (int i = 0; i < pv.pool->size(); ++i)
 		{

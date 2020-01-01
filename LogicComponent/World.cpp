@@ -10,7 +10,7 @@ using namespace DirectX;
 void BuildMaterials(ObjectPtr<UploadBuffer>& materialPropertyBuffer, ID3D12Device* device, ObjectPtr<Material>& opaqueMaterial, ObjectPtr<DescriptorHeap>& bindlessTextureHeap)
 {
 	materialPropertyBuffer = new UploadBuffer();
-	materialPropertyBuffer->Create(device, 1, true, sizeof(MaterialConstants), false);
+	materialPropertyBuffer->Create(device, 1, true, sizeof(MaterialConstants));
 	opaqueMaterial = new Material(ShaderCompiler::GetShader("OpaqueStandard"), materialPropertyBuffer, 0, bindlessTextureHeap);
 	//opaqueMaterial->SetTexture2D(ShaderID::PropertyToID("gDiffuseMap"), mTextures[0]);
 	opaqueMaterial->SetBindlessResource(ShaderID::PropertyToID("gDiffuseMap"), 0);

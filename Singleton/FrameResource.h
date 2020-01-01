@@ -85,7 +85,7 @@ public:
 	std::vector<ID3D12CommandList*> executableCommandList;
 	std::mutex mtx;
 	template <typename Func>
-	IPerCameraResource* GetResource(PipelineComponent* targetComponent, const Func& func)
+	inline IPerCameraResource* GetResource(PipelineComponent* targetComponent, const Func&& func)
 	{
 		auto&& ite = perCameraResources.find(targetComponent);
 		if (ite == perCameraResources.end())
@@ -100,4 +100,10 @@ public:
 		}
 		return ite->second;
 	}
+	template <typename Func>
+	inline IPerCameraResource* GetResource(PipelineComponent* targetComponent, const Func& func)
+	{
+		return GetResource(targetComponent, std::move(func));
+	}
+
 };

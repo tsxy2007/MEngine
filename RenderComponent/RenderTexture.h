@@ -19,19 +19,20 @@ enum class RenderTextureType : int
 	Tex3D = 2,
 	Cubemap = 3
 };
-
+enum RenderTextureDepthSettings
+{
+	RenderTextureDepthSettings_None,
+	RenderTextureDepthSettings_Depth,
+	RenderTextureDepthSettings_DepthStencil
+};
 struct RenderTextureDescriptor
 {
-	enum DepthType
-	{
-		None, Depth, DepthStencil
-	};
 	UINT width;
 	UINT height;
 	UINT depthSlice;
 	RenderTextureType type;
 	DXGI_FORMAT colorFormat;
-	DepthType depthType;
+	RenderTextureDepthSettings depthType;
 	bool operator==(const RenderTextureDescriptor& other) const;
 
 	bool operator==(RenderTextureDescriptor&& other) const;
@@ -83,7 +84,7 @@ public:
 		UINT width,
 		UINT height,
 		DXGI_FORMAT format,
-		UINT depthByte,
+		RenderTextureDepthSettings depthByte,
 		RenderTextureType type,
 		int depthCount,
 		int mipCount

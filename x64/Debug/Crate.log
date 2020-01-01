@@ -1,11 +1,12 @@
-﻿  SceneTree.cpp
+﻿  GBufferComponent.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(131): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(132): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(133): warning C4101: “minZ”: 未引用的局部变量
-c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(133): warning C4101: “minY”: 未引用的局部变量
-c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(134): warning C4101: “maxY”: 未引用的局部变量
-c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(134): warning C4101: “maxX”: 未引用的局部变量
-c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(133): warning C4101: “minX”: 未引用的局部变量
-c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(134): warning C4101: “maxZ”: 未引用的局部变量
+c:\users\user\source\repos\crate\logiccomponent\world.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\gbuffercomponent.cpp(116): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Debug\Crate.exe

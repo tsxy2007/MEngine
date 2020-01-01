@@ -4,6 +4,7 @@
 #include <d3d12.h>
 #include <D3Dcompiler.h>
 #include "Transform.h"
+#include "World.h"
 using namespace DirectX;
 void Transform::SetRotation(XMVECTOR quaternion)
 {
@@ -18,10 +19,11 @@ void Transform::SetPosition(XMFLOAT3 position)
 	this->position = position;
 }
 
-Transform::Transform():
-	MObject()
+Transform::Transform(World* world):
+	MObject(), world(world)
 {
-
+	worldIndex = world->allTransformsPtr.size();
+	world->allTransformsPtr.emplace_back(this);
 }
 
 void Transform::SetLocalScale(XMFLOAT3 localScale)
@@ -60,4 +62,8 @@ Transform::~Transform()
 		(*ite)->Destroy();
 	}
 	allComponents.clear();
+	auto&& ite = world->allTransformsPtr.end() - 1;
+	(*ite)->worldIndex = worldIndex;
+	world->allTransformsPtr[worldIndex] = *ite;
+	world->allTransformsPtr.erase(ite);
 }

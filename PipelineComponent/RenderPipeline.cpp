@@ -112,7 +112,6 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 	bucketArray[renderData.allCameras->size()].GetTask([=]()->void
 	{
 		commandList->ResetCommand();
-		UploadBuffer::UploadData(commandList->GetCmdList());
 		commandList->CloseCommand();
 	});
 	renderData.resource->executableCommandList.emplace_back(commandList->GetCmdList());

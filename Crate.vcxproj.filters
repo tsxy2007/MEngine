@@ -192,6 +192,9 @@
     <ClInclude Include="LogicComponent\SceneTree.h">
       <Filter>Header Files\LogicComponent</Filter>
     </ClInclude>
+    <ClInclude Include="RenderComponent\StructuredBuffer.h">
+      <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -328,6 +331,9 @@
     </ClCompile>
     <ClCompile Include="LogicComponent\SceneTree.cpp">
       <Filter>Source Files\LogicComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\StructuredBuffer.cpp">
+      <Filter>Source Files\RenderComponent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

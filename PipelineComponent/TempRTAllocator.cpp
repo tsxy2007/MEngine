@@ -42,20 +42,7 @@ RenderTexture* TempRTAllocator::GetRenderTextures(ID3D12Device* device, UINT id,
 	else
 	{
 		UsingTempRT usingRTData;
-		UINT depthByte;
-		switch (descriptor.depthType)
-		{
-		case RenderTextureDescriptor::Depth:
-			depthByte = 16;
-			break;
-		case RenderTextureDescriptor::DepthStencil:
-			depthByte = 32;
-			break;
-		default:
-			depthByte = 0;
-			break;
-		}
-		usingRTData.rt = new RenderTexture(device, descriptor.width, descriptor.height, descriptor.colorFormat, depthByte, descriptor.type, descriptor.depthSlice, 1);;
+		usingRTData.rt = new RenderTexture(device, descriptor.width, descriptor.height, descriptor.colorFormat, descriptor.depthType, descriptor.type, descriptor.depthSlice, 1);;
 		usingRTData.desc = descriptor;
 		usingRT.insert_or_assign(id, usingRTData);
 		return usingRTData.rt.operator->();

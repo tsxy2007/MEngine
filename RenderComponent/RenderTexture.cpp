@@ -199,7 +199,7 @@ RenderTexture::RenderTexture(
 	UINT width,
 	UINT height,
 	DXGI_FORMAT format,
-	UINT depthByte,
+	RenderTextureDepthSettings depthByte,
 	RenderTextureType type,
 	int depthCount,
 	int mipCount
@@ -294,21 +294,24 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 		}
 		break;
 	}
-
-	if (depthByte == 0)
+	DXGI_FORMAT resourceFormat;
+	switch (depthByte)
 	{
-		mDepthFormat = DXGI_FORMAT_UNKNOWN;
-	}
-	else if (depthByte <= 16)
-	{
-		mDepthFormat = DXGI_FORMAT_D16_UNORM;
-	}
-	else
-	{
+	case RenderTextureDepthSettings_Depth:
+		mDepthFormat = DXGI_FORMAT_D32_FLOAT;
+		resourceFormat = DXGI_FORMAT_R32_TYPELESS;
+		break;
+	case RenderTextureDepthSettings_DepthStencil:
 		mDepthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		resourceFormat = DXGI_FORMAT_R24G8_TYPELESS;
+		break;
+	default:
+		mDepthFormat = DXGI_FORMAT_UNKNOWN;
+		resourceFormat = DXGI_FORMAT_UNKNOWN;
+		break;
 	}
 
-	if (depthByte > 0)
+	if (depthByte != RenderTextureDepthSettings_None)
 	{
 		dsvHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, arraySize, false);
 		D3D12_RESOURCE_DESC depthStencilDesc;
@@ -317,14 +320,8 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 		depthStencilDesc.Width = width;
 		depthStencilDesc.Height = height;
 		depthStencilDesc.DepthOrArraySize = arraySize;
-		depthStencilDesc.MipLevels = 1;
-
-		// Correction 11/12/2016: SSAO chapter requires an SRV to the depth buffer to read from 
-		// the depth buffer.  Therefore, because we need to create two views to the same resource:
-		//   1. SRV format: DXGI_FORMAT_R24_UNORM_X8_TYPELESS
-		//   2. DSV Format: DXGI_FORMAT_D24_UNORM_S8_UINT
-		// we need to create the depth buffer resource with a typeless format.  
-		depthStencilDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+		depthStencilDesc.MipLevels = 1;  
+		depthStencilDesc.Format = resourceFormat;
 		depthStencilDesc.SampleDesc.Count = 1;
 		depthStencilDesc.SampleDesc.Quality = 0;
 		depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;

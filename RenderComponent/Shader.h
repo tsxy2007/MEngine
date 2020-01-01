@@ -20,7 +20,7 @@ struct ShaderVariable
 {
 	enum Type
 	{
-		ConstantBuffer, StructuredBuffer, DescriptorHeap
+		ConstantBuffer, DescriptorHeap, StructuredBuffer
 	};
 	std::string name;
 	Type type;
@@ -52,6 +52,7 @@ public:
 	int GetPropertyRootSigPos(UINT id);
 	ID3D12RootSignature* GetSignature() const { return mRootSignature.Get(); }
 	void SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset);
+	void SetStructuredBufferByAddress(ID3D12GraphicsCommandList* commandList, UINT id, D3D12_GPU_VIRTUAL_ADDRESS address);
 	bool TryGetShaderVariable(UINT id, ShaderVariable& targetVar);
 	size_t VariableLength() const { return mVariablesVector.size(); }
 	template<typename Func>

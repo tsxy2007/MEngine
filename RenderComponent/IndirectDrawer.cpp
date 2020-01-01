@@ -61,12 +61,12 @@ allMeshCommands(commandCount),
 cmdSig(targetShader, device)
 {
 	memcpy(allMeshCommands.data(), commands, sizeof(MeshCommand) * commandCount);
-	csConstBuffer.Create(device, 1, true, sizeof(CullShaderData), false);
+	csConstBuffer.Create(device, 1, true, sizeof(CullShaderData));
 	CullShaderData data = { commandCount };
 	csConstBuffer.CopyData(0, &data);
-	indirectDataBuffer.Create(device, commandCount, false, sizeof(MultiDrawCommand), true);
-	materialBuffers.Create(device, materialCount, true, materialBufferStride, false);
-	objectBuffers.Create(device, commandCount, true, objectBufferStride, false);
+	indirectDataBuffer.Create(device, commandCount, false, sizeof(MultiDrawCommand));
+	materialBuffers.Create(device, materialCount, true, materialBufferStride);
+	objectBuffers.Create(device, commandCount, true, objectBufferStride);
 	std::vector<MultiDrawCommand> tempCommand(commandCount);
 	for (UINT i = 0; i < commandCount; ++i)
 	{
@@ -91,7 +91,6 @@ cmdSig(targetShader, device)
 		D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
 		nullptr,
 		IID_PPV_ARGS(&indirectDrawBuffer)));
-	indirectDataBuffer.MakeNoLongerWritable();
 }
 
 IndirectDrawer::~IndirectDrawer()

@@ -207,6 +207,13 @@ bool Shader::TryGetShaderVariable(UINT id, ShaderVariable& targetVar)
 	targetVar = mVariablesVector[ite->second];
 	return true;
 }
-/*
 
-*/
+void Shader::SetStructuredBufferByAddress(ID3D12GraphicsCommandList* commandList, UINT id, D3D12_GPU_VIRTUAL_ADDRESS address)
+{
+	auto&& ite = mVariablesDict.find(id);
+	if (ite == mVariablesDict.end()) return;
+	UINT rootSigPos = ite->second;
+	commandList->SetGraphicsRootShaderResourceView(
+		rootSigPos,
+		address);
+}
