@@ -25,10 +25,9 @@ void Skybox::Draw(
 	skyboxMat->BindShaderResource(commandList);
 	skyboxMat->GetShader()->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer.operator->(), cameraBuffer->element);
 	commandList->IASetVertexBuffers(0, 1, &fullScreenMesh->VertexBufferView());
-	commandList->IASetIndexBuffer(&fullScreenMesh->IndexBufferView(0));
+	commandList->IASetIndexBuffer(&fullScreenMesh->IndexBufferView());
 	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	SubMesh& subMesh = fullScreenMesh->GetSubmesh(0);
-	commandList->DrawIndexedInstanced(subMesh.indexCount, 1, 0, 0, 0);
+	commandList->DrawIndexedInstanced(fullScreenMesh->GetIndexCount(), 1, 0, 0, 0);
 }
 
 Skybox::~Skybox()
@@ -58,11 +57,6 @@ skyboxTex(tex)
 		vertex[1] = { 1, 3, 1 };
 		vertex[2] = { 1, -1, 1 };
 		std::array<INT16, 3> indices{ 0, 1, 2 };
-		std::vector<SubMesh> subMeshes(1);
-		SubMesh& sm = subMeshes[0];
-		sm.indexCount = 3;
-		sm.indexFormat = DXGI_FORMAT_R16_UINT;
-		sm.indexArrayPtr = indices.data();
 		fullScreenMesh = std::make_unique<Mesh>(
 			3,
 			vertex.data(),
@@ -75,8 +69,9 @@ skyboxTex(tex)
 			nullptr,
 			device,
 			commandList,
-			subMeshes.data(),
-			subMeshes.size()
+			DXGI_FORMAT_R16_UINT,
+			3,
+			indices.data()
 			);
 	}
 }

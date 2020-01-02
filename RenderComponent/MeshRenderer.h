@@ -7,13 +7,7 @@
 #include "../LogicComponent/Component.h"
 class PSOContainer;
 class UploadBuffer;
-struct IndirectDrawCommand
-{
-	D3D12_GPU_VIRTUAL_ADDRESS objectCBufferAddress; // Object Constant Buffer Address
-	D3D12_VERTEX_BUFFER_VIEW vertexBuffer;			// Vertex Buffer Address
-	D3D12_INDEX_BUFFER_VIEW indexBuffer;			//Index Buffer Address
-	D3D12_DRAW_INDEXED_ARGUMENTS drawArgs;			//Draw Arguments
-};
+struct MultiDrawCommand;
 
 class MeshRenderer : public Component
 {
@@ -27,17 +21,16 @@ public:
 	static std::vector<std::pair<MeshRenderer*, MeshRendererObjectData>> allRendererData;
 	virtual ~MeshRenderer();
 	ObjectPtr<Mesh> mesh;
-	std::vector<ObjectPtr<Material>> mMaterials;
+	ObjectPtr<Material> mMaterial;
 	UINT listIndex;
 	MeshRenderer(
 		Transform* trans,
 		ID3D12Device* device,
 		ObjectPtr<Mesh>& initMesh,
-		std::vector<ObjectPtr<Material>>& allMaterials
+		ObjectPtr<Material>& allMaterial
 	);
 	void Draw(
 		int targetPass,
-		int targetSubMesh,
 		ID3D12GraphicsCommandList* commandList,
 		ID3D12Device* device,
 		ConstBufferElement* cameraBuffer,
@@ -47,10 +40,9 @@ public:
 	);
 	void GetIndirectArgument(
 		int targetPass,
-		int targetSubMesh,
 		ID3D12Device* device,
 		UploadBuffer* objectBuffer,
 		UINT objectBufferOffset,
-		IndirectDrawCommand* command
+		MultiDrawCommand* command
 	);
 };

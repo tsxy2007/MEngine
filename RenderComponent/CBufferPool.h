@@ -1,7 +1,7 @@
 #pragma once
 #include "../Common/d3dUtil.h"
-#include "UploadBuffer.h"
 #include "../Common/MObject.h"
+class UploadBuffer;
 struct ConstBufferElement
 {
 	ObjectPtr<UploadBuffer> buffer;

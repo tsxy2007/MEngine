@@ -26,7 +26,8 @@ GBufferPerFrameResource::GBufferPerFrameResource(ID3D12Device* device, UINT init
 	objectBuffer = std::make_unique<StructuredBuffer>(
 		device,
 		strElement,
-		2
+		2,
+		true
 		);
 }
 
@@ -44,7 +45,8 @@ void GBufferPerFrameResource::Resize(UINT targetSize, ID3D12Device* device)
 	objectBuffer = std::make_unique<StructuredBuffer>(
 		device,
 		strElement,
-		2
+		2,
+		true
 		);
 }
 class GBufferRunnable

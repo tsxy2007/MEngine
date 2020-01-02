@@ -17,6 +17,7 @@ struct ComputeShaderVariable
 };
 
 class DescriptorHeap;
+class StructuredBuffer;
 class ComputeShader
 {
 private:
@@ -27,6 +28,7 @@ private:
 	std::vector<Microsoft::WRL::ComPtr<ID3DBlob>> csShaders;
 	std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> pso;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature;
+	Microsoft::WRL::ComPtr<ID3D12CommandSignature> mCommandSignature;
 public:
 	ComputeShader(
 		std::wstring compilePath,
@@ -39,6 +41,7 @@ public:
 	void SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset);
 	void SetStructuredBufferByAddress(ID3D12GraphicsCommandList* commandList, UINT id, D3D12_GPU_VIRTUAL_ADDRESS address);
 	void Dispatch(ID3D12GraphicsCommandList* cList, UINT kernel, UINT x, UINT y, UINT z);
+	void DispatchIndirect(ID3D12GraphicsCommandList* cList, UINT dispatchKernel, StructuredBuffer* indirectBuffer, UINT bufferElement, UINT bufferIndex);
 	template<typename Func>
 	void IterateVariables(Func&& f)
 	{

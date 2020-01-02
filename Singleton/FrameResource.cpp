@@ -29,6 +29,16 @@ void FrameResource::UpdateBeforeFrame(ID3D12Fence* mFence)
 		}
 		needClearResources.clear();
 		needClearResourcesAfterFlush.clear();
+		for (auto i = needRemovePipelineResource.begin(); i != needRemovePipelineResource.end(); ++i)
+		{
+			auto&& ite = perFrameResources.find(*i);
+			if (ite != perFrameResources.end())
+			{
+				delete ite->second;
+				perFrameResources.erase(ite);
+			}
+		}
+		needRemovePipelineResource.clear();
 	}
 }
 void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* commandQueue, ID3D12Fence* mFence)
@@ -103,4 +113,9 @@ FrameResource::~FrameResource()
 		}
 	}
 	delete commmonThreadCommand;
+}
+
+void FrameResource::ReleasePipelineResAfterFlush(void* key)
+{
+	needRemovePipelineResource.push_back(key);
 }

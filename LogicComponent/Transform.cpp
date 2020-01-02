@@ -5,45 +5,58 @@
 #include <D3Dcompiler.h>
 #include "Transform.h"
 #include "World.h"
+RandomVector<TransformData> Transform::randVec(100);
 using namespace DirectX;
 void Transform::SetRotation(XMVECTOR quaternion)
 {
 	XMMATRIX rotationMatrix = XMMatrixRotationQuaternion(quaternion);
 	rotationMatrix = XMMatrixTranspose(rotationMatrix);
-	XMStoreFloat3(&right, rotationMatrix.r[0]);
-	XMStoreFloat3(&up, rotationMatrix.r[1]);
-	XMStoreFloat3(&forward, rotationMatrix.r[2]);
+	TransformData& data = randVec[vectorPos];
+	XMStoreFloat3(&data.right, rotationMatrix.r[0]);
+	XMStoreFloat3(&data.up, rotationMatrix.r[1]);
+	XMStoreFloat3(&data.forward, rotationMatrix.r[2]);
 }
 void Transform::SetPosition(XMFLOAT3 position)
 {
-	this->position = position;
+	randVec[vectorPos].position = position;
 }
 
-Transform::Transform(World* world):
+Transform::Transform(World* world) :
 	MObject(), world(world)
 {
 	worldIndex = world->allTransformsPtr.size();
 	world->allTransformsPtr.emplace_back(this);
+	randVec.Add(
+		{
+			{0,1,0},
+			{0,0,1},
+			{1,0,0},
+			{1,1,1},
+			{0,0,0}
+		},
+		&vectorPos
+	);
 }
 
 void Transform::SetLocalScale(XMFLOAT3 localScale)
 {
-	this->localScale = localScale;
+	randVec[vectorPos].localScale = localScale;
 }
 
 XMMATRIX Transform::GetLocalToWorldMatrix()
 {
 	XMMATRIX target;
-	XMVECTOR vec = { right.x, right.y, right.z, 0 };
-	vec *= this->localScale.x;
+	TransformData& data = randVec[vectorPos];
+	XMVECTOR vec = XMLoadFloat3(&data.right);
+	vec *= data.localScale.x;
 	target.r[0] = vec;
-	vec = { up.x, up.y, up.z, 0 };
-	vec *= this->localScale.y;
+	vec = XMLoadFloat3(&data.up);
+	vec *= data.localScale.y;
 	target.r[1] = vec;
-	vec = { forward.x, forward.y, forward.z, 0 };
-	vec *= this->localScale.z;
+	vec = XMLoadFloat3(&data.forward);
+	vec *= data.localScale.z;
 	target.r[2] = vec;
-	target.r[3] = { position.x, position.y, position.z, 1 };
+	target.r[3] = { data.position.x, data.position.y, data.position.z, 1 };
 	return target;
 }
 

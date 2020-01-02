@@ -32,6 +32,8 @@
     <ClInclude Include="Common\MObject.h" />
     <ClInclude Include="Common\MQueue.h" />
     <ClInclude Include="Common\Pool.h" />
+    <ClInclude Include="Common\RandomVector.h" />
+    <ClInclude Include="RenderComponent\GPU Driven\GRP_Renderer.h" />
     <ClInclude Include="JobSystem\ConcurrentQueue.h" />
     <ClInclude Include="JobSystem\JobBucket.h" />
     <ClInclude Include="JobSystem\JobHandle.h" />
@@ -82,6 +84,7 @@
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Common\MObject.cpp" />
     <ClCompile Include="CrateApp.cpp" />
+    <ClCompile Include="RenderComponent\GPU Driven\GRP_Renderer.cpp" />
     <ClCompile Include="JobSystem\JobBucket.cpp" />
     <ClCompile Include="JobSystem\JobHandle.cpp" />
     <ClCompile Include="JobSystem\JobNode.cpp" />

@@ -70,7 +70,7 @@ cmdSig(targetShader, device)
 	std::vector<MultiDrawCommand> tempCommand(commandCount);
 	for (UINT i = 0; i < commandCount; ++i)
 	{
-		MultiDrawCommand& t = tempCommand[i];
+		/*MultiDrawCommand& t = tempCommand[i];
 		MeshCommand& c = commands[i];
 		SubMesh& subm = c.mesh->GetSubmesh(c.subMeshIndex);
 		t.vertexBuffer = c.mesh->VertexBufferView();
@@ -81,7 +81,7 @@ cmdSig(targetShader, device)
 		t.drawArgs.IndexCountPerInstance = subm.indexCount;
 		t.drawArgs.InstanceCount = 1;
 		t.drawArgs.StartIndexLocation = 0;
-		t.drawArgs.StartInstanceLocation = 0;
+		t.drawArgs.StartInstanceLocation = 0;*/
 	}
 	indirectDataBuffer.CopyDatas(0, commandCount, tempCommand.data());
 	ThrowIfFailed(device->CreateCommittedResource(

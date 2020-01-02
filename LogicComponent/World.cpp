@@ -17,6 +17,7 @@ void BuildMaterials(ObjectPtr<UploadBuffer>& materialPropertyBuffer, ID3D12Devic
 	opaqueMaterial->SetBindlessResource(ShaderID::PropertyToID("cubemap"), 9);
 
 }
+/*
 void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh, ID3D12GraphicsCommandList* commandList, ID3D12Device* device)
 {
 	std::vector<XMFLOAT3> positions(box.Vertices.size());
@@ -50,10 +51,11 @@ void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh
 		device,
 		commandList,
 		subMeshs.data(),
-		subMeshs.size()
+		subMeshs.size(),
 	);
 
 }
+*/
 void BuildTexture(ObjectPtr<Texture>& texs, ID3D12GraphicsCommandList* cmdList, ID3D12Device* device)
 {
 	texs = new Texture(cmdList, device, "woodCrateTex", L"Textures/WoodCrate01.dds");

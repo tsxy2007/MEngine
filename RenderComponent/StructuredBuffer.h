@@ -11,14 +11,16 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> mDefaultBuffer;
 	std::vector<StructuredBufferElement> elements;
 	std::vector<size_t> offsets;
-	size_t GetStride(UINT index);
-	size_t GetElementCount(UINT index);
-	D3D12_GPU_VIRTUAL_ADDRESS GetAddress(UINT element, UINT index);
 public:
 	StructuredBuffer(
 		ID3D12Device* device,
 		StructuredBufferElement* elementsArray,
-		UINT elementsCount
+		UINT elementsCount,
+		bool isIndirectArgument
 	);
-
+	size_t GetStride(UINT index) const;
+	size_t GetElementCount(UINT index) const;
+	D3D12_GPU_VIRTUAL_ADDRESS GetAddress(UINT element, UINT index) const;
+	size_t GetAddressOffset(UINT element, UINT index) const;
+	inline ID3D12Resource* GetResource() const { return mDefaultBuffer.Get(); }
 };

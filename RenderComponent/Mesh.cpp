@@ -1,5 +1,6 @@
 #include "Mesh.h"
 #include "../Singleton/FrameResource.h"
+#include "../Singleton/MeshLayout.h"
 //CPP
 D3D12_VERTEX_BUFFER_VIEW Mesh::VertexBufferView() const
 {
@@ -12,13 +13,12 @@ D3D12_VERTEX_BUFFER_VIEW Mesh::VertexBufferView() const
 }
 
 
-D3D12_INDEX_BUFFER_VIEW Mesh::IndexBufferView(int submesh)
+D3D12_INDEX_BUFFER_VIEW Mesh::IndexBufferView()
 {
 	D3D12_INDEX_BUFFER_VIEW ibv;
-	ibv.BufferLocation = dataBuffer->GetGPUVirtualAddress() + VertexBufferByteSize + indexOffsets[submesh];
-	SubMesh& subm = mSubMeshes[submesh];
-	ibv.Format = subm.indexFormat;
-	ibv.SizeInBytes = subm.indexCount * ((subm.indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4);
+	ibv.BufferLocation = dataBuffer->GetGPUVirtualAddress() + VertexBufferByteSize;
+	ibv.Format = indexFormat;
+	ibv.SizeInBytes = indexCount * ((indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4);
 	return ibv;
 }
 
@@ -31,6 +31,7 @@ Mesh::~Mesh()
 		dataPtr = nullptr;
 	}
 }
+
 Mesh::Mesh(
 	int vertexCount,
 	DirectX::XMFLOAT3* positions,
@@ -43,11 +44,14 @@ Mesh::Mesh(
 	DirectX::XMFLOAT2* uv3,
 	ID3D12Device* device,
 	ID3D12GraphicsCommandList* commandList,
-	SubMesh* subMeshes,
-	UINT subMeshCount
-) : MObject(), dataPtr(nullptr), mVertexCount(vertexCount), mSubMeshes(subMeshCount), indexOffsets(subMeshCount), boundingCenter({0,0,0}), boundingExtent({0.5,0.5,0.5})
+	DXGI_FORMAT indexFormat,
+	UINT indexCount,
+	void* indexArrayPtr
+) : MObject(), dataPtr(nullptr), mVertexCount(vertexCount),
+indexFormat(indexFormat),
+indexCount(indexCount),
+indexArrayPtr(indexArrayPtr)
 {
-	memcpy(mSubMeshes.data(), subMeshes, subMeshCount * sizeof(SubMesh));
 	//IndexFormat = indexFormat == DXGI_FORMAT_R16_UINT ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
 	//TODO
 	meshLayoutIndex = MeshLayout::GetMeshLayoutIndex(
@@ -76,11 +80,7 @@ Mesh::Mesh(
 	VertexByteStride = stride;
 	VertexBufferByteSize = stride * vertexCount;
 	//IndexBufferByteSize = (IndexFormat == DXGI_FORMAT_R16_UINT ? 2 : 4) * indexCount;
-	size_t indexSize = 0;
-	for (int i = 0; i < subMeshCount; ++i) {
-		indexOffsets[i] = indexSize;
-		indexSize += subMeshes[i].indexCount * ((subMeshes[i].indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4);
-	}
+	size_t indexSize = indexCount * ((indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4);
 	dataPtr = reinterpret_cast<char*>(malloc(VertexBufferByteSize + indexSize));
 
 	auto vertBufferCopy = [&](char* buffer, char* ptr, UINT size, int& offset, std::array<int, 8>& offstArray, int arrayLen) -> void
@@ -163,14 +163,10 @@ Mesh::Mesh(
 		7
 	);
 	char* indexBufferStart = dataPtr + VertexBufferByteSize;
-	for (int i = 0; i < subMeshCount; ++i)
-	{
-		memcpy(indexBufferStart + indexOffsets[i], subMeshes[i].indexArrayPtr, subMeshes[i].indexCount * ((subMeshes[i].indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4));
-	}
+	memcpy(indexBufferStart, indexArrayPtr, indexCount * ((indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4));
 	dataBuffer = d3dUtil::CreateDefaultBuffer(device, commandList, dataPtr, indexSize + VertexBufferByteSize, uploadBuffer);
 	FrameResource::mCurrFrameResource->ReleaseResourceAfterFlush(uploadBuffer);
 }
-
 
 
 struct CharPart

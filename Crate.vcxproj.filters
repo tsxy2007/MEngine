@@ -37,6 +37,9 @@
     <Filter Include="Source Files\JobSystem">
       <UniqueIdentifier>{9f8b9eaa-1fea-4c75-8f52-ecffb698c49c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Library">
+      <UniqueIdentifier>{764ce53c-e7a4-4c42-a20d-d8ef39778007}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\d3dApp.h">
@@ -78,12 +81,6 @@
     <ClInclude Include="Singleton\ShaderCompiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Singleton\MathLib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\MQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PipelineComponent\ThreadCommand.h">
       <Filter>Header Files\PipelineComponent</Filter>
     </ClInclude>
@@ -94,9 +91,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderComponent\ComputeShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\MetaLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common\Camera.h">
@@ -128,9 +122,6 @@
     </ClInclude>
     <ClInclude Include="RenderComponent\IndirectDrawer.h">
       <Filter>Header Files\RenderComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Pool.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderComponent\RenderTexture.h">
       <Filter>Header Files\RenderComponent</Filter>
@@ -194,6 +185,24 @@
     </ClInclude>
     <ClInclude Include="RenderComponent\StructuredBuffer.h">
       <Filter>Header Files\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton\MathLib.h">
+      <Filter>Header Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MetaLib.h">
+      <Filter>Header Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MQueue.h">
+      <Filter>Header Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Pool.h">
+      <Filter>Header Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\RandomVector.h">
+      <Filter>Header Files\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent\GPU Driven\GRP_Renderer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -331,6 +340,9 @@
     </ClCompile>
     <ClCompile Include="RenderComponent\StructuredBuffer.cpp">
       <Filter>Source Files\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent\GPU Driven\GRP_Renderer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -17,11 +17,6 @@ void Graphics::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* comma
 	uv[1] = { 1, 1 };
 	uv[2] = { 1, -1 };
 	std::array<INT16, 3> indices = { 0, 1, 2 };
-	std::vector<SubMesh> subMeshes(1);
-	SubMesh& sm = subMeshes[0];
-	sm.indexCount = 3;
-	sm.indexFormat = DXGI_FORMAT_R16_UINT;
-	sm.indexArrayPtr = indices.data();
 	fullScreenMesh = std::make_unique<Mesh>(
 		3,
 		vertex.data(),
@@ -34,8 +29,9 @@ void Graphics::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* comma
 		nullptr,
 		device,
 		commandList,
-		subMeshes.data(),
-		subMeshes.size()
+		DXGI_FORMAT_R16_UINT,
+		3,
+		indices.data()
 		);
 
 }
@@ -62,10 +58,9 @@ void Graphics::Blit(
 	commandList->RSSetScissorRects(1, &mScissorRect);
 	commandList->SetPipelineState(container->GetState(psoDesc, device));
 	commandList->IASetVertexBuffers(0, 1, &fullScreenMesh->VertexBufferView());
-	commandList->IASetIndexBuffer(&fullScreenMesh->IndexBufferView(0));
+	commandList->IASetIndexBuffer(&fullScreenMesh->IndexBufferView());
 	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	SubMesh& subMesh = fullScreenMesh->GetSubmesh(0);
-	commandList->DrawIndexedInstanced(subMesh.indexCount, 1, 0, 0, 0);
+	commandList->DrawIndexedInstanced(fullScreenMesh->GetIndexCount(), 1, 0, 0, 0);
 }
 /*	UINT64 n64RequiredSize = 0u;
 UINT   nNumSubresources = 1u;

@@ -1,5 +1,6 @@
 #include "CBufferPool.h" 
 #include <math.h>
+#include "UploadBuffer.h"
 CBufferPool::CBufferPool(UINT stride, UINT initCapacity) : initElementCount(initCapacity)
 {
 	mStride = d3dUtil::CalcConstantBufferByteSize(stride);
@@ -15,7 +16,7 @@ ConstBufferElement CBufferPool::GetBuffer(ID3D12Device* device)
 		pv.buffer = new UploadBuffer();
 		pv.buffer->Create(device, initElementCount, true, mStride);
 		pv.pool = new std::vector<UINT>(initElementCount);
-		for (int i = 0; i < pv.pool->size(); ++i)
+		for (int i = 0; i < initElementCount; ++i)
 		{
 			(*pv.pool)[i] = i;
 		}

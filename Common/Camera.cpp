@@ -49,7 +49,7 @@ void Camera::UploadCameraBuffer(FrameResource* res, PassConstants& mMainPassCB)
 	mMainPassCB.NearZ = GetNearZ();
 	mMainPassCB.worldSpaceCameraPos = GetPosition3f();
 	mMainPassCB.FarZ = GetFarZ();
-	auto currPassCB = res->cameraCBs[GetInstanceID()];
+	auto& currPassCB = res->cameraCBs[GetInstanceID()];
 	currPassCB.buffer->CopyData(currPassCB.element, &mMainPassCB);
 }
 

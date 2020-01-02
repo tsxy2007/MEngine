@@ -4,6 +4,7 @@
 #include "../RenderComponent/DescriptorHeap.h"
 #include "../Common/d3dUtil.h"
 #include <fstream>
+#include "StructuredBuffer.h"
 
 using Microsoft::WRL::ComPtr;
 ComPtr<ID3DBlob> Compile(std::wstring& path, std::string& kernelName, D3D_SHADER_MACRO* m, bool useCache)
@@ -149,8 +150,20 @@ ComputeShader::ComputeShader(
 		psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 		ThrowIfFailed(device->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&pso[i])));
 	}
-	int i = 5;
+
+	D3D12_COMMAND_SIGNATURE_DESC desc = {};
+	D3D12_INDIRECT_ARGUMENT_DESC indDesc;
+	ZeroMemory(&indDesc, sizeof(D3D12_INDIRECT_ARGUMENT_DESC));
+	indDesc.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH;
+
+	desc.ByteStride = sizeof(UINT) * 3;
+	desc.NodeMask = 0;
+	desc.NumArgumentDescs = 1;
+	desc.pArgumentDescs = &indDesc;
+	ThrowIfFailed(device->CreateCommandSignature(&desc, nullptr, IID_PPV_ARGS(&mCommandSignature)));
 }
+
+
 
 void ComputeShader::BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* heap)
 {
@@ -228,4 +241,10 @@ void ComputeShader::Dispatch(ID3D12GraphicsCommandList* commandList, UINT kernel
 {
 	commandList->SetPipelineState(pso[kernel].Get());
 	commandList->Dispatch(x, y, z);
+}
+
+void ComputeShader::DispatchIndirect(ID3D12GraphicsCommandList* commandList, UINT dispatchKernel, StructuredBuffer* indirectBuffer, UINT bufferElement, UINT bufferIndex)
+{
+	commandList->SetPipelineState(pso[dispatchKernel].Get());
+	commandList->ExecuteIndirect(mCommandSignature.Get(), 1, indirectBuffer->GetResource(), indirectBuffer->GetAddressOffset(bufferElement, bufferIndex), nullptr, 0);
 }
