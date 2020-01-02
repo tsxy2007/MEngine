@@ -2,12 +2,7 @@
 #include <vector>
 #include <atomic>
 #include <mutex>
-template <typename T>
-class Storage
-{
-	static const size_t alignedSize = sizeof(T) + (alignof(T) - ((sizeof(T) - 1) % alignof(T)) ) - 1;
-	char c[alignedSize];
-};
+#include "MetaLib.h"
 
 template <typename T>
 class Pool
@@ -18,7 +13,7 @@ private:
 	int capacity;
 	void AllocateMemory()
 	{
-		using StorageT = Storage<T>;
+		using StorageT = Storage<T, 1>;
 		StorageT* ptr = reinterpret_cast<StorageT*>(malloc(sizeof(StorageT) * capacity));
 		for (int i = 0; i < capacity; ++i)
 		{
@@ -64,7 +59,7 @@ template <typename T>
 class ConcurrentPool
 {
 private:
-	typedef Storage<T> StorageT;
+	typedef Storage<T, 1> StorageT;
 	struct Array
 	{
 		StorageT** objs;

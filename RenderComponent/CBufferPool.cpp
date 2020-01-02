@@ -1,76 +1,48 @@
 #include "CBufferPool.h" 
 #include <math.h>
 #include "UploadBuffer.h"
-CBufferPool::CBufferPool(UINT stride, UINT initCapacity) : initElementCount(initCapacity)
+
+void CBufferPool::Add(ID3D12Device* device)
 {
-	mStride = d3dUtil::CalcConstantBufferByteSize(stride);
-	allPoolKeys.reserve(10);
-	allPoolValues.reserve(10);
+	UploadBuffer* tPtr = new UploadBuffer();
+	tPtr->Create(device, capacity, true, stride);
+	arr.push_back(tPtr);
+	for (UINT i = 0; i < capacity; ++i)
+	{
+		poolValue.push_back({ tPtr, i });
+	}
 }
 
-ConstBufferElement CBufferPool::GetBuffer(ID3D12Device* device)
+CBufferPool::CBufferPool(UINT initCapacity, UINT stride) :
+	capacity(initCapacity),
+	stride(stride)
 {
-	PoolValue pv;
-	if (allPoolValues.size() == 0)
-	{
-		pv.buffer = new UploadBuffer();
-		pv.buffer->Create(device, initElementCount, true, mStride);
-		pv.pool = new std::vector<UINT>(initElementCount);
-		for (int i = 0; i < initElementCount; ++i)
-		{
-			(*pv.pool)[i] = i;
-		}
-		allPoolKeys[pv.buffer.operator->()] = allPoolValues.size();
-		allPoolValues.push_back(pv);
-		
-	}
-	else
-	{
-		pv = allPoolValues[allPoolValues.size() - 1];
-	}
-	ConstBufferElement ele;
-	ele.element = (*pv.pool)[pv.pool->size() - 1];
-	pv.pool->erase(pv.pool->end() - 1);
-	if (pv.pool->size() <= 0)
-	{
-		delete pv.pool;
-		allPoolKeys.erase(pv.buffer.operator->());
-		allPoolValues[allPoolValues.size() - 1].buffer = nullptr;
-		allPoolValues[allPoolValues.size() - 1].pool = nullptr;
-		allPoolValues.erase(allPoolValues.end() - 1);
-	}
-	ele.buffer = pv.buffer;
-	return ele;
-}
-
-void CBufferPool::Release(ConstBufferElement ele)
-{
-	auto&& ite = allPoolKeys.find(ele.buffer.operator->());
-	if (ite != allPoolKeys.end())
-	{
-		allPoolValues[ite->second].pool->push_back(ele.element);
-	}
-	else {
-		PoolValue pv;
-		pv.buffer = ele.buffer;
-		pv.pool = new std::vector<UINT>();
-		allPoolKeys[ele.buffer.operator->()] = allPoolValues.size();
-		pv.pool->reserve(initElementCount);
-		allPoolValues.push_back(pv);
-		pv.pool->push_back(ele.element);
-	}
+	poolValue.reserve(initCapacity);
+	arr.reserve(10);
 }
 
 CBufferPool::~CBufferPool()
 {
-	for (int i = 0; i < allPoolValues.size(); ++i)
+	for (auto ite = arr.begin(); ite != arr.end(); ++ite)
 	{
-		auto& a = allPoolValues[i];
-		a.buffer = nullptr;
-		if (a.pool != nullptr)
-		{
-			delete a.pool;
-			a.pool = nullptr;
-		}
+		delete *ite;
 	}
+}
+
+ConstBufferElement CBufferPool::Get(ID3D12Device* device)
+{
+	if (poolValue.empty())
+	{
+		Add(device);
+	}
+	auto&& ite = poolValue.end() - 1;
+	ConstBufferElement pa = *ite;
+	poolValue.erase(ite);
+	return pa;
+
+}
+
+void CBufferPool::Return(ConstBufferElement& target)
+{
+	poolValue.push_back(target);
 }

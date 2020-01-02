@@ -23,7 +23,7 @@ void Skybox::Draw(
 	ID3D12PipelineState* pso = container->GetState(desc, device);
 	commandList->SetPipelineState(pso);
 	skyboxMat->BindShaderResource(commandList);
-	skyboxMat->GetShader()->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer.operator->(), cameraBuffer->element);
+	skyboxMat->GetShader()->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer, cameraBuffer->element);
 	commandList->IASetVertexBuffers(0, 1, &fullScreenMesh->VertexBufferView());
 	commandList->IASetIndexBuffer(&fullScreenMesh->IndexBufferView());
 	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

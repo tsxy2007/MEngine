@@ -4,7 +4,6 @@ std::mutex MObject::mtx;
 
 MObject::MObject()
 {
-	allPtrs.reserve(20);
 	instanceID = CurrentID++;
 }
 
@@ -13,6 +12,11 @@ void MObject::AddPtr(PtrLink* ptr)
 	if (this == nullptr)
 	{
 		return;
+	}
+	if (!ptrInitialized)
+	{
+		allPtrs.reserve(10);
+		ptrInitialized = true;
 	}
 	ptr->value = allPtrs.size();
 	allPtrs.push_back(ptr);
@@ -51,9 +55,10 @@ void MObject::RemovePtr(PtrLink* ptr)
 		mtx.unlock();
 		return;
 	}
-	allPtrs[ptr->value] = allPtrs[allPtrs.size() - 1];
+	auto&& ite = allPtrs.end() - 1;
+	allPtrs[ptr->value] = *ite;
 	memcpy(allPtrs[ptr->value], ptr, sizeof(PtrLink));
-	allPtrs.erase(allPtrs.end() - 1);
+	allPtrs.erase(ite);
 	bool deleteThis = allPtrs.size() <= 0;
 	mtx.unlock();
 	if (deleteThis)

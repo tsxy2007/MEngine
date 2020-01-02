@@ -46,7 +46,7 @@ void MeshRenderer::Draw(
 	ID3D12PipelineState* pso = container->GetState(desc, device);
 	commandList->SetPipelineState(pso);
 	mat->BindShaderResource(commandList);
-	mat->GetShader()->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer.operator->(), cameraBuffer->element);
+	mat->GetShader()->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer, cameraBuffer->element);
 	mat->GetShader()->SetResource(commandList, ShaderID::GetPerObjectBufferID(), objectBuffer, objectBufferOffset);
 	commandList->IASetVertexBuffers(0, 1, &mesh->VertexBufferView());
 	commandList->IASetIndexBuffer(&mesh->IndexBufferView());

@@ -2,7 +2,62 @@
 #include "../DescriptorHeap.h"
 #include "../Mesh.h"
 #include "../../LogicComponent/Transform.h"
+#include "../../Singleton/ShaderCompiler.h"
+#include "../ComputeShader.h"
+#include "../../Singleton/FrameResource.h"
+#include "../../PipelineComponent/IPerCameraResource.h"
+#include "../StructuredBuffer.h"
+#include "../../Common/MetaLib.h"
+#include <mutex>
+struct ObjectData
+{
+	DirectX::XMFLOAT4X4 localToWorld;
+	DirectX::XMFLOAT3 boundingCenter;
+	DirectX::XMFLOAT3 boundingExtent;
+};
+struct Command
+{
+	enum CommandType
+	{
+		CommandType_Add,
+		CommandType_Remove,
+		CommandType_Transform
+	};
+	CommandType type;
+	UINT index;
+	MultiDrawCommand cmd;
+	ObjectData objData;
+};
+class GpuDrivenRenderer : public IPipelineResource
+{
+public:
+	Storage<StructuredBuffer, 1> sbuffers;
+	UploadBuffer objectPosBuffer;
+	UploadBuffer cmdDrawBuffers;
+	StructuredBuffer* argBuffer;
+	std::mutex mtx;
+	UINT capacity;
+	std::vector<Command> allCommands;
+	GpuDrivenRenderer(
+		ID3D12Device* device,
+		UINT capacity
+	) : capacity(capacity)
+	{
+		objectPosBuffer.Create(device, capacity, false, sizeof(ObjectData));
+		cmdDrawBuffers.Create(device, capacity, false, sizeof(MultiDrawCommand));
+		StructuredBufferElement ele[2];
+		ele[0].elementCount = capacity;
+		ele[0].stride = sizeof(MultiDrawCommand);
+		ele[1].elementCount = 1;
+		ele[1].stride = sizeof(UINT);
+		argBuffer = new (&sbuffers) StructuredBuffer(device, ele, 2, true);
+	}
 
+	~GpuDrivenRenderer()
+	{
+		argBuffer->~StructuredBuffer();
+	}
+};
 GRP_Renderer::GRP_Renderer(
 	size_t materialPropertyStride,
 	UINT meshLayoutIndex,
@@ -24,6 +79,7 @@ GRP_Renderer::GRP_Renderer(
 	textureIndicesPool(maxCapacity),
 	meshLayoutIndex(meshLayoutIndex)
 {
+	cullShader = ShaderCompiler::GetComputeShader("Cull");
 	textureHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, maxCapacity * texRequireInMat, true);
 	for (UINT i = 0, size = textureDescPool.size(); i < size; ++i)
 		textureDescPool[i] = i;
@@ -32,6 +88,7 @@ GRP_Renderer::GRP_Renderer(
 	{
 		textureIndicesPool[i] = allocatedIndices + i * texRequireInMat;
 	}
+
 }
 
 GRP_Renderer::RenderElement& GRP_Renderer::AddRenderElement(
@@ -48,7 +105,7 @@ GRP_Renderer::RenderElement& GRP_Renderer::AddRenderElement(
 	auto&& indPtrIte = textureIndicesPool.end() - 1;
 	RenderElement& ele = elements.emplace_back(
 		&mesh,
-		std::move(pool.GetBuffer(device)),
+		std::move(pool.Get(device)),
 		&textureHeap,
 		*indPtrIte
 	);

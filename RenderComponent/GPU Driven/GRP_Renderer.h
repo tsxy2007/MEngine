@@ -6,6 +6,8 @@
 class DescriptorHeap;
 class Mesh;
 class Transform;
+class FrameResource;
+class ComputeShader;
 class GRP_Renderer : public MObject
 {
 private:
@@ -35,6 +37,7 @@ private:
 	UINT* allocatedIndices;
 	UINT texRequireInMat;
 	UINT meshLayoutIndex;
+	ComputeShader* cullShader;
 public:
 	GRP_Renderer(
 		size_t materialPropertyStride,
@@ -56,5 +59,14 @@ public:
 	
 	CommandSignature* GetCmdSignature() { return &cmdSig; }
 	DescriptorHeap* GetTextureHeap();
+	void UpdateTransform(Transform* targetTrans);
+	void DrawCommand(
+		ID3D12GraphicsCommandList* commandList,
+		ID3D12Device* device,
+		UINT targetShaderPass,
+		FrameResource* targetResource,
+		ConstBufferElement& cameraProperty,
+		UploadBuffer* cullDataBuffer
+	);
 };
 

@@ -49,3 +49,12 @@ void UploadBuffer::CopyDatas(UINT startElementIndex, UINT elementCount, const vo
 	memcpy(dataPos, data, (elementCount - 1) * mElementByteSize + mStride);
 }
 
+
+void UploadBuffer::CopyFrom(UploadBuffer* otherBuffer, UINT selfStartIndex, UINT otherBufferStartIndex, UINT elementCount)
+{
+	char* otherPtr = (char*)otherBuffer->mMappedData;
+	char* currPtr = (char*)mMappedData;
+	otherPtr += otherBuffer->GetAlignedStride() * otherBufferStartIndex;
+	currPtr += GetAlignedStride() * selfStartIndex;
+	memcpy(currPtr, otherPtr, elementCount * GetAlignedStride());
+}

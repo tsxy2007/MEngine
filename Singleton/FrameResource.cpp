@@ -55,7 +55,7 @@ void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* c
 void FrameResource::OnLoadCamera(Camera* targetCamera, ID3D12Device* device)
 {
 	perCameraDatas[targetCamera] = perCameraDataMemPool.New();
-	ConstBufferElement constBuffer = cameraCBufferPool.GetBuffer(device);
+	ConstBufferElement constBuffer = cameraCBufferPool.Get(device);
 	cameraCBs[targetCamera->GetInstanceID()] = constBuffer;
 }
 void FrameResource::OnUnloadCamera(Camera* targetCamera)
@@ -67,7 +67,7 @@ void FrameResource::OnUnloadCamera(Camera* targetCamera)
 	}
 	perCameraDatas.erase(targetCamera);
 	ConstBufferElement& constBuffer = cameraCBs[targetCamera->GetInstanceID()];
-	cameraCBufferPool.Release({ constBuffer.buffer, constBuffer.element });
+	cameraCBufferPool.Return(constBuffer);
 	cameraCBs.erase(targetCamera->GetInstanceID());
 	perCameraDataMemPool.Delete(data);
 }

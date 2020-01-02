@@ -40,7 +40,7 @@ void IndirectDrawer::Draw(
 		mShader->SetResource(commandList, heapSets[i].shaderID, srvHeap, heapSets[i].heapOffset);
 	}
 	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	mShader->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer.operator->(), cameraBuffer->element);
+	mShader->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraBuffer->buffer, cameraBuffer->element);
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(indirectDrawBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
 	commandList->ExecuteIndirect(cmdSig.GetSignature(), allMeshCommands.size(), indirectDrawBuffer.Get(), 0, indirectDrawBuffer.Get(), sizeof(MultiDrawCommand) * allMeshCommands.size());
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(indirectDrawBuffer.Get(), D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));

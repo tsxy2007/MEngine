@@ -12,6 +12,7 @@ public:
 	virtual ~UploadBuffer();
 	void CopyData(UINT elementIndex, const void* data);
 	void CopyDatas(UINT startElementIndex, UINT elementCount, const void* data);
+	void CopyFrom(UploadBuffer* otherBuffer, UINT selfStartIndex, UINT otherBufferStartIndex, UINT elementCount);
 	size_t GetStride() const { return mStride; }
 	size_t GetAlignedStride() const { return mElementByteSize; }
 	ID3D12Resource* Resource()const

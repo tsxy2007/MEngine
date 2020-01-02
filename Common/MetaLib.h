@@ -1,4 +1,15 @@
 #pragma once
+typedef unsigned int UINT;
+template <typename T, UINT size>
+class Storage
+{
+	alignas(T) char c[size * sizeof(T)];
+};
+template <typename T>
+class Storage<T, 0>
+{};
+
+
 template <typename ... Args>
 class AlignedTuple
 {

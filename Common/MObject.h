@@ -7,6 +7,7 @@ class MObject
 {
 	friend class PtrLink;
 private:
+	bool ptrInitialized = false;
 	static std::mutex mtx;
 	std::vector<PtrLink*> allPtrs;
 	void AddPtr(PtrLink* ptr);

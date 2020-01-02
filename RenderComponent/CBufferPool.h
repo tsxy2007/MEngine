@@ -4,24 +4,20 @@
 class UploadBuffer;
 struct ConstBufferElement
 {
-	ObjectPtr<UploadBuffer> buffer;
+	UploadBuffer* buffer;
 	UINT element;
 };
 class CBufferPool
 {
 private:
-	struct PoolValue
-	{
-		ObjectPtr<UploadBuffer> buffer;
-		std::vector<UINT>* pool;
-	};
-	UINT mStride;
-	UINT initElementCount;
-	std::vector<PoolValue> allPoolValues;
-	std::unordered_map<UploadBuffer*, UINT> allPoolKeys;
+	std::vector<UploadBuffer*> arr;
+	std::vector<ConstBufferElement> poolValue;
+	UINT capacity;
+	UINT stride;
+	void Add(ID3D12Device* device);
 public:
-	CBufferPool(UINT stride, UINT initCapacity);
-	ConstBufferElement GetBuffer(ID3D12Device* device);
-	void Release(ConstBufferElement element);
-	virtual ~CBufferPool();
+	CBufferPool(UINT initCapacity, UINT stride);
+	~CBufferPool();
+	ConstBufferElement Get(ID3D12Device* device);
+	void Return(ConstBufferElement& target);
 };
