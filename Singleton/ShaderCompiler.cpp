@@ -50,7 +50,8 @@ void GetPostProcessShader(ID3D12Device* device)
 	cullDesc.AntialiasedLineEnable = FALSE;
 	cullDesc.ForcedSampleCount = 0;
 	cullDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
-	std::vector<Pass> allPasses(1);
+	const UINT PASS_COUNT = 1;
+	Pass allPasses[PASS_COUNT];
 	Pass& p = allPasses[0];
 	p.fragment = "frag";
 	p.vertex = "vert";
@@ -61,15 +62,17 @@ void GetPostProcessShader(ID3D12Device* device)
 	p.depthStencilState = dsDesc;
 	p.psShader = nullptr;
 	p.vsShader = nullptr;
+	const UINT SHADER_VAR_COUNT = 1;
 	//Properties
-	std::vector<ShaderVariable> var(1);
+
+	ShaderVariable var[SHADER_VAR_COUNT];
 	ShaderVariable& v = var[0];
 	v.name = "_MainTex";
 	v.registerPos = 0;
 	v.space = 0;
 	v.tableSize = 1;
 	v.type = ShaderVariable::DescriptorHeap;
-	Shader* opaqueShader = new Shader(allPasses, var, device, false);
+	Shader* opaqueShader = new Shader(allPasses, PASS_COUNT, var, SHADER_VAR_COUNT, device, false);
 	ShaderCompiler::AddShader("PostProcess", opaqueShader);
 }
 
@@ -86,8 +89,8 @@ void GetOpaqueStandardShader(ID3D12Device* device)
 	{ D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
 	dsDesc.FrontFace = defaultStencilOp;
 	dsDesc.BackFace = defaultStencilOp;
-
-	std::vector<Pass> allPasses(2);
+	const UINT PASS_COUNT = 1;
+	Pass allPasses[PASS_COUNT];
 	Pass& p = allPasses[0];
 	p.fragment = "PS";
 	p.vertex = "VS";
@@ -98,22 +101,13 @@ void GetOpaqueStandardShader(ID3D12Device* device)
 	p.depthStencilState = dsDesc;
 	p.psShader = nullptr;
 	p.vsShader = nullptr;
-	Pass& sp = allPasses[1];
-	sp.fragment = "PS_PureColor";
-	sp.vertex = "VS";
-	sp.filePath = L"Shaders\\Default";
-	sp.name = "OpaqueStandardPureColor";
-	sp.rasterizeState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	sp.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	sp.depthStencilState = dsDesc;
-	sp.psShader = nullptr;
-	sp.vsShader = nullptr;
-	std::vector<ShaderVariable> var(5);
+	const UINT SHADER_VAR_COUNT = 4;
+	ShaderVariable var[SHADER_VAR_COUNT];
 	var[0].type = ShaderVariable::Type::DescriptorHeap;
-	var[0].registerPos = 2;
-	var[0].space = 1;
+	var[0].registerPos = 0;
+	var[0].space = 0;
 	var[0].tableSize = 10;
-	var[0].name = "gDiffuseMap";
+	var[0].name = "_MainTex";
 
 	var[1].type = ShaderVariable::Type::ConstantBuffer;
 	var[1].name = "Per_Object_Buffer";
@@ -129,13 +123,7 @@ void GetOpaqueStandardShader(ID3D12Device* device)
 	var[3].name = "Per_Material_Buffer";
 	var[3].registerPos = 2;
 	var[3].space = 0;
-
-	var[4].type = ShaderVariable::Type::DescriptorHeap;
-	var[4].registerPos = 0;
-	var[4].space = 0;
-	var[4].name = "cubemap";
-	var[4].tableSize = 1;
-	Shader* opaqueShader = new Shader(allPasses, var, device, false);
+	Shader* opaqueShader = new Shader(allPasses, PASS_COUNT, var, SHADER_VAR_COUNT, device, false);
 	ShaderCompiler::AddShader("OpaqueStandard", opaqueShader);
 
 }
@@ -153,8 +141,8 @@ void GetSkyboxShader(ID3D12Device* device)
 	{ D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
 	dsDesc.FrontFace = defaultStencilOp;
 	dsDesc.BackFace = defaultStencilOp;
-
-	std::vector<Pass> allPasses(1);
+	const UINT PASS_COUNT = 1;
+	Pass allPasses[PASS_COUNT];
 	Pass& p = allPasses[0];
 	p.fragment = "frag";
 	p.vertex = "vert";
@@ -165,7 +153,8 @@ void GetSkyboxShader(ID3D12Device* device)
 	p.depthStencilState = dsDesc;
 	p.psShader = nullptr;
 	p.vsShader = nullptr;
-	std::vector<ShaderVariable> var(2); 
+	const UINT SHADER_VAR_COUNT = 2;
+	ShaderVariable var[SHADER_VAR_COUNT];
 	var[0].type = ShaderVariable::Type::ConstantBuffer;
 	var[0].name = "Per_Camera_Buffer";
 	var[0].registerPos = 0;
@@ -176,16 +165,18 @@ void GetSkyboxShader(ID3D12Device* device)
 	var[1].space = 0;
 	var[1].name = "cubemap";
 	var[1].tableSize = 1;
-	Shader* skyboxShader = new Shader(allPasses, var, device, false);
+	Shader* skyboxShader = new Shader(allPasses, PASS_COUNT, var, SHADER_VAR_COUNT, device, false);
 	ShaderCompiler::AddShader("Skybox", skyboxShader);
 }
 
 void GetCullingShader(ID3D12Device* device)
 {
-	std::vector<std::string> kernelNames(2);
+	const UINT KERNEL_COUNT = 2;
+	std::string kernelNames[KERNEL_COUNT];
 	kernelNames[0] = "CSMain";
 	kernelNames[1] = "Clear";
-	std::vector<ComputeShaderVariable> vars(5);
+	const UINT SHADER_VAR_COUNT = 5;
+	ComputeShaderVariable vars[SHADER_VAR_COUNT];
 	vars[0].name = "CBuffer";
 	vars[0].type = ComputeShaderVariable::ConstantBuffer;
 	vars[0].registerPos = 0;
@@ -210,7 +201,7 @@ void GetCullingShader(ID3D12Device* device)
 	vars[4].type = ComputeShaderVariable::StructuredBuffer;
 	vars[4].registerPos = 1;
 	vars[4].space = 0;
-	ComputeShader* cs = new ComputeShader(L"Shaders\\Cull", kernelNames, vars, device, false);
+	ComputeShader* cs = new ComputeShader(L"Shaders\\Cull", kernelNames, KERNEL_COUNT, vars, SHADER_VAR_COUNT, device, false);
 	ShaderCompiler::AddComputeShader("Cull", cs);
 }
 

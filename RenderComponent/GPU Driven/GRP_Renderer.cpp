@@ -8,6 +8,8 @@
 #include "../../PipelineComponent/IPerCameraResource.h"
 #include "../StructuredBuffer.h"
 #include "../../Common/MetaLib.h"
+#include "../../Singleton/ShaderID.h"
+#include "../../Singleton/PSOContainer.h"
 #include <mutex>
 struct ObjectData
 {
@@ -15,42 +17,140 @@ struct ObjectData
 	DirectX::XMFLOAT3 boundingCenter;
 	DirectX::XMFLOAT3 boundingExtent;
 };
+struct CullData
+{
+	UINT _Count;
+	DirectX::XMFLOAT4 planes[6];
+	DirectX::XMFLOAT3 _FrustumMinPoint;
+	DirectX::XMFLOAT3 _FrustumMaxPoint;
+};
 struct Command
 {
 	enum CommandType
 	{
 		CommandType_Add,
 		CommandType_Remove,
-		CommandType_Transform
+		CommandType_TransformPos,
+		CommandType_Renderer
 	};
 	CommandType type;
 	UINT index;
+	UINT removedIndex;
 	MultiDrawCommand cmd;
 	ObjectData objData;
+	Command() {}
+	Command(const Command& cmd)
+	{
+		memcpy(this, &cmd, sizeof(Command));
+	}
 };
 class GpuDrivenRenderer : public IPipelineResource
 {
 public:
 	Storage<StructuredBuffer, 1> sbuffers;
-	UploadBuffer objectPosBuffer;
-	UploadBuffer cmdDrawBuffers;
+	std::unique_ptr<UploadBuffer> objectPosBuffer;
+	std::unique_ptr<UploadBuffer> cmdDrawBuffers;
 	StructuredBuffer* argBuffer;
 	std::mutex mtx;
 	UINT capacity;
+	UINT count;
 	std::vector<Command> allCommands;
 	GpuDrivenRenderer(
 		ID3D12Device* device,
 		UINT capacity
-	) : capacity(capacity)
+	) : capacity(capacity), count(0)
 	{
-		objectPosBuffer.Create(device, capacity, false, sizeof(ObjectData));
-		cmdDrawBuffers.Create(device, capacity, false, sizeof(MultiDrawCommand));
+		objectPosBuffer = std::unique_ptr<UploadBuffer>(new UploadBuffer());
+		cmdDrawBuffers = std::unique_ptr<UploadBuffer>(new UploadBuffer());
+		objectPosBuffer->Create(device, capacity, false, sizeof(ObjectData));
+		cmdDrawBuffers->Create(device, capacity, false, sizeof(MultiDrawCommand));
 		StructuredBufferElement ele[2];
 		ele[0].elementCount = capacity;
 		ele[0].stride = sizeof(MultiDrawCommand);
 		ele[1].elementCount = 1;
 		ele[1].stride = sizeof(UINT);
 		argBuffer = new (&sbuffers) StructuredBuffer(device, ele, 2, true);
+	}
+
+	void Resize(
+		UINT targetCapacity,
+		ID3D12Device* device)
+	{
+		if (targetCapacity <= capacity) return;
+		UINT autoCapac = (UINT)(capacity * 1.5);
+		targetCapacity = max(targetCapacity, autoCapac);
+		UploadBuffer* newObjBuffer = new UploadBuffer();
+		UploadBuffer* newCmdDrawBuffer = new UploadBuffer();
+		newObjBuffer->Create(device, targetCapacity, false, sizeof(ObjectData));
+		newCmdDrawBuffer->Create(device, targetCapacity, false, sizeof(MultiDrawCommand));
+		newObjBuffer->CopyFrom(objectPosBuffer.get(), 0, 0, capacity);
+		newCmdDrawBuffer->CopyFrom(cmdDrawBuffers.get(), 0, 0, capacity);
+
+		objectPosBuffer = std::unique_ptr<UploadBuffer>(newObjBuffer);
+		cmdDrawBuffers = std::unique_ptr<UploadBuffer>(newCmdDrawBuffer);
+		for (UINT i = 0; i < capacity; ++i)
+		{
+			MultiDrawCommand* ptr = (MultiDrawCommand*)cmdDrawBuffers->GetMappedDataPtr(i);
+			ptr->objectCBufferAddress = objectPosBuffer->Resource()->GetGPUVirtualAddress() +
+				objectPosBuffer->GetAlignedStride() * i;
+		}
+		capacity = targetCapacity;
+	}
+
+	void AddCommand(Command& cmd)
+	{
+		std::lock_guard<std::mutex> lck(mtx);
+		allCommands.push_back(cmd);
+	}
+
+	void UpdateFrame(
+		ID3D12Device* device
+	)
+	{
+		for (UINT i = 0; ; ++i)
+		{
+			Command c;
+			mtx.lock();
+			if (i >= allCommands.size())
+			{
+				goto END_OF_LOOP;
+			}
+			c = allCommands[i];
+			mtx.unlock();
+			switch (c.type)
+			{
+			case Command::CommandType_Add:
+				Resize(count + 1, device);
+				c.cmd.objectCBufferAddress = objectPosBuffer->Resource()->GetGPUVirtualAddress() +
+					objectPosBuffer->GetAlignedStride() *  count;
+				objectPosBuffer->CopyData(count, &c.objData);
+				cmdDrawBuffers->CopyData(count, &c.cmd);
+				count++;
+				break;
+			case Command::CommandType_Remove:
+				if (c.index != c.removedIndex)
+				{
+					objectPosBuffer->CopyDataInside(c.removedIndex, c.index);
+					cmdDrawBuffers->CopyDataInside(c.removedIndex, c.index);
+					MultiDrawCommand* ptr = (MultiDrawCommand*)cmdDrawBuffers->GetMappedDataPtr(c.index);
+					ptr->objectCBufferAddress = objectPosBuffer->Resource()->GetGPUVirtualAddress() +
+						objectPosBuffer->GetAlignedStride() *  c.index;
+				}
+				count--;
+				break;
+			case Command::CommandType::CommandType_TransformPos:
+				objectPosBuffer->CopyData(c.index, &c.objData);
+				break;
+			case Command::CommandType::CommandType_Renderer:
+				c.cmd.objectCBufferAddress = objectPosBuffer->Resource()->GetGPUVirtualAddress() +
+					objectPosBuffer->GetAlignedStride() *  c.index;
+				cmdDrawBuffers->CopyData(c.index, &c.cmd);
+				break;
+			}
+		}
+	END_OF_LOOP:
+		allCommands.clear();
+		mtx.unlock();
 	}
 
 	~GpuDrivenRenderer()
@@ -68,6 +168,7 @@ GRP_Renderer::GRP_Renderer(
 	ID3D12Device* device
 ) :
 	MObject(),
+	capacity(initCapacity),
 	pool(materialPropertyStride, initCapacity),
 	cbufferStride(materialPropertyStride),
 	shader(shader),
@@ -89,10 +190,15 @@ GRP_Renderer::GRP_Renderer(
 		textureIndicesPool[i] = allocatedIndices + i * texRequireInMat;
 	}
 
+	_InputBuffer = ShaderID::PropertyToID("_InputBuffer");
+	_InputDataBuffer = ShaderID::PropertyToID("_InputDataBuffer");
+	_OutputBuffer = ShaderID::PropertyToID("_OutputBuffer");
+	_CountBuffer = ShaderID::PropertyToID("_CountBuffer");
+	CBuffer = ShaderID::PropertyToID("CBuffer");
 }
 
 GRP_Renderer::RenderElement& GRP_Renderer::AddRenderElement(
-	ObjectPtr<Transform>& textureHeap,
+	ObjectPtr<Transform>& targetTrans,
 	ObjectPtr<Mesh>& mesh,
 	ID3D12Device* device
 )
@@ -101,13 +207,15 @@ GRP_Renderer::RenderElement& GRP_Renderer::AddRenderElement(
 		throw "Out of Range!";
 	if (mesh->GetLayoutIndex() != meshLayoutIndex)
 		throw "Mesh Bad Layout!";
-	dicts.insert_or_assign(std::move(textureHeap.operator->()), elements.size());
+
+	dicts.insert_or_assign(std::move(targetTrans.operator->()), elements.size());
 	auto&& indPtrIte = textureIndicesPool.end() - 1;
 	RenderElement& ele = elements.emplace_back(
-		&mesh,
 		std::move(pool.Get(device)),
-		&textureHeap,
-		*indPtrIte
+		&targetTrans,
+		*indPtrIte,
+		mesh->boundingCenter,
+		mesh->boundingExtent
 	);
 	textureIndicesPool.erase(indPtrIte);
 	for (UINT i = 0; i < texRequireInMat; ++i)
@@ -116,15 +224,73 @@ GRP_Renderer::RenderElement& GRP_Renderer::AddRenderElement(
 		ele.textures[i] = *ite;
 		textureDescPool.erase(ite);
 	}
+
+	Command cmd;
+	cmd.index = elements.size() - 1;
+	cmd.type = Command::CommandType_Add;
+	cmd.cmd.objectCBufferAddress = 0;
+	cmd.cmd.materialBufferAddress = ele.propertyBuffer.buffer->Resource()->GetGPUVirtualAddress()
+		+ ele.propertyBuffer.element * ele.propertyBuffer.buffer->GetAlignedStride();
+	cmd.cmd.vertexBuffer = mesh->VertexBufferView();
+	cmd.cmd.indexBuffer = mesh->IndexBufferView();
+	cmd.cmd.drawArgs.BaseVertexLocation = 0;
+	cmd.cmd.drawArgs.IndexCountPerInstance = mesh->GetIndexCount();
+	cmd.cmd.drawArgs.InstanceCount = 1;
+	cmd.cmd.drawArgs.StartIndexLocation = 0;
+	cmd.cmd.drawArgs.StartInstanceLocation = 0;
+	cmd.objData.boundingCenter = ele.boundingCenter;
+	cmd.objData.boundingExtent = ele.boundingExtent;
+	DirectX::XMMATRIX* ptr = (DirectX::XMMATRIX*) &cmd.objData.localToWorld;
+	*ptr = targetTrans->GetLocalToWorldMatrix();
+	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
+	{
+		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)FrameResource::mFrameResources[i]->GetResource(this, [=]()->GpuDrivenRenderer*
+		{
+			return new GpuDrivenRenderer(device, capacity);
+		});
+		perFrameData->AddCommand(cmd);
+	}
+
 	return ele;
 }
 
-void GRP_Renderer::RemoveElement(Transform* trans)
+void GRP_Renderer::UpdateRenderer(Transform* targetTrans, Mesh* mesh, ID3D12Device* device)
+{
+	auto&& ite = dicts.find(targetTrans);
+	if (ite == dicts.end()) return;
+	RenderElement& rem = elements[ite->second];
+
+	Command cmd;
+	cmd.index = ite->second;
+	cmd.type = Command::CommandType_Renderer;
+	cmd.cmd.objectCBufferAddress = 0;
+	cmd.cmd.materialBufferAddress = rem.propertyBuffer.buffer->Resource()->GetGPUVirtualAddress()
+		+ rem.propertyBuffer.element * rem.propertyBuffer.buffer->GetAlignedStride();
+	cmd.cmd.vertexBuffer = mesh->VertexBufferView();
+	cmd.cmd.indexBuffer = mesh->IndexBufferView();
+	cmd.cmd.drawArgs.BaseVertexLocation = 0;
+	cmd.cmd.drawArgs.IndexCountPerInstance = mesh->GetIndexCount();
+	cmd.cmd.drawArgs.InstanceCount = 1;
+	cmd.cmd.drawArgs.StartIndexLocation = 0;
+	cmd.cmd.drawArgs.StartInstanceLocation = 0;
+	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
+	{
+		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)FrameResource::mFrameResources[i]->GetResource(this, [=]()->GpuDrivenRenderer*
+		{
+			return new GpuDrivenRenderer(device, capacity);
+		});
+		perFrameData->AddCommand(cmd);
+	}
+}
+
+void GRP_Renderer::RemoveElement(Transform* trans, ID3D12Device* device)
 {
 	auto&& ite = dicts.find(trans);
 	if (ite == dicts.end()) return;
 	auto arrEnd = elements.end() - 1;
+	UINT index = ite->second;
 	RenderElement& ele = elements[ite->second];
+	pool.Return(ele.propertyBuffer);
 	for (UINT i = 0; i < texRequireInMat; ++i)
 		textureDescPool.push_back(ele.textures[i]);
 	textureIndicesPool.push_back(ele.textures);
@@ -132,6 +298,100 @@ void GRP_Renderer::RemoveElement(Transform* trans)
 	dicts.insert_or_assign(arrEnd->transform.operator->(), ite->second);
 	elements.erase(arrEnd);
 	dicts.erase(ite);
+
+	Command cmd;
+	cmd.index = index;
+	cmd.removedIndex = elements.size();
+	cmd.type = Command::CommandType_Remove;
+	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
+	{
+		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)FrameResource::mFrameResources[i]->GetResource(this, [=]()->GpuDrivenRenderer*
+		{
+			return new GpuDrivenRenderer(device, capacity);
+		});
+		perFrameData->AddCommand(cmd);
+	}
+
+}
+
+void GRP_Renderer::UpdateTransform(Transform* targetTrans, ID3D12Device* device)
+{
+	auto&& ite = dicts.find(targetTrans);
+	if (ite == dicts.end()) return;
+	RenderElement& rem = elements[ite->second];
+	Command cmd;
+	cmd.index = ite->second;
+	cmd.type = Command::CommandType_TransformPos;
+	cmd.objData.boundingCenter = rem.boundingCenter;
+	cmd.objData.boundingExtent = rem.boundingExtent;
+	DirectX::XMMATRIX* ptr = (DirectX::XMMATRIX*) &cmd.objData.localToWorld;
+	*ptr = targetTrans->GetLocalToWorldMatrix();
+	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
+	{
+		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)FrameResource::mFrameResources[i]->GetResource(this, [=]()->GpuDrivenRenderer*
+		{
+			return new GpuDrivenRenderer(device, capacity);
+		});
+		perFrameData->AddCommand(cmd);
+	}
+}
+void  GRP_Renderer::DrawCommand(
+	ID3D12GraphicsCommandList* commandList,
+	ID3D12Device* device,
+	UINT targetShaderPass,
+	FrameResource* targetResource,
+	ConstBufferElement& cameraProperty,
+	ConstBufferElement& cullDataBuffer,
+	DirectX::XMFLOAT4* frustumPlanes,
+	DirectX::XMFLOAT3 frustumMinPoint,
+	DirectX::XMFLOAT3 frustumMaxPoint,
+	PSOContainer* container
+)
+{
+	cullShader->BindRootSignature(commandList, nullptr);
+	UINT dispatchCount = (UINT)ceil(elements.size() / 64.0);
+	UINT capacity = this->capacity;
+	GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)targetResource->GetResource(this, [=]()->GpuDrivenRenderer*
+	{
+		return new GpuDrivenRenderer(device, capacity);
+	});
+	CullData cullD;
+	cullD._Count = elements.size();
+	memcpy(cullD.planes, frustumPlanes, sizeof(DirectX::XMFLOAT4) * 6);
+	cullD._FrustumMaxPoint = frustumMaxPoint;
+	cullD._FrustumMinPoint = frustumMinPoint;
+	cullDataBuffer.buffer->CopyData(cullDataBuffer.element, &cullD);
+	cullShader->SetResource(commandList, _InputBuffer, perFrameData->cmdDrawBuffers.get(), 0);
+	cullShader->SetResource(commandList, _InputDataBuffer, perFrameData->objectPosBuffer.get(), 0);
+	cullShader->SetStructuredBufferByAddress(commandList, _OutputBuffer, perFrameData->argBuffer->GetAddress(0, 0));
+	cullShader->SetStructuredBufferByAddress(commandList, _CountBuffer, perFrameData->argBuffer->GetAddress(1, 0));
+	cullShader->SetResource(commandList, CBuffer, cullDataBuffer.buffer, cullDataBuffer.element);
+	cullShader->Dispatch(commandList, 1, dispatchCount, 1, 1);
+	cullShader->Dispatch(commandList, 0, dispatchCount, 1, 1);
+	PSODescriptor desc;
+	desc.meshLayoutIndex = meshLayoutIndex;
+	desc.shaderPass = targetShaderPass;
+	desc.shaderPtr = shader;
+	ID3D12PipelineState* pso = container->GetState(desc, device);
+	commandList->SetPipelineState(pso);
+	shader->BindRootSignature(commandList);
+	textureHeap->SetDescriptorHeap(commandList);
+	shader->SetResource(commandList, ShaderID::GetMainTex(), textureHeap.operator->(), 0);
+	shader->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraProperty.buffer, cameraProperty.element);
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->ExecuteIndirect(
+		cmdSig.GetSignature(),
+		elements.size(),
+		perFrameData->argBuffer->GetResource(),
+		perFrameData->argBuffer->GetAddressOffset(0, 0),
+		perFrameData->argBuffer->GetResource(),
+		perFrameData->argBuffer->GetAddressOffset(1, 0)
+	);
+}
+
+CBufferPool* GRP_Renderer::GetCullDataPool(UINT initCapacity)
+{
+	return new CBufferPool(initCapacity, sizeof(CullData));
 }
 
 DescriptorHeap* GRP_Renderer::GetTextureHeap()
@@ -141,5 +401,9 @@ DescriptorHeap* GRP_Renderer::GetTextureHeap()
 
 GRP_Renderer::~GRP_Renderer()
 {
+	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
+	{
+		FrameResource::mFrameResources[i]->ReleasePipelineResAfterFlush(this);
+	}
 	delete allocatedIndices;
 }

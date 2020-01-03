@@ -64,6 +64,7 @@ public:
     ~FrameResource();
 	void UpdateBeforeFrame(ID3D12Fence* mFence);
 	static void ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources);
+	static void ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>&& resources);
 	void UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* commandQueue, ID3D12Fence* mFence);
 	ThreadCommand* GetNewThreadCommand(Camera* cam, ID3D12Device* device);
 	void ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd);
@@ -88,10 +89,10 @@ public:
 	template <typename Func>
 	inline IPipelineResource* GetResource(void* targetComponent, const Func&& func)
 	{
+		std::lock_guard<std::mutex> lck(mtx);
 		auto&& ite = perFrameResources.find(targetComponent);
 		if (ite == perFrameResources.end())
 		{
-			std::lock_guard<std::mutex> lck(mtx);
 			if (ite == perFrameResources.end())
 			{
 				IPipelineResource* newComp = func();

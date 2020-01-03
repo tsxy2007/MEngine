@@ -8,22 +8,27 @@ class Mesh;
 class Transform;
 class FrameResource;
 class ComputeShader;
+class CBufferPool;
+class PSOContainer;
 class GRP_Renderer : public MObject
 {
-private:
+public:
 	struct RenderElement
 	{
-		ObjectPtr<Mesh> mesh;
 		ConstBufferElement propertyBuffer;
 		ObjectPtr<Transform> transform;
 		UINT* textures;
+		DirectX::XMFLOAT3 boundingCenter;
+		DirectX::XMFLOAT3 boundingExtent;
 		RenderElement(
-			ObjectPtr<Mesh>* anotherMesh,
 			ConstBufferElement&& anotherBuffer,
 			ObjectPtr<Transform>* anotherTrans,
-			UINT* textures
-		) : mesh(*anotherMesh), propertyBuffer(anotherBuffer), transform(*anotherTrans), textures(textures) {}
+			UINT* textures,
+			DirectX::XMFLOAT3 boundingCenter,
+			DirectX::XMFLOAT3 boundingExtent
+		) : propertyBuffer(anotherBuffer), transform(*anotherTrans), textures(textures), boundingCenter(boundingCenter), boundingExtent(boundingExtent) {}
 	};
+private:
 	CBufferPool pool;
 	ObjectPtr<DescriptorHeap> textureHeap;
 	size_t cbufferStride;
@@ -37,6 +42,12 @@ private:
 	UINT* allocatedIndices;
 	UINT texRequireInMat;
 	UINT meshLayoutIndex;
+	UINT capacity;
+	UINT _InputBuffer;
+	UINT _InputDataBuffer;
+	UINT _OutputBuffer;
+	UINT _CountBuffer;
+	UINT CBuffer;
 	ComputeShader* cullShader;
 public:
 	GRP_Renderer(
@@ -50,23 +61,26 @@ public:
 	);
 	~GRP_Renderer();
 	RenderElement& AddRenderElement(
-		ObjectPtr<Transform>& textureHeap,
+		ObjectPtr<Transform>& targetTrans,
 		ObjectPtr<Mesh>& mesh,
 		ID3D12Device* device
 	);
-
-	void RemoveElement(Transform* trans);
-	
+	static CBufferPool* GetCullDataPool(UINT initCapacity);
+	void RemoveElement(Transform* trans, ID3D12Device* device);
+	void UpdateRenderer(Transform* targetTrans, Mesh* mesh, ID3D12Device* device);
 	CommandSignature* GetCmdSignature() { return &cmdSig; }
 	DescriptorHeap* GetTextureHeap();
-	void UpdateTransform(Transform* targetTrans);
+	void UpdateTransform(Transform* targetTrans, ID3D12Device* device);
 	void DrawCommand(
 		ID3D12GraphicsCommandList* commandList,
 		ID3D12Device* device,
 		UINT targetShaderPass,
 		FrameResource* targetResource,
 		ConstBufferElement& cameraProperty,
-		UploadBuffer* cullDataBuffer
+		ConstBufferElement& cullDataBuffer,
+		DirectX::XMFLOAT4* frustumPlanes,
+		DirectX::XMFLOAT3 frustumMinPoint,
+		DirectX::XMFLOAT3 frustumMaxPoint,
+		PSOContainer* container
 	);
 };
-

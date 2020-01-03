@@ -4,7 +4,7 @@ StructuredBuffer::StructuredBuffer(
 	StructuredBufferElement* elementsArray,
 	UINT elementsCount,
 	bool isIndirectArgument
-) : elements(elementsCount), offsets(elementsCount)
+) : MObject(), elements(elementsCount), offsets(elementsCount)
 {
 	memcpy(elements.data(), elementsArray, sizeof(StructuredBufferElement) * elementsCount);
 	size_t offst = 0;

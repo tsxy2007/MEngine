@@ -5,23 +5,16 @@
 //***************************************************************************************
 
 // Defaults for number of lights.
-#ifndef NUM_DIR_LIGHTS
-    #define NUM_DIR_LIGHTS 3
-#endif
-
-#ifndef NUM_POINT_LIGHTS
-    #define NUM_POINT_LIGHTS 0
-#endif
-
-#ifndef NUM_SPOT_LIGHTS
-    #define NUM_SPOT_LIGHTS 0
-#endif
-
 // Include structures and functions for lighting.
 #include "LightingUtil.hlsl"
-Texture2D gDiffuseMap[10] : register(t2, space1);
-TextureCube cubemap : register(t0, space0);
-SamplerState gsamLinear  : register(s4);
+Texture2D<float4> _MainTex[10] : register(t0, space0);
+
+SamplerState pointWrapSampler  : register(s0);
+SamplerState pointClampSampler  : register(s1);
+SamplerState linearWrapSampler  : register(s2);
+SamplerState linearClampSampler  : register(s3);
+SamplerState anisotropicWrapSampler  : register(s4);
+SamplerState anisotropicClampSampler  : register(s5);
 
 cbuffer Per_Object_Buffer : register(b0)
 {
@@ -89,12 +82,6 @@ float4 PS(VertexOut pin) : SV_Target
 {
    // float2 bindlessChooser = floor(saturate(pin.TexC) * 3);
  //   uint sampleCount = (uint)(bindlessChooser.x * 3 + bindlessChooser.y);
-    float4 diffuseAlbedo = gDiffuseMap[0].SampleLevel(gsamLinear, pin.TexC.xy, 1);
-    return diffuseAlbedo;
-}
-
-float4 PS_PureColor(VertexOut pin) : SV_Target
-{
- float4 diffuseAlbedo = gDiffuseMap[1].Sample(gsamLinear, pin.TexC.xy);
+    float4 diffuseAlbedo = _MainTex[0].SampleLevel(anisotropicWrapSampler, pin.TexC.xy, 1);
     return diffuseAlbedo;
 }

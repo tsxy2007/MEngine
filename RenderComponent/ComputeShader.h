@@ -32,8 +32,8 @@ private:
 public:
 	ComputeShader(
 		std::wstring compilePath,
-		std::vector<std::string>& kernelName,
-		std::vector<ComputeShaderVariable>& allShaderVariables,
+		std::string* kernelName, UINT kernelCount,
+		ComputeShaderVariable* allShaderVariables, UINT varSize,
 		ID3D12Device* device,
 		bool useCache);
 	size_t VariableLength() const { return mVariablesVector.size(); }

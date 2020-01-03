@@ -40,8 +40,8 @@ public:
 	Shader() {}
 	~Shader();
 	Shader(
-		std::vector<Pass> passPaths,
-		std::vector<ShaderVariable> allShaderVariables,
+		Pass* passes, UINT passCount,
+		ShaderVariable* shaderVariables, UINT shaderVarCount,
 		ID3D12Device* device,
 		bool useShaderCache
 	);

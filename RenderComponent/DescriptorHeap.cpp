@@ -23,6 +23,12 @@ HRESULT DescriptorHeap::Create(
 	return hr;
 }
 
+void DescriptorHeap::SetDescriptorHeap(ID3D12GraphicsCommandList* commandList)
+{
+	ID3D12DescriptorHeap* heap = pDH.Get();
+	commandList->SetDescriptorHeaps(1, &heap);
+}
+
 DescriptorHeap::~DescriptorHeap()
 {
 	pDH = nullptr;

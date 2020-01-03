@@ -63,13 +63,13 @@ float PlaneTest(float3 localPosition, float3 extent, float4x4 localToWorld){
 void CSMain(uint id : SV_DISPATCHTHREADID)
 {
     if(id >= _Count) return;
-  /*  uint count;
+    uint count;
     ObjectData data = _InputDataBuffer[id];
     if(PlaneTest(data.boundingCenter, data.boundingExtent, data.localToWorld) > 0.5)
     {
         InterlockedAdd(_CountBuffer[0], 1, count);
         _OutputBuffer[count] = _InputBuffer[id];
-    }*/
+    }
 }
 
 [numthreads(1,1,1)]

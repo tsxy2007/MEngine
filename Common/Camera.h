@@ -85,10 +85,10 @@ public:
 	template <typename Func>
 	inline IPipelineResource* GetResource(PipelineComponent* targetComponent, const Func&& func)
 	{
+		std::lock_guard<std::mutex> lck(mtx);
 		auto&& ite = perCameraResource.find(targetComponent);
 		if (ite == perCameraResource.end())
 		{
-			std::lock_guard<std::mutex> lck(mtx);
 			if (ite == perCameraResource.end())
 			{
 				IPipelineResource* newComp = func();

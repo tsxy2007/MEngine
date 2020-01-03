@@ -56,14 +56,14 @@ ComPtr<ID3DBlob> Compile(std::wstring& path, std::string& kernelName, D3D_SHADER
 using namespace std;
 ComputeShader::ComputeShader(
 	wstring compilePath,
-	vector<std::string>& kernelName,
-	vector<ComputeShaderVariable>& allShaderVariables,
+	std::string* kernelName, UINT kernelCount,
+	ComputeShaderVariable* allShaderVariables, UINT varSize,
 	ID3D12Device* device,
-	bool useCache) : csShaders(kernelName.size()), pso(kernelName.size())
+	bool useCache) : csShaders(kernelCount), pso(kernelCount)
 {
-	mVariablesDict.reserve(allShaderVariables.size() + 2);
-	mVariablesVector.reserve(allShaderVariables.size());
-	for (int i = 0; i < allShaderVariables.size(); ++i)
+	mVariablesDict.reserve(varSize + 2);
+	mVariablesVector.reserve(varSize);
+	for (int i = 0; i < varSize; ++i)
 	{
 		ComputeShaderVariable& variable = allShaderVariables[i];
 		mVariablesDict[ShaderID::PropertyToID(variable.name)] = i;
@@ -136,7 +136,7 @@ ComputeShader::ComputeShader(
 		serializedRootSig->GetBufferPointer(),
 		serializedRootSig->GetBufferSize(),
 		IID_PPV_ARGS(mRootSignature.GetAddressOf())));
-	UINT kernelSize = kernelName.size();
+	UINT kernelSize = kernelCount;
 	for (int i = 0; i < kernelSize; ++i)
 	{
 		csShaders[i] = Compile(compilePath, kernelName[i], nullptr, useCache);//d3dUtil::CompileShader(compilePath + L".compute", nullptr, kernelName[i], "cs_5_1");
@@ -200,12 +200,6 @@ void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id,
 			rootSigPos,
 			uploadBufferPtr->Resource()->GetGPUVirtualAddress() + indexOffset * uploadBufferPtr->GetAlignedStride()
 		);
-		break;
-	case ComputeShaderVariable::Type::RWStructuredBuffer:
-		uploadBufferPtr = ((UploadBuffer*)targetObj);
-		commandList->SetComputeRootUnorderedAccessView(
-			rootSigPos,
-			uploadBufferPtr->Resource()->GetGPUVirtualAddress() + indexOffset * uploadBufferPtr->GetStride());
 		break;
 	case ComputeShaderVariable::Type::StructuredBuffer:
 		uploadBufferPtr = ((UploadBuffer*)targetObj);

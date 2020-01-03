@@ -26,6 +26,7 @@ public:
 		h.ptr = hGPUHeapStart.ptr + index * HandleIncrementSize;
 		return h;
 	}
+	void SetDescriptorHeap(ID3D12GraphicsCommandList* commandList);
 	inline D3D12_DESCRIPTOR_HEAP_DESC GetDesc() const { return Desc; };
 	virtual ~DescriptorHeap();
 private:

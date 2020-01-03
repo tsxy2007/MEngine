@@ -70,28 +70,28 @@ ComPtr<ID3DBlob> CompileShader(std::wstring& path, std::string& functionName, st
 }
 
 Shader::Shader(
-	std::vector<Pass> passPaths,
-	std::vector<ShaderVariable> allShaderVariables,
+	Pass* passes, UINT passCount,
+	ShaderVariable* shaderVariables, UINT shaderVarCount,
 	ID3D12Device* device,
 	bool useShaderCache
 )
 {
 	//Create Pass
-	allPasses.reserve(passPaths.size());
-	for (int i = 0; i < passPaths.size(); ++i)
+	allPasses.reserve(passCount);
+	for (int i = 0; i < passCount; ++i)
 	{
-		Pass& p = passPaths[i];
+		Pass& p = passes[i];
 		if (p.vsShader == nullptr)
 			p.vsShader = CompileShader(p.filePath, p.vertex, "vs_5_1", nullptr, useShaderCache);// d3dUtil::CompileShader(p.filePath, nullptr, p.vertex, "vs_5_1");
 		if (p.psShader == nullptr)
 			p.psShader = CompileShader(p.filePath, p.fragment, "ps_5_1", nullptr, useShaderCache);// d3dUtil::CompileShader(p.filePath, nullptr, p.fragment, "ps_5_1");
 		allPasses.push_back(std::move(p));
 	}
-	mVariablesDict.reserve(allShaderVariables.size() + 2);
-	mVariablesVector.reserve(allShaderVariables.size());
-	for (int i = 0; i < allShaderVariables.size(); ++i)
+	mVariablesDict.reserve(shaderVarCount + 2);
+	mVariablesVector.reserve(shaderVarCount);
+	for (int i = 0; i < shaderVarCount; ++i)
 	{
-		ShaderVariable& variable = allShaderVariables[i];
+		ShaderVariable& variable = shaderVariables[i];
 		mVariablesDict[ShaderID::PropertyToID(variable.name)] = i;
 		mVariablesVector.push_back(variable);
 
