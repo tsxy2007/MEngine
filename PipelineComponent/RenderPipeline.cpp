@@ -4,6 +4,7 @@
 #include "PrepareComponent.h"
 #include "GBufferComponent.h"
 #include "../LogicComponent/World.h"
+#include "SkyboxComponent.h"
 //ThreadCommand* threadCommand;
 RenderPipeline* RenderPipeline::current(nullptr);
 std::unordered_map<std::string, PipelineComponent*> RenderPipeline::componentsLink;
@@ -37,6 +38,7 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 	//Init All Events Here
 	Init<PrepareComponent>();
 	Init<GBufferComponent>();
+	Init<SkyboxComponent>();
 
 	for (UINT i = 0, size = components.size(); i < size; ++i)
 	{
@@ -46,6 +48,7 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 	//Init Path
 	renderPathComponents[0].push_back(components[0]);
 	renderPathComponents[0].push_back(components[1]);
+	renderPathComponents[0].push_back(components[2]);
 }
 
 void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
@@ -71,7 +74,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 			PipelineComponent* component = waitingComponents[i];
 			std::vector<TemporalRTCommand>& descriptors = component->SendRenderTextureRequire(data);
 			//Allocate Temporal Render Texture
-
+			component->allTempRT.resize(descriptors.size());
 			for (UINT j = 0, descriptorSize = descriptors.size(); j < descriptorSize; ++j)
 			{
 				TemporalRTCommand& command = descriptors[j];
@@ -93,6 +96,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 						throw "No Such Render Texture!";
 					}
 					markPtr->endComponent = i;
+					component->requiredRTs.emplace_back(j, command.uID);
 				}
 			}
 
@@ -150,4 +154,23 @@ RenderPipeline::~RenderPipeline()
 		delete components[i];
 	}
 
+}
+
+RenderPipeline* RenderPipeline::GetInstance(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+{
+	if (current == nullptr)
+	{
+		current = new RenderPipeline(device, commandList);
+	}
+	return current;
+}
+
+void RenderPipeline::DestroyInstance()
+{
+	if (current != nullptr)
+	{
+		auto ptr = current;
+		current = nullptr;
+		delete ptr;
+	}
 }

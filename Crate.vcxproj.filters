@@ -204,6 +204,12 @@
     <ClInclude Include="RenderComponent\GPU Driven\GRP_Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PipelineComponent\SkyboxComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineComponent\PostProcessingComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -342,6 +348,12 @@
       <Filter>Source Files\RenderComponent</Filter>
     </ClCompile>
     <ClCompile Include="RenderComponent\GPU Driven\GRP_Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineComponent\SkyboxComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineComponent\PostProcessingComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

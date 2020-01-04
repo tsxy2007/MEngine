@@ -35,7 +35,6 @@ struct Command
 	};
 	CommandType type;
 	UINT index;
-	UINT removedIndex;
 	MultiDrawCommand cmd;
 	ObjectData objData;
 	Command() {}
@@ -50,16 +49,20 @@ public:
 	Storage<StructuredBuffer, 1> sbuffers;
 	std::unique_ptr<UploadBuffer> objectPosBuffer;
 	std::unique_ptr<UploadBuffer> cmdDrawBuffers;
+	CBufferPool objectPool;
 	StructuredBuffer* argBuffer;
 	std::mutex mtx;
 	UINT capacity;
 	UINT count;
 	std::vector<Command> allCommands;
+	std::vector<ConstBufferElement> allocatedObjects;
 	GpuDrivenRenderer(
 		ID3D12Device* device,
 		UINT capacity
-	) : capacity(capacity), count(0)
+	) : capacity(capacity), count(0),
+		objectPool(capacity, sizeof(ObjectConstants))
 	{
+		allocatedObjects.reserve(capacity);
 		objectPosBuffer = std::unique_ptr<UploadBuffer>(new UploadBuffer());
 		cmdDrawBuffers = std::unique_ptr<UploadBuffer>(new UploadBuffer());
 		objectPosBuffer->Create(device, capacity, false, sizeof(ObjectData));
@@ -88,12 +91,6 @@ public:
 
 		objectPosBuffer = std::unique_ptr<UploadBuffer>(newObjBuffer);
 		cmdDrawBuffers = std::unique_ptr<UploadBuffer>(newCmdDrawBuffer);
-		for (UINT i = 0; i < capacity; ++i)
-		{
-			MultiDrawCommand* ptr = (MultiDrawCommand*)cmdDrawBuffers->GetMappedDataPtr(i);
-			ptr->objectCBufferAddress = objectPosBuffer->Resource()->GetGPUVirtualAddress() +
-				objectPosBuffer->GetAlignedStride() * i;
-		}
 		capacity = targetCapacity;
 	}
 
@@ -117,33 +114,38 @@ public:
 			}
 			c = allCommands[i];
 			mtx.unlock();
+			ConstBufferElement& cEle = allocatedObjects[c.index];
+			auto&& ite = allocatedObjects.end() - 1;
+			UINT last = count - 1;
 			switch (c.type)
 			{
 			case Command::CommandType_Add:
 				Resize(count + 1, device);
-				c.cmd.objectCBufferAddress = objectPosBuffer->Resource()->GetGPUVirtualAddress() +
-					objectPosBuffer->GetAlignedStride() *  count;
+				ConstBufferElement obj = objectPool.Get(device);
+				c.cmd.objectCBufferAddress = obj.buffer->Resource()->GetGPUVirtualAddress() +
+					obj.element * obj.buffer->GetAlignedStride();
+				allocatedObjects.push_back(obj);
 				objectPosBuffer->CopyData(count, &c.objData);
 				cmdDrawBuffers->CopyData(count, &c.cmd);
 				count++;
 				break;
 			case Command::CommandType_Remove:
-				if (c.index != c.removedIndex)
+				if (c.index != last)
 				{
-					objectPosBuffer->CopyDataInside(c.removedIndex, c.index);
-					cmdDrawBuffers->CopyDataInside(c.removedIndex, c.index);
-					MultiDrawCommand* ptr = (MultiDrawCommand*)cmdDrawBuffers->GetMappedDataPtr(c.index);
-					ptr->objectCBufferAddress = objectPosBuffer->Resource()->GetGPUVirtualAddress() +
-						objectPosBuffer->GetAlignedStride() *  c.index;
+					objectPosBuffer->CopyDataInside(last, c.index);
+					cmdDrawBuffers->CopyDataInside(last, c.index);
 				}
+				objectPool.Return(cEle);
+				cEle = *ite;
+				allocatedObjects.erase(ite);
 				count--;
 				break;
 			case Command::CommandType::CommandType_TransformPos:
 				objectPosBuffer->CopyData(c.index, &c.objData);
 				break;
 			case Command::CommandType::CommandType_Renderer:
-				c.cmd.objectCBufferAddress = objectPosBuffer->Resource()->GetGPUVirtualAddress() +
-					objectPosBuffer->GetAlignedStride() *  c.index;
+				c.cmd.objectCBufferAddress = cEle.buffer->Resource()->GetGPUVirtualAddress() +
+					cEle.element * cEle.buffer->GetAlignedStride();
 				cmdDrawBuffers->CopyData(c.index, &c.cmd);
 				break;
 			}
@@ -301,7 +303,6 @@ void GRP_Renderer::RemoveElement(Transform* trans, ID3D12Device* device)
 
 	Command cmd;
 	cmd.index = index;
-	cmd.removedIndex = elements.size();
 	cmd.type = Command::CommandType_Remove;
 	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
 	{

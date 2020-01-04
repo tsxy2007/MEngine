@@ -194,6 +194,28 @@ void RenderTexture::SetUAV(ID3D12GraphicsCommandList* commandList, bool value)
 		commandList->ResourceBarrier(1, &result);
 }
 */
+
+void RenderTexture::BindRTVToHeap(ID3D12Device* device, DescriptorHeap* targetHeap, UINT targetHeapIndex, UINT slice)
+{
+	UINT maxDepth = depthSlice - 1;
+	slice = min(slice, maxDepth);
+	switch (mType)
+	{
+	case RenderTextureType::Tex2D:
+
+		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, targetHeap->hCPU(targetHeapIndex));
+		break;
+
+	case RenderTextureType::Tex3D:
+		rtvDesc.Texture3D.FirstWSlice = slice;
+		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, targetHeap->hCPU(targetHeapIndex));
+		break;
+	default:
+		rtvDesc.Texture2DArray.FirstArraySlice = slice;
+		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, targetHeap->hCPU(targetHeapIndex));
+	}
+}
+
 RenderTexture::RenderTexture(
 	ID3D12Device* device,
 	UINT width,
@@ -251,8 +273,6 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 		&colorClear,
 		IID_PPV_ARGS(&mColorResource)));
 
-
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;
 	switch (type)
 	{
 	case RenderTextureType::Tex2D:
@@ -370,13 +390,13 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 	}
 }
 
-void RenderTexture::BindColorBufferToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device)
+void RenderTexture::BindColorBufferToSRVHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	GetColorViewDesc(srvDesc);
 	device->CreateShaderResourceView(mColorResource.Get(), &srvDesc, targetHeap->hCPU(index));
 }
-void RenderTexture::BindDepthBufferToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device)
+void RenderTexture::BindDepthBufferToSRVHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	GetDepthViewDesc(srvDesc);

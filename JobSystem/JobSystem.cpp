@@ -42,6 +42,7 @@ void JobSystem::UpdateNewBucket()
 	}
 	bucket->jobNodesVec.clear();
 	currentBucketPos++;
+	UINT size = executingNode.GetSize();
 	if (executingNode.GetSize() < mThreadCount) {
 		for (int64_t i = 0; i < executingNode.GetSize(); ++i) {
 			std::lock_guard<std::mutex> lck(JobNode::threadMtx);

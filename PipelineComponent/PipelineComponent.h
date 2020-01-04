@@ -40,6 +40,7 @@ private:
 	};
 	std::vector<LoadTempRTCommand> loadRTCommands;
 	std::vector<UINT> unLoadRTCommands;
+	std::vector<std::pair<UINT, UINT>> requiredRTs;
 	void ExecuteTempRTCommand(ID3D12Device* device, TempRTAllocator* allocator);
 
 protected:

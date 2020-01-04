@@ -50,8 +50,10 @@ private:
 		components.emplace_back(ptr);
 		componentsLink.insert_or_assign(typeid(T).name(), ptr);
 	}
-public:
 	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+public:
+	static RenderPipeline* GetInstance(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+	static void DestroyInstance();
 	~RenderPipeline();
 	void RenderCamera(RenderPipelineData& data);
 	static PipelineComponent* GetComponent(const char* typeName);

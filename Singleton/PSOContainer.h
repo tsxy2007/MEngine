@@ -38,6 +38,18 @@ private:
 	UINT rtCount;
 	DXGI_FORMAT rtFormat[8];
 public:
+	DXGI_FORMAT* GetColorFormats()
+	{
+		return rtFormat;
+	}
+	UINT GetRTCount() const
+	{
+		return rtCount;
+	}
+	DXGI_FORMAT GetDepthFormat() const
+	{
+		return depthFormat;
+	}
 	PSOContainer(DXGI_FORMAT depthFormat, UINT rtCount, DXGI_FORMAT* allRTFormat);
 	ID3D12PipelineState* GetState(PSODescriptor& desc, ID3D12Device* device);
 };

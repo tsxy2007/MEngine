@@ -9,16 +9,20 @@ RenderTexture* PipelineComponent::GetTempRT(UINT index)
 
 void PipelineComponent::ExecuteTempRTCommand(ID3D12Device* device, TempRTAllocator* allocator)
 {
-	allTempRT.resize(loadRTCommands.size());
-	for (UINT i = 0; i < loadRTCommands.size(); ++i)
+	for (auto ite = loadRTCommands.begin(); ite != loadRTCommands.end(); ++ite)
 	{
-		LoadTempRTCommand& cmd = loadRTCommands[i];
+		LoadTempRTCommand& cmd = *ite;
 		allTempRT[cmd.index] = allocator->GetRenderTextures(device, cmd.uID, cmd.descriptor);
 	}
 	loadRTCommands.clear();
-	for (UINT i = 0; i < unLoadRTCommands.size(); ++i)
+	for (auto ite = requiredRTs.begin(); ite != requiredRTs.end(); ++ite)
 	{
-		allocator->ReleaseRenderTexutre(unLoadRTCommands[i]);
+		allTempRT[ite->first] = allocator->GetUsingRenderTexture(ite->second);
+	}
+	requiredRTs.clear();
+	for (auto ite = unLoadRTCommands.begin(); ite!= unLoadRTCommands.end(); ++ite)
+	{
+		allocator->ReleaseRenderTexutre(*ite);
 	}
 	unLoadRTCommands.clear();
 }

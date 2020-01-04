@@ -33,6 +33,7 @@
     <ClInclude Include="Common\MQueue.h" />
     <ClInclude Include="Common\Pool.h" />
     <ClInclude Include="Common\RandomVector.h" />
+    <ClInclude Include="PipelineComponent\PostProcessingComponent.h" />
     <ClInclude Include="RenderComponent\GPU Driven\GRP_Renderer.h" />
     <ClInclude Include="JobSystem\ConcurrentQueue.h" />
     <ClInclude Include="JobSystem\JobBucket.h" />
@@ -73,6 +74,7 @@
     <ClInclude Include="Singleton\PSOContainer.h" />
     <ClInclude Include="Singleton\ShaderCompiler.h" />
     <ClInclude Include="Singleton\ShaderID.h" />
+    <ClInclude Include="PipelineComponent\SkyboxComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\Camera.cpp" />
@@ -84,6 +86,7 @@
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Common\MObject.cpp" />
     <ClCompile Include="CrateApp.cpp" />
+    <ClCompile Include="PipelineComponent\PostProcessingComponent.cpp" />
     <ClCompile Include="RenderComponent\GPU Driven\GRP_Renderer.cpp" />
     <ClCompile Include="JobSystem\JobBucket.cpp" />
     <ClCompile Include="JobSystem\JobHandle.cpp" />
@@ -121,6 +124,7 @@
     <ClCompile Include="Singleton\PSOContainer.cpp" />
     <ClCompile Include="Singleton\ShaderCompiler.cpp" />
     <ClCompile Include="Singleton\ShaderID.cpp" />
+    <ClCompile Include="PipelineComponent\SkyboxComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Crate.rc" />

@@ -22,6 +22,7 @@
 #include "RenderComponent/RenderTexture.h"
 #include "PipelineComponent/RenderPipeline.h"
 #include "Singleton/Graphics.h"
+#include "Singleton/MathLib.h"
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -102,17 +103,17 @@ public:
 //	ObjectPtr<DescriptorHeap> bindlessTextureHeap;
 //	ObjectPtr<DescriptorHeap> uavTextureHeap;
 //	ObjectPtr<IndirectDrawer> indirectDrawer;
-	std::unique_ptr<RenderPipeline> rp;
-//	std::unordered_map<std::string, std::unique_ptr<FMaterial>> mMaterials;
-//	std::vector<ObjectPtr<Texture>> mTextures;
-//	ObjectPtr<Mesh> boxMesh;
-//	ObjectPtr<Mesh> sphereMesh;
-	//	Shader* opaqueShader;
-	//ObjectPtr<Material> opaqueMaterial;
-//	ObjectPtr<MeshRenderer> mainRenderer;
-//	ObjectPtr<MeshRenderer> mainRenderer1;
-	//ObjectPtr<Skybox> skybox;
-	//PassConstants mMainPassCB;
+	RenderPipeline* rp;
+	//	std::unordered_map<std::string, std::unique_ptr<FMaterial>> mMaterials;
+	//	std::vector<ObjectPtr<Texture>> mTextures;
+	//	ObjectPtr<Mesh> boxMesh;
+	//	ObjectPtr<Mesh> sphereMesh;
+		//	Shader* opaqueShader;
+		//ObjectPtr<Material> opaqueMaterial;
+	//	ObjectPtr<MeshRenderer> mainRenderer;
+	//	ObjectPtr<MeshRenderer> mainRenderer1;
+		//ObjectPtr<Skybox> skybox;
+		//PassConstants mMainPassCB;
 	ObjectPtr<Camera> mainCamera;
 
 	//ObjectPtr <UploadBuffer> materialPropertyBuffer;
@@ -164,6 +165,7 @@ CrateApp::~CrateApp()
 	if (md3dDevice != nullptr)
 		FlushCommandQueue();
 	JobSystem::Dispose();
+	RenderPipeline::DestroyInstance();
 	((World*)&worldPtr)->~World();
 }
 
@@ -190,7 +192,8 @@ bool CrateApp::Initialize()
 	// Execute the initialization commands.
 	// Wait until initialization is complete.
 	new (&worldPtr)World(directThreadCommand->GetCmdList(), md3dDevice.Get());
-	rp = std::make_unique<RenderPipeline>(md3dDevice.Get(), directThreadCommand->GetCmdList());
+	rp = RenderPipeline::GetInstance(md3dDevice.Get(),
+		directThreadCommand->GetCmdList());
 	Graphics::Initialize(md3dDevice.Get(), directThreadCommand->GetCmdList());
 	directThreadCommand->CloseCommand();
 	ID3D12CommandList* lst = directThreadCommand->GetCmdList();
@@ -259,7 +262,7 @@ void CrateApp::Draw(const GameTimer& gt)
 	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 	// Clear the back buffer and depth buffer.
-	
+
 	mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 0, 0, 0, nullptr);
 
 	// Specify the buffers we are going to render to.
@@ -305,10 +308,10 @@ void CrateApp::Draw(const GameTimer& gt)
 		&hpSt,
 		1
 	);
-	
+
 	mCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
-		
+
 	mCommandList->Close();
 	mCommandQueue->ExecuteCommandLists(1, (ID3D12CommandList**)mCommandList.GetAddressOf());*/
 	cam[0] = mainCamera.operator->();
@@ -328,8 +331,8 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.world = (World*)&worldPtr;
 	data.world->windowWidth = mClientWidth;
 	data.world->windowHeight = mClientHeight;
-		rp->RenderCamera(data);
-	
+	rp->RenderCamera(data);
+
 	lastFrameExecute = true;
 }
 
@@ -424,29 +427,29 @@ void CrateApp::UpdateMaterialCBs(const GameTimer& gt)
 
 void CrateApp::LoadTextures()
 {
-/*	mTextures.reserve(12);
-	mTextures.clear();
-	auto woodCrateTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "woodCrateTex", L"Textures/WoodCrate01.dds");
-	mTextures.push_back(woodCrateTex);
-	auto brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "brickTex", L"Textures/bricks.dds");
-	mTextures.push_back(brickTex);
-	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "brickTex2", L"Textures/bricks2.dds");
-	mTextures.push_back(brickTex);
-	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "brickTex3", L"Textures/bricks3.dds");
-	mTextures.push_back(brickTex);
-	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "grass", L"Textures/grass.dds");
-	mTextures.push_back(brickTex);
-	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "head_diff", L"Textures/head_diff.dds");
-	mTextures.push_back(brickTex);
-	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "ice", L"Textures/ice.dds");
-	mTextures.push_back(brickTex);
-	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "jacket_diff", L"Textures/jacket_diff.dds");
-	mTextures.push_back(brickTex);
-	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "jacket_diff", L"Textures/pants_diff.dds");
-	mTextures.push_back(brickTex);
-	brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "grasscube1024", L"Textures/grasscube1024.dds", Texture::Cubemap);
-	mTextures.push_back(brickTex);*/
-//	mainRenderTexture = new RenderTexture(md3dDevice.Get(), 1024, 1024, DXGI_FORMAT_R16G16B16A16_FLOAT, true, RenderTextureType::Tex2D, 1, 2);
+	/*	mTextures.reserve(12);
+		mTextures.clear();
+		auto woodCrateTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "woodCrateTex", L"Textures/WoodCrate01.dds");
+		mTextures.push_back(woodCrateTex);
+		auto brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "brickTex", L"Textures/bricks.dds");
+		mTextures.push_back(brickTex);
+		brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "brickTex2", L"Textures/bricks2.dds");
+		mTextures.push_back(brickTex);
+		brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "brickTex3", L"Textures/bricks3.dds");
+		mTextures.push_back(brickTex);
+		brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "grass", L"Textures/grass.dds");
+		mTextures.push_back(brickTex);
+		brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "head_diff", L"Textures/head_diff.dds");
+		mTextures.push_back(brickTex);
+		brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "ice", L"Textures/ice.dds");
+		mTextures.push_back(brickTex);
+		brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "jacket_diff", L"Textures/jacket_diff.dds");
+		mTextures.push_back(brickTex);
+		brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "jacket_diff", L"Textures/pants_diff.dds");
+		mTextures.push_back(brickTex);
+		brickTex = new Texture(mCommandList.Get(), md3dDevice.Get(), "grasscube1024", L"Textures/grasscube1024.dds", Texture::Cubemap);
+		mTextures.push_back(brickTex);*/
+		//	mainRenderTexture = new RenderTexture(md3dDevice.Get(), 1024, 1024, DXGI_FORMAT_R16G16B16A16_FLOAT, true, RenderTextureType::Tex2D, 1, 2);
 }
 
 void CrateApp::BuildDescriptorHeaps()

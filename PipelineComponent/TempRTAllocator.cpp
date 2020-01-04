@@ -52,6 +52,15 @@ bool TempRTAllocator::Contains(UINT id)
 {
 	return usingRT.find(id) != usingRT.end();
 }
+RenderTexture* TempRTAllocator::GetUsingRenderTexture(UINT id)
+{
+	auto&& ite = usingRT.find(id);
+	if (ite != usingRT.end())
+	{
+		return ite->second.rt.operator->();
+	}
+	return nullptr;
+}
 
 void TempRTAllocator::ReleaseRenderTexutre(UINT id)
 {

@@ -22,6 +22,7 @@ public:
 	TempRTAllocator();
 	~TempRTAllocator();
 	bool Contains(UINT id);
+	RenderTexture* GetUsingRenderTexture(UINT id);
 	RenderTexture* GetRenderTextures(ID3D12Device* device, UINT id, RenderTextureDescriptor& descriptors);
 	void ReleaseRenderTexutre(UINT id);
 	void CumulateReleaseAfterFrame();

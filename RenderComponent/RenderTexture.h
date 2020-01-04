@@ -64,6 +64,7 @@ class RenderTexture : public MObject
 private:
 	D3D12_VIEWPORT mViewport;
 	D3D12_RECT mScissorRect;
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;
 	UINT depthSlice;
 	UINT mWidth = 0;
 	UINT mHeight = 0;
@@ -97,10 +98,11 @@ public:
 	ID3D12Resource* GetColorResource() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE GetColorDescriptor(UINT slice);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetDepthDescriptor(UINT slice);
-	void BindColorBufferToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
-	void BindDepthBufferToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
+	void BindColorBufferToSRVHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
+	void BindDepthBufferToSRVHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
 	void BindUAVToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device, UINT targetMipLevel);
 	void ClearRenderTarget(ID3D12GraphicsCommandList* commandList, UINT slice, bool clearColor, bool clearDepth);
+	void BindRTVToHeap(ID3D12Device* device, DescriptorHeap* targetHeap, UINT targetHeapIndex, UINT slice);
 	DXGI_FORMAT GetColorFormat() const;
 	DXGI_FORMAT GetDepthFormat() const;
 };

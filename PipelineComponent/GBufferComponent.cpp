@@ -8,6 +8,9 @@
 #include "../RenderComponent/DescriptorHeap.h"
 #include "../Singleton/PSOContainer.h"
 #include "../RenderComponent/StructuredBuffer.h"
+#include "../RenderComponent/MeshRenderer.h"
+#include "../PipelineComponent/RenderPipeline.h"
+#include "../PipelineComponent/PrepareComponent.h"
 PSOContainer* gbufferContainer(nullptr);
 #define ALBEDO_RT(component) (component->GetTempRT(0))
 #define SPECULAR_RT(component) (component->GetTempRT(1))
@@ -15,40 +18,6 @@ PSOContainer* gbufferContainer(nullptr);
 #define EMISSION_RT (component) (component->GetTempRT(3))
 #define MOTION_VECTOR_RT (component) (component->GetTempRT(4))
 
-GBufferPerFrameResource::GBufferPerFrameResource(ID3D12Device* device, UINT initIndex) :
-	objectIndex(initIndex)
-{
-	StructuredBufferElement strElement[2];
-	strElement[0].stride = sizeof(MeshRenderer::MeshRendererObjectData);
-	strElement[0].elementCount = initIndex;
-	strElement[1].stride = sizeof(UINT);
-	strElement[1].elementCount = 1;
-	objectBuffer = std::make_unique<StructuredBuffer>(
-		device,
-		strElement,
-		2,
-		true
-		);
-}
-
-void GBufferPerFrameResource::Resize(UINT targetSize, ID3D12Device* device)
-{
-	if (objectIndex >= targetSize) return;
-	UINT newSize = (UINT)(objectIndex * 1.5);
-	newSize = max(newSize, targetSize);
-	objectIndex = newSize;
-	StructuredBufferElement strElement[2];
-	strElement[0].stride = sizeof(MeshRenderer::MeshRendererObjectData);
-	strElement[0].elementCount = newSize;
-	strElement[1].stride = sizeof(UINT);
-	strElement[1].elementCount = 1;
-	objectBuffer = std::make_unique<StructuredBuffer>(
-		device,
-		strElement,
-		2,
-		true
-		);
-}
 class GBufferRunnable
 {
 public:
@@ -64,12 +33,6 @@ public:
 		tcmd->ResetCommand();
 		ID3D12GraphicsCommandList* commandList = tcmd->GetCmdList();
 		ID3D12Device* thsDevice = device;
-		GBufferPerFrameResource* frameResource = (GBufferPerFrameResource*)resource->GetResource(component,
-			[=]()->GBufferPerFrameResource*
-		{
-			return new GBufferPerFrameResource(device, max(MeshRenderer::allRendererData.size(), 50));
-		});
-		frameResource->Resize(MeshRenderer::allRendererData.size(), device);
 		tcmd->CloseCommand();
 	}
 };
@@ -146,6 +109,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 		colorFormats[i] = tempRTRequire[i].descriptor.colorFormat;
 	}
 	gbufferContainer = new PSOContainer(DXGI_FORMAT_D24_UNORM_S8_UINT, colorFormats.size(), colorFormats.data());
+	prepareComponent = (PrepareComponent*)RenderPipeline::GetComponent(typeid(PrepareComponent).name());
 }
 
 void GBufferComponent::Dispose()
