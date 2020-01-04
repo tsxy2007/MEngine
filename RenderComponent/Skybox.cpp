@@ -16,6 +16,7 @@ void Skybox::Draw(
 	PSOContainer* container
 )
 {
+	UINT value = cameraBuffer->element;
 	PSODescriptor desc;
 	desc.meshLayoutIndex = fullScreenMesh->GetLayoutIndex();
 	desc.shaderPass = targetPass;

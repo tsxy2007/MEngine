@@ -37,5 +37,5 @@ v2f vert(appdata v)
 
 float4 frag(v2f i) : SV_TARGET
 {
-    return  cubemap.SampleLevel(gsamLinear, i.worldView, 0);
+    return cubemap.SampleLevel(gsamLinear, i.worldView, 0);
 }

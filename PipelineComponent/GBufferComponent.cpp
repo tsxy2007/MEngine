@@ -57,7 +57,8 @@ void GBufferComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadC
 		data.resource,
 		this
 	};
-	taskFlow.GetTask(runnable);
+	auto hand = taskFlow.GetTask(runnable);
+	//prepareComponent->taskHandle.Precede(hand);
 }
 
 void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)

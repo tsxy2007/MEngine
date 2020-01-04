@@ -166,9 +166,12 @@ void Shader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObjec
 	UINT rootSigPos = ite->second;
 	ShaderVariable& var = mVariablesVector[rootSigPos];
 	UploadBuffer* uploadBufferPtr;
+	ID3D12DescriptorHeap* heap = nullptr;
 	switch (var.type)
 	{
 	case ShaderVariable::Type::DescriptorHeap:
+		heap = ((DescriptorHeap*)targetObj)->Get().Get();
+		commandList->SetDescriptorHeaps(1, &heap);
 		commandList->SetGraphicsRootDescriptorTable(
 			rootSigPos,
 			((DescriptorHeap*)targetObj)->hGPU(indexOffset)

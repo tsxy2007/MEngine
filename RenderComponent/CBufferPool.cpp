@@ -13,7 +13,7 @@ void CBufferPool::Add(ID3D12Device* device)
 	}
 }
 
-CBufferPool::CBufferPool(UINT initCapacity, UINT stride) :
+CBufferPool::CBufferPool(UINT stride, UINT initCapacity) :
 	capacity(initCapacity),
 	stride(stride)
 {
@@ -31,6 +31,7 @@ CBufferPool::~CBufferPool()
 
 ConstBufferElement CBufferPool::Get(ID3D12Device* device)
 {
+	UINT value = capacity;
 	if (poolValue.empty())
 	{
 		Add(device);

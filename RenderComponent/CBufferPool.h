@@ -16,7 +16,7 @@ private:
 	UINT stride;
 	void Add(ID3D12Device* device);
 public:
-	CBufferPool(UINT initCapacity, UINT stride);
+	CBufferPool(UINT stride, UINT initCapacity);
 	~CBufferPool();
 	ConstBufferElement Get(ID3D12Device* device);
 	void Return(ConstBufferElement& target);

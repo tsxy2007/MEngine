@@ -5,6 +5,7 @@
 #include "GBufferComponent.h"
 #include "../LogicComponent/World.h"
 #include "SkyboxComponent.h"
+#include "PostProcessingComponent.h"
 //ThreadCommand* threadCommand;
 RenderPipeline* RenderPipeline::current(nullptr);
 std::unordered_map<std::string, PipelineComponent*> RenderPipeline::componentsLink;
@@ -39,6 +40,7 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 	Init<PrepareComponent>();
 	Init<GBufferComponent>();
 	Init<SkyboxComponent>();
+	Init<PostProcessingComponent>();
 
 	for (UINT i = 0, size = components.size(); i < size; ++i)
 	{
@@ -46,16 +48,17 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 	}
 	//TODO
 	//Init Path
-	renderPathComponents[0].push_back(components[0]);
-	renderPathComponents[0].push_back(components[1]);
-	renderPathComponents[0].push_back(components[2]);
+	for (auto i = components.begin(); i != components.end(); ++i)
+	{
+		renderPathComponents[0].push_back(*i);
+	}
 }
 
 void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 {
 	std::vector <JobBucket>& bucketArray = buckets[bucketsFlag];
 	bucketsFlag = !bucketsFlag;
-	bucketArray.resize(renderData.allCameras->size() + 1);
+	bucketArray.resize(renderData.allCameras->size());
 	PipelineComponent::EventData data;
 	data.device = renderData.device;
 	data.backBuffer = renderData.backBufferResource;
@@ -123,15 +126,15 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 			ExecuteThreadCommand(renderData.resource->executableCommandList, cam, component->threadCommand);
 		}
 	}
-	ThreadCommand* commandList = renderData.resource->commmonThreadCommand;
+	/*ThreadCommand* commandList = renderData.resource->commmonThreadCommand;
 	bucketArray[renderData.allCameras->size()].GetTask([=]()->void
 	{
 		commandList->ResetCommand();
 		commandList->CloseCommand();
 	});
-	renderData.resource->executableCommandList.emplace_back(commandList->GetCmdList());
+	renderData.resource->executableCommandList.emplace_back(commandList->GetCmdList());*/
 	JobSystem::ExecuteBucket(bucketArray.data(), bucketArray.size());
-
+	
 	if (renderData.lastResource != nullptr)
 	{
 		//Final Execute

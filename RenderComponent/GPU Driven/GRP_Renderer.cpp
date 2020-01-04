@@ -60,7 +60,7 @@ public:
 		ID3D12Device* device,
 		UINT capacity
 	) : capacity(capacity), count(0),
-		objectPool(capacity, sizeof(ObjectConstants))
+		objectPool(sizeof(ObjectConstants), capacity)
 	{
 		allocatedObjects.reserve(capacity);
 		objectPosBuffer = std::unique_ptr<UploadBuffer>(new UploadBuffer());
@@ -376,7 +376,6 @@ void  GRP_Renderer::DrawCommand(
 	ID3D12PipelineState* pso = container->GetState(desc, device);
 	commandList->SetPipelineState(pso);
 	shader->BindRootSignature(commandList);
-	textureHeap->SetDescriptorHeap(commandList);
 	shader->SetResource(commandList, ShaderID::GetMainTex(), textureHeap.operator->(), 0);
 	shader->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraProperty.buffer, cameraProperty.element);
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -392,7 +391,7 @@ void  GRP_Renderer::DrawCommand(
 
 CBufferPool* GRP_Renderer::GetCullDataPool(UINT initCapacity)
 {
-	return new CBufferPool(initCapacity, sizeof(CullData));
+	return new CBufferPool(sizeof(CullData), initCapacity);
 }
 
 DescriptorHeap* GRP_Renderer::GetTextureHeap()

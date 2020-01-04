@@ -2,7 +2,8 @@
 #include "../Singleton/ShaderID.h"
 #include "../RenderComponent/Skybox.h"
 #include "../Singleton/PSOContainer.h"
-
+#include "RenderPipeline.h"
+#include "PrepareComponent.h"
 Skybox* defaultSkybox;
 std::unique_ptr<PSOContainer> container;
 class SkyboxPerFrameData : public IPipelineResource
@@ -15,6 +16,7 @@ public:
 			D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	}
 };
+PrepareComponent* prepareComp;
 class SkyboxRunnable
 {
 public:
@@ -71,7 +73,7 @@ public:
 };
 void SkyboxComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
 {
-	taskFlow.GetTask<SkyboxRunnable>(
+	JobHandle hand = taskFlow.GetTask<SkyboxRunnable>(
 		{
 			 GetTempRT(0),
 			 GetTempRT(1),
@@ -81,11 +83,13 @@ void SkyboxComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCo
 			 data.device,
 			 data.camera
 		});
+	//prepareComp->taskHandle.Precede(hand);
 }
 
 
 void SkyboxComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
+	prepareComp = (PrepareComponent*)RenderPipeline::GetComponent(typeid(PrepareComponent).name());
 	tempRT.resize(2);
 	tempRT[0].type = TemporalRTCommand::Require;
 	tempRT[0].uID = ShaderID::PropertyToID("_CameraRenderTarget");

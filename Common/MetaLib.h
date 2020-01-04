@@ -9,55 +9,35 @@ template <typename T>
 class Storage<T, 0>
 {};
 
-
-template <typename ... Args>
-class AlignedTuple
+template <typename... Args>
+class AlignedTuple;
+template<>
+class AlignedTuple<>
 {
-private:
-	template <typename ... Args>
-	class AlignedTuple_Package;
-
-	template <>
-	class AlignedTuple_Package<>
-	{
-	public:
-		static void GetOffset(size_t* offsets, AlignedTuple_Package<>* ptr, unsigned int& index) {}
-	};
-
-	template <typename T, typename ... Args>
-
-	class AlignedTuple_Package<T, Args...>
-	{
-	private:
-		std::aligned_storage_t<sizeof(T), alignof(T)> value;
-		AlignedTuple_Package<Args...> args;
-	public:
-		static void GetOffset(size_t* offsets, AlignedTuple_Package<T, Args...>* ptr, unsigned int& index)
-		{
-			offsets[index] = (size_t)(&(ptr)->value);
-			index++;
-			AlignedTuple_Package<Args...>::GetOffset(offsets, &ptr->args, index);
-		}
-	};
-	char* arr[sizeof(AlignedTuple_Package<Args...>)];
-	size_t offsets[sizeof...(Args)];
 public:
-	AlignedTuple()
+	AlignedTuple(size_t* ptr, int count) {}
+	AlignedTuple(size_t* ptr) {}
+};
+template <typename T, typename... Args>
+class AlignedTuple<T, Args...> : public AlignedTuple<Args...>
+{
+public:
+	Storage<T, 1> value;
+	AlignedTuple(size_t* ptr, int count) :
+		AlignedTuple<Args...>(ptr, count - 1)
 	{
-		unsigned int index = 0;
-		AlignedTuple_Package<Args...>::GetOffset(offsets, nullptr, index);
+		count -= 1;
+		if (count < 0) return;
+		AlignedTuple<T, Args...>* classPtr = nullptr;
+		ptr[count] = (size_t)&classPtr->value;
 	}
-	size_t GetOffset(unsigned int index) const
+	AlignedTuple(size_t* ptr) :
+		AlignedTuple<Args...>(ptr, sizeof...(Args))
 	{
-		return offsets[index];
-	}
-	unsigned int GetObjectCount() const
-	{
-		return sizeof...(Args);
-	}
-	void* operator[](unsigned int index)
-	{
-		return arr + offsets[index];
+		int count = sizeof...(Args);
+		if (count < 0) return;
+		AlignedTuple<T, Args...>* classPtr = nullptr;
+		ptr[count] = (size_t)&classPtr->value;
 	}
 };
 
