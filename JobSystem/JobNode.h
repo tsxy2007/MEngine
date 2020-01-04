@@ -26,7 +26,7 @@ private:
 		using Storage = std::aligned_storage_t<sizeof(Func), alignof(Func)>;
 		if (sizeof(Storage) >= 256)	//Create in heap
 		{
-			ptr = new Func(std::move(func));
+			ptr = new Func(std::forward<Func>(func));
 			destructorFunc = [](void* currPtr)->void
 			{
 				Func* fc = (Func*)currPtr;
@@ -36,7 +36,7 @@ private:
 		else
 		{
 			ptr = stackArr;
-			new (ptr)Func(std::move(func));
+			new (ptr)Func(std::forward<Func>(func));
 			destructorFunc = [](void* currPtr)->void
 			{
 				Func* fc = (Func*)currPtr;

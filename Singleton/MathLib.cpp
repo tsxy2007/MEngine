@@ -20,7 +20,7 @@ DirectX::XMVECTOR MathLib::GetPlane(XMVECTOR& a, XMVECTOR& b, XMVECTOR& c)
 
 
 
-XMVECTOR MathLib::GetPlane(XMVECTOR&& normal, XMVECTOR&& inPoint)
+XMVECTOR MathLib::GetPlane(XMVECTOR& normal, XMVECTOR& inPoint)
 {
 	XMVECTOR dt = -XMVector3Dot(normal, inPoint);
 	memcpy(&dt, &normal, sizeof(XMFLOAT3));
@@ -46,7 +46,7 @@ bool MathLib::BoxIntersect(DirectX::XMMATRIX& localToWorldMatrix, DirectX::XMVEC
 }
 
 void MathLib::GetCameraNearPlanePoints(
-	XMMATRIX&& localToWorldMatrix,
+	XMMATRIX& localToWorldMatrix,
 	float fov,
 	float aspect,
 	float distance,
@@ -65,7 +65,7 @@ void MathLib::GetCameraNearPlanePoints(
 }
 
 void MathLib::GetPerspFrustumPlanes(
-	XMMATRIX&& localToWorldMatrix,
+	XMMATRIX& localToWorldMatrix,
 	float fov,
 	float aspect,
 	float nearPlane,
@@ -74,9 +74,9 @@ void MathLib::GetPerspFrustumPlanes(
 )
 {
 	XMVECTOR nearCorners[4];
-	GetCameraNearPlanePoints(std::move(localToWorldMatrix), fov, aspect, nearPlane, nearCorners);
-	*(XMVECTOR*)frustumPlanes = GetPlane(std::move(localToWorldMatrix.r[2]), std::move(localToWorldMatrix.r[3] + farPlane * localToWorldMatrix.r[2]));
-	*(XMVECTOR*)(frustumPlanes + 1) = GetPlane(std::move(-localToWorldMatrix.r[2]), std::move(localToWorldMatrix.r[3] + nearPlane * localToWorldMatrix.r[2]));
+	GetCameraNearPlanePoints(localToWorldMatrix, fov, aspect, nearPlane, nearCorners);
+	*(XMVECTOR*)frustumPlanes = GetPlane(localToWorldMatrix.r[2], (localToWorldMatrix.r[3] + farPlane * localToWorldMatrix.r[2]));
+	*(XMVECTOR*)(frustumPlanes + 1) = GetPlane(-localToWorldMatrix.r[2], (localToWorldMatrix.r[3] + nearPlane * localToWorldMatrix.r[2]));
 	*(XMVECTOR*)(frustumPlanes + 2) = GetPlane(nearCorners[1], nearCorners[0], localToWorldMatrix.r[3]);
 	*(XMVECTOR*)(frustumPlanes + 3) = GetPlane(nearCorners[2], nearCorners[3], localToWorldMatrix.r[3]);
 	*(XMVECTOR*)(frustumPlanes + 4) = GetPlane(nearCorners[0], nearCorners[2], localToWorldMatrix.r[3]);

@@ -8,8 +8,8 @@ class MathLib final
 
 public:
 	static DirectX::XMVECTOR GetPlane(
-		DirectX::XMVECTOR&& normal,
-		DirectX::XMVECTOR&& inPoint);
+		DirectX::XMVECTOR& normal,
+		DirectX::XMVECTOR& inPoint);
 	static DirectX::XMVECTOR GetPlane(
 		DirectX::XMVECTOR& a,
 		DirectX::XMVECTOR& b, 
@@ -20,7 +20,7 @@ public:
 		DirectX::XMVECTOR position,
 		DirectX::XMVECTOR localExtent);
 	static void GetCameraNearPlanePoints(
-		DirectX::XMMATRIX&& localToWorldMatrix,
+		DirectX::XMMATRIX& localToWorldMatrix,
 		float fov,
 		float aspect,
 		float distance,
@@ -28,7 +28,7 @@ public:
 	);
 
 	static void GetPerspFrustumPlanes(
-		DirectX::XMMATRIX&& localToWorldMatrix,
+		DirectX::XMMATRIX& localToWorldMatrix,
 		float fov,
 		float aspect,
 		float nearPlane,
