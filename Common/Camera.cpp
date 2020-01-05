@@ -3,6 +3,8 @@
 //***************************************************************************************
 
 #include "Camera.h"
+#include "../RenderComponent/CBufferPool.h"
+#include "../RenderComponent/UploadBuffer.h"
 using namespace DirectX;
 
 Camera::Camera(ID3D12Device* device, CameraRenderPath renderType) : MObject(), renderType(renderType)
@@ -30,7 +32,7 @@ Camera::~Camera()
 	}
 }
 
-void Camera::UploadCameraBuffer(FrameResource* res, PassConstants& mMainPassCB)
+void Camera::UploadCameraBuffer(PassConstants& mMainPassCB)
 {
 	UpdateViewMatrix();
 	XMMATRIX view = GetView();
@@ -49,8 +51,8 @@ void Camera::UploadCameraBuffer(FrameResource* res, PassConstants& mMainPassCB)
 	mMainPassCB.NearZ = GetNearZ();
 	mMainPassCB.worldSpaceCameraPos = GetPosition3f();
 	mMainPassCB.FarZ = GetFarZ();
-	auto& currPassCB = res->cameraCBs[GetInstanceID()];
-	currPassCB.buffer->CopyData(currPassCB.element, &mMainPassCB);
+	//auto& currPassCB = res->cameraCBs[GetInstanceID()];
+	//currPassCB.buffer->CopyData(currPassCB.element, &mMainPassCB);
 }
 
 XMVECTOR Camera::GetPosition()const

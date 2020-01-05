@@ -10,6 +10,7 @@ class FrameResource;
 class ComputeShader;
 class CBufferPool;
 class PSOContainer;
+class StructuredBuffer;
 class GRP_Renderer : public MObject
 {
 public:
@@ -35,6 +36,7 @@ private:
 	CommandSignature cmdSig;
 	Shader* shader;
 	UINT maxCapacity;
+	std::unique_ptr<StructuredBuffer> cullResultBuffer;
 	std::vector<RenderElement> elements;
 	std::unordered_map<Transform*, UINT> dicts;
 	std::vector<UINT> textureDescPool;

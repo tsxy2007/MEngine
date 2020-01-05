@@ -5,12 +5,26 @@ JobNode::~JobNode()
 	if (destructorFunc != nullptr)
 		destructorFunc(ptr);
 }
-void JobNode::Execute(ConcurrentQueue<JobNode*>& taskList, std::condition_variable& cv)
+JobNode* JobNode::Execute(ConcurrentQueue<JobNode*>& taskList, std::condition_variable& cv)
 {
 	executeFunc(ptr);
-	for (size_t i = 0; i < dependingEvent.size(); ++i)
+	std::vector<JobNode*>::iterator ite = dependingEvent.begin();
+	JobNode* nextNode = nullptr;
+	while(ite != dependingEvent.end())
 	{
-		JobNode* node = dependingEvent[i];
+		JobNode* node = *ite;
+		unsigned int dependingCount = --node->targetDepending;
+		if (dependingCount == 0)
+		{
+			nextNode = node;
+			++ite;
+			break;
+		}
+		++ite;
+	}
+	for (; ite != dependingEvent.end(); ++ite)
+	{
+		JobNode* node = *ite;
 		unsigned int dependingCount = --node->targetDepending;
 		if (dependingCount == 0)
 		{
@@ -21,7 +35,7 @@ void JobNode::Execute(ConcurrentQueue<JobNode*>& taskList, std::condition_variab
 			}
 		}
 	}
-
+	return nextNode;
 }
 
 void JobNode::Precede(JobNode* depending)

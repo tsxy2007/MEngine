@@ -1,50 +1,261 @@
-﻿  CrateApp.cpp
+﻿  Camera.cpp
 c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\rendercomponent\meshrenderer.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  d3dApp.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+  MObject.cpp
+c:\users\user\source\repos\crate\common\mobject.cpp(21): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+  CrateApp.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
   c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
 c:\users\user\source\repos\crate\rendercomponent\skybox.h(6): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\rendercomponent\meshrenderer.h(8): note: 参见“FrameResource”的声明
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\rendercomponent\skybox.h(7): warning C4099: “ConstBufferElement”: 类型名称以前使用“struct”现在使用的是“class”
   c:\users\user\source\repos\crate\rendercomponent\cbufferpool.h(5): note: 参见“ConstBufferElement”的声明
 c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
   c:\users\user\source\repos\crate\rendercomponent\skybox.h(6): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
   c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\singleton\mathlib.h(4): warning C4305: “初始化”: 从“double”到“float”截断
+c:\users\user\source\repos\crate\singleton\mathlib.h(5): warning C4305: “初始化”: 从“double”到“float”截断
 c:\users\user\source\repos\crate\logiccomponent\world.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
   c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\crateapp.cpp(182): warning C4101: “geoGen”: 未引用的局部变量
-c:\users\user\source\repos\crate\crateapp.cpp(224): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\user\source\repos\crate\crateapp.cpp(184): warning C4101: “geoGen”: 未引用的局部变量
+c:\users\user\source\repos\crate\crateapp.cpp(227): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+  PostProcessingComponent.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+c:\users\user\source\repos\crate\logiccomponent\world.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
+  GRP_Renderer.cpp
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\rendercomponent\structuredbuffer.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(176): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(179): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(239): warning C4267: “=”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(255): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(286): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(315): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(338): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(384): warning C4267: “=”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(413): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(428): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4267: “=”: 从“size_t”转换到“_Ty2”，可能丢失数据
+          with
+          [
+              _Ty2=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(398): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Keyty=Transform *,
+              _Mappedty=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(397): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Keyty=Transform *,
+              _Mappedty=unsigned __int64
+          ]
+  c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(221): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(Transform *&&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Mappedty=unsigned __int64
+          ]
+  c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(221): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(Transform *&&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Mappedty=unsigned __int64
+          ]
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(174): warning C4267: “初始化”: 从“size_t”转换到“_Ty2”，可能丢失数据
+          with
+          [
+              _Ty2=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(879): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<Transform*,unsigned __int64,0>(_Other1 &&,_Other2 &&) noexcept”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT,
+              _Other1=Transform *,
+              _Other2=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(881): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<Transform*,unsigned __int64,0>(_Other1 &&,_Other2 &&) noexcept”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT,
+              _Other1=Transform *,
+              _Other2=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(711): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,Transform*,unsigned __int64>(_Alloc &,_Objty *const ,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Alloc=std::allocator<std::_List_node<std::pair<Transform *const ,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<Transform *const ,UINT>>>::void_pointer>>,
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Objty=std::pair<Transform *const ,UINT>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(716): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,Transform*,unsigned __int64>(_Alloc &,_Objty *const ,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Alloc=std::allocator<std::_List_node<std::pair<Transform *const ,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<Transform *const ,UINT>>>::void_pointer>>,
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Objty=std::pair<Transform *const ,UINT>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(947): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<Transform*,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT,
+              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(950): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<Transform*,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT,
+              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(916): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<Transform*,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(917): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<Transform*,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xhash(299): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty> &std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::emplace_front<Transform*,unsigned __int64>(Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(369): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<Transform*,unsigned __int64>(Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Hasher=std::hash<Transform *>,
+              _Keyeq=std::equal_to<Transform *>,
+              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(367): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<Transform*,unsigned __int64>(Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Hasher=std::hash<Transform *>,
+              _Keyeq=std::equal_to<Transform *>,
+              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(398): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Keyty=Transform *,
+              _Mappedty=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(397): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Keyty=Transform *,
+              _Mappedty=unsigned __int64
+          ]
+  JobBucket.cpp
+  JobHandle.cpp
+  JobNode.cpp
+  JobSystem.cpp
+c:\users\user\source\repos\crate\jobsystem\jobsystem.cpp(32): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+c:\users\user\source\repos\crate\jobsystem\jobsystem.cpp(45): warning C4244: “初始化”: 从“int64_t”转换到“UINT”，可能丢失数据
   Component.cpp
 c:\users\user\source\repos\crate\logiccomponent\component.cpp(8): warning C4267: “=”: 从“size_t”转换到“UINT”，可能丢失数据
+  SceneTree.cpp
+c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(131): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(132): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(133): warning C4101: “minZ”: 未引用的局部变量
+c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(133): warning C4101: “minY”: 未引用的局部变量
+c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(134): warning C4101: “maxY”: 未引用的局部变量
+c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(134): warning C4101: “maxX”: 未引用的局部变量
+c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(133): warning C4101: “minX”: 未引用的局部变量
+c:\users\user\source\repos\crate\logiccomponent\scenetree.cpp(134): warning C4101: “maxZ”: 未引用的局部变量
   Transform.cpp
+c:\users\user\source\repos\crate\logiccomponent\transform.cpp(29): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+c:\users\user\source\repos\crate\common\randomvector.h(45): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  c:\users\user\source\repos\crate\common\randomvector.h(43): note: 编译 类 模板 成员函数 "void RandomVector<TransformData>::Add(const T &&,UINT *)" 时
+          with
+          [
+              T=TransformData
+          ]
+  c:\users\user\source\repos\crate\logiccomponent\transform.cpp(36): note: 参见对正在编译的函数 模板 实例化“void RandomVector<TransformData>::Add(const T &&,UINT *)”的引用
+          with
+          [
+              T=TransformData
+          ]
+  c:\users\user\source\repos\crate\logiccomponent\transform.h(26): note: 参见对正在编译的 类 模板 实例化 "RandomVector<TransformData>" 的引用
+c:\users\user\source\repos\crate\common\randomvector.h(46): warning C4267: “=”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\common\randomvector.h(13): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+  c:\users\user\source\repos\crate\common\randomvector.h(11): note: 编译 类 模板 成员函数 "void RandomVector<TransformData>::Resize(UINT)" 时
+  c:\users\user\source\repos\crate\common\randomvector.h(45): note: 参见对正在编译的函数 模板 实例化“void RandomVector<TransformData>::Resize(UINT)”的引用
   World.cpp
 c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
   c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
 c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\logiccomponent\world.cpp(55): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
   CullTask.cpp
-c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\singleton\mathlib.h(24): warning C4305: “初始化”: 从“double”到“float”截断
-c:\users\user\source\repos\crate\singleton\mathlib.h(25): warning C4305: “初始化”: 从“double”到“float”截断
+c:\users\user\source\repos\crate\singleton\mathlib.h(4): warning C4305: “初始化”: 从“double”到“float”截断
+c:\users\user\source\repos\crate\singleton\mathlib.h(5): warning C4305: “初始化”: 从“double”到“float”截断
   GBufferComponent.cpp
 c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\rendercomponent\meshrenderer.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\logiccomponent\world.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\rendercomponent\meshrenderer.h(8): note: 参见“FrameResource”的声明
+  c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
   c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
-c:\users\user\source\repos\crate\pipelinecomponent\gbuffercomponent.cpp(107): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\structuredbuffer.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\logiccomponent\world.h(4): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\rendercomponent\structuredbuffer.h(4): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\gbuffercomponent.cpp(156): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  PipelineComponent.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+  PrepareComponent.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\preparecomponent.cpp(5): warning C4099: “PrepareRunnable”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\pipelinecomponent\preparecomponent.cpp(4): note: 参见“PrepareRunnable”的声明
   RenderPipeline.cpp
 c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
@@ -52,13 +263,16 @@ c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warni
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
   c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
-c:\users\user\source\repos\crate\rendercomponent\meshrenderer.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\logiccomponent\world.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\rendercomponent\meshrenderer.h(8): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(119): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
-c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(125): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(45): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(75): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(81): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(108): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(116): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(123): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(136): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(142): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4244: “=”: 从“_Ty”转换到“_Ty2”，可能丢失数据
           with
           [
@@ -86,7 +300,7 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
               _Keyty=const unsigned int &,
               _Mappedty=unsigned __int64
           ]
-  c:\users\user\source\repos\crate\common\metalib.h(119): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<UINT>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const unsigned int &,_Mappedty &&)”的引用
+  c:\users\user\source\repos\crate\common\metalib.h(109): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<UINT>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const unsigned int &,_Mappedty &&)”的引用
           with
           [
               _Ty=std::pair<const UINT,UINT>,
@@ -94,7 +308,7 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
               _Kty=UINT,
               _Mappedty=unsigned __int64
           ]
-  c:\users\user\source\repos\crate\common\metalib.h(119): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<UINT>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const unsigned int &,_Mappedty &&)”的引用
+  c:\users\user\source\repos\crate\common\metalib.h(109): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<UINT>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const unsigned int &,_Mappedty &&)”的引用
           with
           [
               _Ty=std::pair<const UINT,UINT>,
@@ -102,13 +316,13 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
               _Kty=UINT,
               _Mappedty=unsigned __int64
           ]
-  c:\users\user\source\repos\crate\common\metalib.h(118): note: 编译 类 模板 成员函数 "void Dictionary<UINT,RenderPipeline::RenderTextureMark>::Add(K &,V &)" 时
+  c:\users\user\source\repos\crate\common\metalib.h(108): note: 编译 类 模板 成员函数 "void Dictionary<UINT,RenderPipeline::RenderTextureMark>::Add(K &,V &)" 时
           with
           [
               K=UINT,
               V=RenderPipeline::RenderTextureMark
           ]
-  c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(75): note: 参见对正在编译的函数 模板 实例化“void Dictionary<UINT,RenderPipeline::RenderTextureMark>::Add(K &,V &)”的引用
+  c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(92): note: 参见对正在编译的函数 模板 实例化“void Dictionary<UINT,RenderPipeline::RenderTextureMark>::Add(K &,V &)”的引用
           with
           [
               K=UINT,
@@ -222,21 +436,261 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
               _Keyty=const unsigned int &,
               _Mappedty=unsigned __int64
           ]
-  MeshRenderer.cpp
-c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
+  TempRTAllocator.cpp
+c:\users\user\source\repos\crate\pipelinecomponent\temprtallocator.cpp(79): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+c:\users\user\source\repos\crate\pipelinecomponent\temprtallocator.cpp(80): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4244: “=”: 从“_Ty”转换到“_Ty2”，可能丢失数据
+          with
+          [
+              _Ty=unsigned __int64
+          ]
+          and
+          [
+              _Ty2=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(382): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<RenderTextureDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const RenderTextureDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              K=RenderTextureDescriptor,
+              _Kty=RenderTextureDescriptor,
+              _Keyty=const RenderTextureDescriptor &,
+              _Mappedty=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(381): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<RenderTextureDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const RenderTextureDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              K=RenderTextureDescriptor,
+              _Kty=RenderTextureDescriptor,
+              _Keyty=const RenderTextureDescriptor &,
+              _Mappedty=unsigned __int64
+          ]
+  c:\users\user\source\repos\crate\common\metalib.h(109): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<RenderTextureDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const RenderTextureDescriptor &,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              K=RenderTextureDescriptor,
+              _Kty=RenderTextureDescriptor,
+              _Mappedty=unsigned __int64
+          ]
+  c:\users\user\source\repos\crate\common\metalib.h(109): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<RenderTextureDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const RenderTextureDescriptor &,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              K=RenderTextureDescriptor,
+              _Kty=RenderTextureDescriptor,
+              _Mappedty=unsigned __int64
+          ]
+  c:\users\user\source\repos\crate\common\metalib.h(108): note: 编译 类 模板 成员函数 "void Dictionary<RenderTextureDescriptor,std::vector<TempRTAllocator::TempRTData,std::allocator<_Ty>> *>::Add(K &,V &)" 时
+          with
+          [
+              _Ty=TempRTAllocator::TempRTData,
+              K=RenderTextureDescriptor,
+              V=std::vector<TempRTAllocator::TempRTData,std::allocator<TempRTAllocator::TempRTData>> *
+          ]
+  c:\users\user\source\repos\crate\pipelinecomponent\temprtallocator.cpp(27): note: 参见对正在编译的函数 模板 实例化“void Dictionary<RenderTextureDescriptor,std::vector<TempRTAllocator::TempRTData,std::allocator<_Ty>> *>::Add(K &,V &)”的引用
+          with
+          [
+              _Ty=TempRTAllocator::TempRTData,
+              K=RenderTextureDescriptor,
+              V=std::vector<TempRTAllocator::TempRTData,std::allocator<TempRTAllocator::TempRTData>> *
+          ]
+  c:\users\user\source\repos\crate\pipelinecomponent\temprtallocator.h(19): note: 参见对正在编译的 类 模板 实例化 "Dictionary<RenderTextureDescriptor,std::vector<TempRTAllocator::TempRTData,std::allocator<_Ty>> *>" 的引用
+          with
+          [
+              _Ty=TempRTAllocator::TempRTData
+          ]
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(173): warning C4244: “初始化”: 从“_Ty”转换到“_Ty2”，可能丢失数据
+          with
+          [
+              _Ty=unsigned __int64
+          ]
+          and
+          [
+              _Ty2=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(879): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<const RenderTextureDescriptor&,unsigned __int64,0>(_Other1,_Other2 &&) noexcept”的引用
+          with
+          [
+              _Kty=RenderTextureDescriptor,
+              _Ty=UINT,
+              _Other1=const RenderTextureDescriptor &,
+              _Other2=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(881): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<const RenderTextureDescriptor&,unsigned __int64,0>(_Other1,_Other2 &&) noexcept”的引用
+          with
+          [
+              _Kty=RenderTextureDescriptor,
+              _Ty=UINT,
+              _Other1=const RenderTextureDescriptor &,
+              _Other2=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(711): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,const RenderTextureDescriptor&,unsigned __int64>(_Alloc &,_Objty *const ,const RenderTextureDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Alloc=std::allocator<std::_List_node<std::pair<const RenderTextureDescriptor,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<const RenderTextureDescriptor,UINT>>>::void_pointer>>,
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              _Objty=std::pair<const RenderTextureDescriptor,UINT>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(716): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,const RenderTextureDescriptor&,unsigned __int64>(_Alloc &,_Objty *const ,const RenderTextureDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Alloc=std::allocator<std::_List_node<std::pair<const RenderTextureDescriptor,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<const RenderTextureDescriptor,UINT>>>::void_pointer>>,
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              _Objty=std::pair<const RenderTextureDescriptor,UINT>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(947): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<const RenderTextureDescriptor&,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,const RenderTextureDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=RenderTextureDescriptor,
+              _Ty=UINT,
+              _Alloc=std::allocator<std::pair<const RenderTextureDescriptor,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(950): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<const RenderTextureDescriptor&,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,const RenderTextureDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=RenderTextureDescriptor,
+              _Ty=UINT,
+              _Alloc=std::allocator<std::pair<const RenderTextureDescriptor,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(916): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<const RenderTextureDescriptor&,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,const RenderTextureDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=RenderTextureDescriptor,
+              _Ty=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(917): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<const RenderTextureDescriptor&,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,const RenderTextureDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=RenderTextureDescriptor,
+              _Ty=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xhash(299): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty> &std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::emplace_front<const RenderTextureDescriptor&,unsigned __int64>(const RenderTextureDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=RenderTextureDescriptor,
+              _Ty=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(369): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<const RenderTextureDescriptor&,unsigned __int64>(const RenderTextureDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              _Kty=RenderTextureDescriptor,
+              _Hasher=std::hash<RenderTextureDescriptor>,
+              _Keyeq=std::equal_to<RenderTextureDescriptor>,
+              _Alloc=std::allocator<std::pair<const RenderTextureDescriptor,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(367): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<const RenderTextureDescriptor&,unsigned __int64>(const RenderTextureDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              _Kty=RenderTextureDescriptor,
+              _Hasher=std::hash<RenderTextureDescriptor>,
+              _Keyeq=std::equal_to<RenderTextureDescriptor>,
+              _Alloc=std::allocator<std::pair<const RenderTextureDescriptor,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(382): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<RenderTextureDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const RenderTextureDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              K=RenderTextureDescriptor,
+              _Kty=RenderTextureDescriptor,
+              _Keyty=const RenderTextureDescriptor &,
+              _Mappedty=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(381): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<RenderTextureDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const RenderTextureDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const RenderTextureDescriptor,UINT>,
+              K=RenderTextureDescriptor,
+              _Kty=RenderTextureDescriptor,
+              _Keyty=const RenderTextureDescriptor &,
+              _Mappedty=unsigned __int64
+          ]
+  正在编译...
+  CBufferPool.cpp
+  CommandSignature.cpp
+  ComputeShader.cpp
+c:\users\user\source\repos\crate\rendercomponent\computeshader.cpp(66): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\user\source\repos\crate\rendercomponent\computeshader.cpp(122): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\computeshader.cpp(140): warning C4018: “<”: 有符号/无符号不匹配
+  DescriptorHeap.cpp
+  IndirectDrawer.cpp
 c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+c:\users\user\source\repos\crate\rendercomponent\indirectdrawer.cpp(45): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+  Material.cpp
+c:\users\user\source\repos\crate\rendercomponent\material.cpp(52): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
+  Mesh.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\rendercomponent\mesh.cpp(224): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\mesh.cpp(225): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\mesh.cpp(294): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\mesh.cpp(301): warning C4267: “初始化”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\mesh.cpp(304): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+  MeshRenderer.cpp
+c:\users\user\source\repos\crate\rendercomponent\meshrenderer.cpp(19): warning C4267: “=”: 从“size_t”转换到“UINT”，可能丢失数据
+  RenderTexture.cpp
+c:\users\user\source\repos\crate\rendercomponent\rendertexture.cpp(293): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\user\source\repos\crate\rendercomponent\rendertexture.cpp(308): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\user\source\repos\crate\rendercomponent\rendertexture.cpp(379): warning C4018: “<”: 有符号/无符号不匹配
+  Shader.cpp
+c:\users\user\source\repos\crate\rendercomponent\shader.cpp(81): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\user\source\repos\crate\rendercomponent\shader.cpp(92): warning C4018: “<”: 有符号/无符号不匹配
+c:\users\user\source\repos\crate\rendercomponent\shader.cpp(135): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
   Skybox.cpp
-c:\users\user\source\repos\crate\rendercomponent\mesh.h(30): warning C4267: “return”: 从“size_t”转换到“UINT”，可能丢失数据
 c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
   c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
 c:\users\user\source\repos\crate\rendercomponent\cbufferpool.h(6): warning C4099: “ConstBufferElement”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\rendercomponent\cbufferpool.h(5): note: 参见“ConstBufferElement”的声明
 c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+  StructuredBuffer.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+  Texture.cpp
+  UploadBuffer.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\rendercomponent\uploadbuffer.cpp(14): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
+c:\users\user\source\repos\crate\rendercomponent\uploadbuffer.cpp(15): warning C4267: “=”: 从“size_t”转换到“UINT”，可能丢失数据
+  FrameResource.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+  Graphics.cpp
+c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+  MathLib.cpp
+c:\users\user\source\repos\crate\singleton\mathlib.h(4): warning C4305: “初始化”: 从“double”到“float”截断
+c:\users\user\source\repos\crate\singleton\mathlib.h(5): warning C4305: “初始化”: 从“double”到“float”截断
+  MeshLayout.cpp
+c:\users\user\source\repos\crate\singleton\meshlayout.cpp(102): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
+  PSOContainer.cpp
+  ShaderCompiler.cpp
+c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(188): warning C4099: “ID3D12Device”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): note: 参见“ID3D12Device”的声明
+c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): warning C4099: “ID3D12Device”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
+  正在编译...
+  ShaderID.cpp
+  SkyboxComponent.cpp
+c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\rendercomponent\skybox.h(6): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\rendercomponent\skybox.h(7): warning C4099: “ConstBufferElement”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\rendercomponent\cbufferpool.h(5): note: 参见“ConstBufferElement”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\rendercomponent\skybox.h(6): note: 参见“FrameResource”的声明
   正在生成代码
-  51 of 6345 functions ( 0.8%) were compiled, the rest were copied from previous compilation.
-    45 functions were new in current compilation
-    25 functions had inline decision re-evaluated but remain unchanged
+  2608 of 6733 functions (38.7%) were compiled, the rest were copied from previous compilation.
+    1103 functions were new in current compilation
+    461 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Release\Crate.exe

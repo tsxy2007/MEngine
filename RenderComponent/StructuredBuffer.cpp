@@ -1,4 +1,5 @@
 #include "StructuredBuffer.h"
+#include "../Singleton/FrameResource.h"
 StructuredBuffer::StructuredBuffer(
 	ID3D12Device* device,
 	StructuredBufferElement* elementsArray,
@@ -71,4 +72,9 @@ size_t StructuredBuffer::GetAddressOffset(UINT element, UINT index) const
 
 	return offsets[element] + ele.stride * index;
 #endif
+}
+
+void StructuredBuffer::ReleaseResourceAfterFlush(FrameResource* targetResource)
+{
+	targetResource->ReleaseResourceAfterFlush(mDefaultBuffer);
 }

@@ -13,8 +13,6 @@
 
 #include "d3dUtil.h"
 #include "../Common/MObject.h"
-#include "../RenderComponent/CBufferPool.h"
-#include "../RenderComponent/UploadBuffer.h"
 #include "../Singleton/FrameResource.h"
 #include "../PipelineComponent/IPerCameraResource.h"
 class PipelineComponent;
@@ -80,7 +78,7 @@ public:
 
 	// After modifying camera position/orientation, call to rebuild the view matrix.
 	void UpdateViewMatrix();
-	void UploadCameraBuffer(FrameResource* res, PassConstants& mMainPassCB);
+	void UploadCameraBuffer(PassConstants& mMainPassCB);
 	CameraRenderPath GetRenderingPath() const { return renderType; }
 	template <typename Func>
 	inline IPipelineResource* GetResource(PipelineComponent* targetComponent, const Func&& func)

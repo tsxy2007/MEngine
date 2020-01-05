@@ -9,11 +9,7 @@ struct PrepareRunnable
 	Camera* camera;
 	void operator()()
 	{
-		CameraData* camData = (CameraData*)camera->GetResource(ths, []()->CameraData*
-		{
-			return new CameraData;
-		});
-		camera->UploadCameraBuffer(resource, camData->passConstants);
+		camera->UploadCameraBuffer(ths->passConstants);
 	}
 };
 
@@ -27,4 +23,13 @@ void PrepareComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadC
 		data.camera
 	};
 	taskHandle = taskFlow.GetTask(runnable);
+	FrameResource* res = data.resource;
+	Camera* cam = data.camera;
+	PassConstants* psConstPtr = &passConstants;
+	taskHandle.Precede(std::forward<JobHandle>(
+		taskFlow.GetTask([=]()->void {
+		ConstBufferElement ele = res->cameraCBs[cam->GetInstanceID()];
+		ele.buffer->CopyData(ele.element, psConstPtr);
+	}
+	)));
 }

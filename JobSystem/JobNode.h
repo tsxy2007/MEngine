@@ -49,7 +49,7 @@ private:
 			(*fc)();
 		};
 	}
-	void Execute(ConcurrentQueue<JobNode*>& taskList, std::condition_variable& cv);
+	JobNode* Execute(ConcurrentQueue<JobNode*>& taskList, std::condition_variable& cv);
 	void Precede(JobNode* depending);
 public:
 

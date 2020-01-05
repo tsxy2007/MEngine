@@ -7,7 +7,7 @@
 // Defaults for number of lights.
 // Include structures and functions for lighting.
 #include "LightingUtil.hlsl"
-Texture2D<float4> _MainTex[10] : register(t0, space0);
+//Texture2D<float4> _MainTex[10] : register(t0, space0);
 
 SamplerState pointWrapSampler  : register(s0);
 SamplerState pointClampSampler  : register(s1);
@@ -55,7 +55,6 @@ struct VertexOut
     float3 PosW    : POSITION;
     float3 NormalW : NORMAL;
 	float2 TexC    : TEXCOORD;
-    float depth : TEXCOORD1;
 };
 
 VertexOut VS(VertexIn vin)
@@ -74,14 +73,24 @@ VertexOut VS(VertexIn vin)
     //vout.PosH /= vout.PosH.w;
     //vout.PosH.z = 1 - vout.PosH.z;
     vout.TexC.xy = vin.TexC.xy;
-    vout.depth = vout.PosH.z / vout.PosH.w;
     return vout;
 }
 
-float4 PS(VertexOut pin) : SV_Target
+void PS(VertexOut pin, out float4 albedo : SV_TARGET0, out float4 specular : SV_TARGET1, out float4 normal : SV_TARGET2, out float4 emission : SV_TARGET3, out float2 mv : SV_TARGET4)
 {
    // float2 bindlessChooser = floor(saturate(pin.TexC) * 3);
  //   uint sampleCount = (uint)(bindlessChooser.x * 3 + bindlessChooser.y);
-    float4 diffuseAlbedo = _MainTex[0].SampleLevel(anisotropicWrapSampler, pin.TexC.xy, 1);
-    return diffuseAlbedo;
+    albedo = 0;
+    specular = 0;
+    normal = 0;
+    emission = 0.5;
+    mv = 0;
 }
+
+float4 VS_Depth(float3 position : POSITION) : SV_POSITION
+{
+    float4 posW = mul(gWorld, float4(position, 1));
+    return mul(gViewProj, posW);
+}
+
+void PS_Depth(){}

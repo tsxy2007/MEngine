@@ -24,8 +24,15 @@ void Transform::SetPosition(XMFLOAT3 position)
 Transform::Transform(World* world) :
 	MObject(), world(world)
 {
-	worldIndex = world->allTransformsPtr.size();
-	world->allTransformsPtr.emplace_back(this);
+	if (world != nullptr)
+	{
+		worldIndex = world->allTransformsPtr.size();
+		world->allTransformsPtr.emplace_back(this);
+	}
+	else
+	{
+		worldIndex = -1;
+	}
 	randVec.Add(
 		{
 			{0,1,0},
@@ -75,8 +82,11 @@ Transform::~Transform()
 		(*ite)->Destroy();
 	}
 	allComponents.clear();
-	auto&& ite = world->allTransformsPtr.end() - 1;
-	(*ite)->worldIndex = worldIndex;
-	world->allTransformsPtr[worldIndex] = *ite;
-	world->allTransformsPtr.erase(ite);
+	if (worldIndex >= 0)
+	{
+		auto&& ite = world->allTransformsPtr.end() - 1;
+		(*ite)->worldIndex = worldIndex;
+		world->allTransformsPtr[worldIndex] = *ite;
+		world->allTransformsPtr.erase(ite);
+	}
 }

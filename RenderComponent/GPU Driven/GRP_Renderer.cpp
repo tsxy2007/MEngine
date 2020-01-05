@@ -46,11 +46,9 @@ struct Command
 class GpuDrivenRenderer : public IPipelineResource
 {
 public:
-	Storage<StructuredBuffer, 1> sbuffers;
 	std::unique_ptr<UploadBuffer> objectPosBuffer;
 	std::unique_ptr<UploadBuffer> cmdDrawBuffers;
 	CBufferPool objectPool;
-	StructuredBuffer* argBuffer;
 	std::mutex mtx;
 	UINT capacity;
 	UINT count;
@@ -67,12 +65,7 @@ public:
 		cmdDrawBuffers = std::unique_ptr<UploadBuffer>(new UploadBuffer());
 		objectPosBuffer->Create(device, capacity, false, sizeof(ObjectData));
 		cmdDrawBuffers->Create(device, capacity, false, sizeof(MultiDrawCommand));
-		StructuredBufferElement ele[2];
-		ele[0].elementCount = capacity;
-		ele[0].stride = sizeof(MultiDrawCommand);
-		ele[1].elementCount = 1;
-		ele[1].stride = sizeof(UINT);
-		argBuffer = new (&sbuffers) StructuredBuffer(device, ele, 2, true);
+		
 	}
 
 	void Resize(
@@ -157,7 +150,6 @@ public:
 
 	~GpuDrivenRenderer()
 	{
-		argBuffer->~StructuredBuffer();
 	}
 };
 GRP_Renderer::GRP_Renderer(
@@ -191,6 +183,18 @@ GRP_Renderer::GRP_Renderer(
 	{
 		textureIndicesPool[i] = allocatedIndices + i * texRequireInMat;
 	}
+	StructuredBufferElement ele[2];
+	ele[0].elementCount = capacity;
+	ele[0].stride = sizeof(MultiDrawCommand);
+	ele[1].elementCount = 1;
+	ele[1].stride = sizeof(UINT);
+	cullResultBuffer = std::unique_ptr<StructuredBuffer>(new StructuredBuffer(
+		device,
+		ele,
+		2,
+		true
+	));
+
 
 	_InputBuffer = ShaderID::PropertyToID("_InputBuffer");
 	_InputDataBuffer = ShaderID::PropertyToID("_InputDataBuffer");
@@ -209,8 +213,12 @@ GRP_Renderer::RenderElement& GRP_Renderer::AddRenderElement(
 		throw "Out of Range!";
 	if (mesh->GetLayoutIndex() != meshLayoutIndex)
 		throw "Mesh Bad Layout!";
-
-	dicts.insert_or_assign(std::move(targetTrans.operator->()), elements.size());
+	auto&& ite = dicts.find(std::forward<Transform*>(targetTrans.operator->()));
+	if (ite != dicts.end())
+	{
+		return elements[ite->second];
+	}
+	dicts.insert_or_assign(std::forward<Transform*>(targetTrans.operator->()), elements.size());
 	auto&& indPtrIte = textureIndicesPool.end() - 1;
 	RenderElement& ele = elements.emplace_back(
 		std::move(pool.Get(device)),
@@ -349,6 +357,22 @@ void  GRP_Renderer::DrawCommand(
 	PSOContainer* container
 )
 {
+	if (elements.size() > cullResultBuffer->GetElementCount(0))
+	{
+		cullResultBuffer->ReleaseResourceAfterFlush(targetResource);
+		StructuredBufferElement ele[2];
+		ele[0].elementCount = elements.size();
+		ele[0].stride = sizeof(MultiDrawCommand);
+		ele[1].elementCount = 1;
+		ele[1].stride = sizeof(UINT);
+		cullResultBuffer = std::unique_ptr<StructuredBuffer>(
+			new StructuredBuffer(
+				device,
+				ele,
+				2,
+				true
+			));
+	}
 	cullShader->BindRootSignature(commandList, nullptr);
 	UINT dispatchCount = (UINT)ceil(elements.size() / 64.0);
 	UINT capacity = this->capacity;
@@ -364,8 +388,8 @@ void  GRP_Renderer::DrawCommand(
 	cullDataBuffer.buffer->CopyData(cullDataBuffer.element, &cullD);
 	cullShader->SetResource(commandList, _InputBuffer, perFrameData->cmdDrawBuffers.get(), 0);
 	cullShader->SetResource(commandList, _InputDataBuffer, perFrameData->objectPosBuffer.get(), 0);
-	cullShader->SetStructuredBufferByAddress(commandList, _OutputBuffer, perFrameData->argBuffer->GetAddress(0, 0));
-	cullShader->SetStructuredBufferByAddress(commandList, _CountBuffer, perFrameData->argBuffer->GetAddress(1, 0));
+	cullShader->SetStructuredBufferByAddress(commandList, _OutputBuffer, cullResultBuffer->GetAddress(0, 0));
+	cullShader->SetStructuredBufferByAddress(commandList, _CountBuffer, cullResultBuffer->GetAddress(1, 0));
 	cullShader->SetResource(commandList, CBuffer, cullDataBuffer.buffer, cullDataBuffer.element);
 	cullShader->Dispatch(commandList, 1, dispatchCount, 1, 1);
 	cullShader->Dispatch(commandList, 0, dispatchCount, 1, 1);
@@ -382,10 +406,10 @@ void  GRP_Renderer::DrawCommand(
 	commandList->ExecuteIndirect(
 		cmdSig.GetSignature(),
 		elements.size(),
-		perFrameData->argBuffer->GetResource(),
-		perFrameData->argBuffer->GetAddressOffset(0, 0),
-		perFrameData->argBuffer->GetResource(),
-		perFrameData->argBuffer->GetAddressOffset(1, 0)
+		cullResultBuffer->GetResource(),
+		cullResultBuffer->GetAddressOffset(0, 0),
+		cullResultBuffer->GetResource(),
+		cullResultBuffer->GetAddressOffset(1, 0)
 	);
 }
 

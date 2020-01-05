@@ -19,7 +19,7 @@ private:
 
 	static RandomVector<TransformData> randVec;
 	std::vector<Component*> allComponents;
-	UINT worldIndex;
+	int worldIndex;
 	UINT vectorPos;
 	World* world;
 public:

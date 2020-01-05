@@ -1,6 +1,7 @@
 #pragma once
 #include "../Common/d3dUtil.h"
 #include "../Common/MObject.h"
+class FrameResource;
 struct StructuredBufferElement
 {
 	size_t stride;
@@ -24,4 +25,5 @@ public:
 	D3D12_GPU_VIRTUAL_ADDRESS GetAddress(UINT element, UINT index) const;
 	size_t GetAddressOffset(UINT element, UINT index) const;
 	inline ID3D12Resource* GetResource() const { return mDefaultBuffer.Get(); }
+	void ReleaseResourceAfterFlush(FrameResource* targetResource);
 };

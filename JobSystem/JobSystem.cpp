@@ -71,9 +71,15 @@ public:
 			JobNode* node = nullptr;
 			while (executingNode.TryPop(&node))
 			{
-				node->Execute(executingNode, cv);
+			START_LOOP:
+				JobNode* nextNode = node->Execute(executingNode, cv);
 				JobBucket::jobNodePool.Delete(node);
 				value = bucketMissionCount.fetch_add(-1) - 1;
+				if (nextNode != nullptr)
+				{
+					node = nextNode;
+					goto START_LOOP;
+				}
 				if (value <= 0)
 				{
 					JobSystem::UpdateNewBucket();

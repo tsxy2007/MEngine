@@ -27,10 +27,6 @@ Material::~Material()
 
 void Material::BindShaderResource(ID3D12GraphicsCommandList* commandList)
 {
-	if (shaderResourceHeap != nullptr)
-	{
-		ID3D12DescriptorHeap* descriptorHeaps = shaderResourceHeap->Get().Get();
-	}
 	mShader->BindRootSignature(commandList);
 	if (mPropertyBuffer != nullptr)
 	{

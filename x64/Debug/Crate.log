@@ -1,27 +1,15 @@
-﻿  CrateApp.cpp
+﻿  GBufferComponent.cpp
 c:\users\user\source\repos\crate\singleton\frameresource.h(44): warning C4099: “FrameResource”: 类型名称以前使用“class”现在使用的是“struct”
   c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\logiccomponent\world.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\singleton\shadercompiler.h(7): warning C4099: “ID3D12Device”: 类型名称以前使用“struct”现在使用的是“class”
   c:\program files (x86)\windows kits\10\include\10.0.18362.0\um\d3d12.h(7821): note: 参见“ID3D12Device”的声明
-c:\users\user\source\repos\crate\rendercomponent\skybox.h(6): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\singleton\frameresource.h(43): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\rendercomponent\skybox.h(7): warning C4099: “ConstBufferElement”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\rendercomponent\cbufferpool.h(5): note: 参见“ConstBufferElement”的声明
-c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\rendercomponent\skybox.h(6): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\rendercomponent\structuredbuffer.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
+  c:\users\user\source\repos\crate\logiccomponent\world.h(4): note: 参见“FrameResource”的声明
 c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\pipelinecomponent\pipelinecomponent.h(9): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\singleton\mathlib.h(4): warning C4305: “初始化”: 从“double”到“float”截断
-c:\users\user\source\repos\crate\singleton\mathlib.h(5): warning C4305: “初始化”: 从“double”到“float”截断
-c:\users\user\source\repos\crate\logiccomponent\world.h(4): warning C4099: “FrameResource”: 类型名称以前使用“struct”现在使用的是“class”
-  c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.h(8): note: 参见“FrameResource”的声明
-c:\users\user\source\repos\crate\crateapp.cpp(184): warning C4101: “geoGen”: 未引用的局部变量
-c:\users\user\source\repos\crate\crateapp.cpp(227): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-  CullTask.cpp
-c:\users\user\source\repos\crate\singleton\mathlib.h(4): warning C4305: “初始化”: 从“double”到“float”截断
-c:\users\user\source\repos\crate\singleton\mathlib.h(5): warning C4305: “初始化”: 从“double”到“float”截断
-  MathLib.cpp
-c:\users\user\source\repos\crate\singleton\mathlib.h(4): warning C4305: “初始化”: 从“double”到“float”截断
-c:\users\user\source\repos\crate\singleton\mathlib.h(5): warning C4305: “初始化”: 从“double”到“float”截断
-  正在生成代码...
+  c:\users\user\source\repos\crate\rendercomponent\structuredbuffer.h(4): note: 参见“FrameResource”的声明
+c:\users\user\source\repos\crate\pipelinecomponent\gbuffercomponent.cpp(156): warning C4267: “参数”: 从“size_t”转换到“UINT”，可能丢失数据
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Debug\Crate.exe

@@ -78,18 +78,25 @@ void GetPostProcessShader(ID3D12Device* device)
 
 void GetOpaqueStandardShader(ID3D12Device* device)
 {
-	D3D12_DEPTH_STENCIL_DESC dsDesc;
-	dsDesc.DepthEnable = TRUE;
-	dsDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
-	dsDesc.StencilEnable = FALSE;
-	dsDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
-	dsDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+	D3D12_DEPTH_STENCIL_DESC gbufferDsDesc;
+	gbufferDsDesc.DepthEnable = TRUE;
+	gbufferDsDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	gbufferDsDesc.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
+	gbufferDsDesc.StencilEnable = FALSE;
+	gbufferDsDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+	gbufferDsDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+	D3D12_DEPTH_STENCIL_DESC depthPrepassDesc;
+	depthPrepassDesc.DepthEnable = TRUE;
+	depthPrepassDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthPrepassDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+	depthPrepassDesc.StencilEnable = FALSE;
+	depthPrepassDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+	depthPrepassDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
 	const D3D12_DEPTH_STENCILOP_DESC defaultStencilOp =
 	{ D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_STENCIL_OP_KEEP, D3D12_COMPARISON_FUNC_ALWAYS };
-	dsDesc.FrontFace = defaultStencilOp;
-	dsDesc.BackFace = defaultStencilOp;
-	const UINT PASS_COUNT = 1;
+	gbufferDsDesc.FrontFace = defaultStencilOp;
+	gbufferDsDesc.BackFace = defaultStencilOp;
+	const UINT PASS_COUNT = 2;
 	Pass allPasses[PASS_COUNT];
 	Pass& p = allPasses[0];
 	p.fragment = "PS";
@@ -98,31 +105,35 @@ void GetOpaqueStandardShader(ID3D12Device* device)
 	p.name = "OpaqueStandard";
 	p.rasterizeState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	p.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	p.depthStencilState = dsDesc;
+	p.depthStencilState = gbufferDsDesc;
 	p.psShader = nullptr;
 	p.vsShader = nullptr;
-	const UINT SHADER_VAR_COUNT = 4;
+	Pass& dp = allPasses[1];
+	dp.fragment = "PS_Depth";
+	dp.vertex = "VS_Depth";
+	dp.filePath = L"Shaders\\Default";
+	dp.name = "OpaqueStandard_Depth";
+	dp.rasterizeState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	dp.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	dp.depthStencilState = depthPrepassDesc;
+	dp.psShader = nullptr;
+	dp.vsShader = nullptr;
+	const UINT SHADER_VAR_COUNT = 3;
 	ShaderVariable var[SHADER_VAR_COUNT];
-	var[0].type = ShaderVariable::Type::DescriptorHeap;
+	var[0].type = ShaderVariable::Type::ConstantBuffer;
+	var[0].name = "Per_Object_Buffer";
 	var[0].registerPos = 0;
 	var[0].space = 0;
-	var[0].tableSize = 10;
-	var[0].name = "_MainTex";
 
 	var[1].type = ShaderVariable::Type::ConstantBuffer;
-	var[1].name = "Per_Object_Buffer";
-	var[1].registerPos = 0;
+	var[1].name = "Per_Camera_Buffer";
+	var[1].registerPos = 1;
 	var[1].space = 0;
 
 	var[2].type = ShaderVariable::Type::ConstantBuffer;
-	var[2].name = "Per_Camera_Buffer";
-	var[2].registerPos = 1;
+	var[2].name = "Per_Material_Buffer";
+	var[2].registerPos = 2;
 	var[2].space = 0;
-
-	var[3].type = ShaderVariable::Type::ConstantBuffer;
-	var[3].name = "Per_Material_Buffer";
-	var[3].registerPos = 2;
-	var[3].space = 0;
 	Shader* opaqueShader = new Shader(allPasses, PASS_COUNT, var, SHADER_VAR_COUNT, device, false);
 	ShaderCompiler::AddShader("OpaqueStandard", opaqueShader);
 

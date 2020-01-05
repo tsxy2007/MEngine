@@ -11,19 +11,37 @@
 #include "../RenderComponent/MeshRenderer.h"
 #include "../PipelineComponent/RenderPipeline.h"
 #include "../PipelineComponent/PrepareComponent.h"
+#include "../LogicComponent/Transform.h"
+#include "../Common/GeometryGenerator.h"
+using namespace DirectX;
 PSOContainer* gbufferContainer(nullptr);
-#define ALBEDO_RT(component) (component->GetTempRT(0))
-#define SPECULAR_RT(component) (component->GetTempRT(1))
-#define NORMAL_RT (component) (component->GetTempRT(2))
-#define EMISSION_RT (component) (component->GetTempRT(3))
-#define MOTION_VECTOR_RT (component) (component->GetTempRT(4))
-
+PSOContainer* depthPrepassContainer(nullptr);
+#define ALBEDO_RT (component->GetTempRT(0))
+#define SPECULAR_RT (component->GetTempRT(1))
+#define NORMAL_RT  (component->GetTempRT(2))
+#define EMISSION_RT  (component->GetTempRT(3))
+#define MOTION_VECTOR_RT (component->GetTempRT(4))
+class GBufferFrameResource : public IPipelineResource
+{
+public:
+	DescriptorHeap renderTargetHeap;
+	UploadBuffer ub;
+	GBufferFrameResource(ID3D12Device* device)
+	{
+		ub.Create(device, 2, true, sizeof(ObjectConstants));
+		renderTargetHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 5, false);
+		XMFLOAT4X4 mat = MathHelper::Identity4x4();
+		XMMATRIX* vec = (XMMATRIX*)&mat;
+		vec->r[3] = { 0, 0.5, 0, 1 };
+		ub.CopyData(0, &mat);
+		vec->r[3] = { 0, -0.5, 0, 1 };
+		ub.CopyData(1, &mat);
+	}
+};
 class GBufferRunnable
 {
 public:
-	ID3D12Resource* backBuffer;
 	ID3D12Device* device;
-	D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
 	ThreadCommand* tcmd;
 	Camera* cam;
 	FrameResource* resource;
@@ -32,7 +50,35 @@ public:
 	{
 		tcmd->ResetCommand();
 		ID3D12GraphicsCommandList* commandList = tcmd->GetCmdList();
-		ID3D12Device* thsDevice = device;
+		GBufferFrameResource* frameRes = (GBufferFrameResource*)resource->GetResource(component, [=]()->GBufferFrameResource*
+		{
+			return new GBufferFrameResource(device);
+		});
+		//Bind To RTV Heap
+		ALBEDO_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 0, 0);
+		SPECULAR_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 1, 0);
+		NORMAL_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 2, 0);
+		EMISSION_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 3, 0);
+		MOTION_VECTOR_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 4, 0);
+		//Clear
+		ALBEDO_RT->ClearRenderTarget(commandList, 0, true, false);
+		SPECULAR_RT->ClearRenderTarget(commandList, 0, true, false);
+		NORMAL_RT->ClearRenderTarget(commandList, 0, true, false);
+		MOTION_VECTOR_RT->ClearRenderTarget(commandList, 0, true, false);
+		EMISSION_RT->ClearRenderTarget(commandList, 0, false, true);
+		D3D12_CPU_DESCRIPTOR_HANDLE handles[5];
+		auto st = [&](UINT p)->void
+		{
+			handles[p] = frameRes->renderTargetHeap.hCPU(p);
+		};
+		InnerLoop<decltype(st), 5>(st);
+		EMISSION_RT->SetViewport(commandList);
+		//Depth Prepass
+		//TODO
+		commandList->OMSetRenderTargets(0, nullptr, true, &EMISSION_RT->GetDepthDescriptor(0));
+		//GBuffer Pass
+		//TODO
+		commandList->OMSetRenderTargets(5, handles, true, &EMISSION_RT->GetDepthDescriptor(0));
 		tcmd->CloseCommand();
 	}
 };
@@ -49,16 +95,14 @@ void GBufferComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadC
 {
 	GBufferRunnable runnable
 	{
-		data.backBuffer,
 		data.device,
-		data.backBufferHandle,
 		commandList,
 		data.camera,
 		data.resource,
 		this
 	};
 	auto hand = taskFlow.GetTask(runnable);
-	//prepareComponent->taskHandle.Precede(hand);
+	prepareComponent->taskHandle.Precede(hand);
 }
 
 void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
@@ -103,17 +147,20 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	motionVectorBuffer.descriptor.depthType = RenderTextureDepthSettings_None;
 	motionVectorBuffer.descriptor.depthSlice = 1;
 	motionVectorBuffer.descriptor.type = RenderTextureType::Tex2D;
-	
+
 	std::vector<DXGI_FORMAT> colorFormats(tempRTRequire.size());
 	for (int i = 0; i < tempRTRequire.size(); ++i)
 	{
 		colorFormats[i] = tempRTRequire[i].descriptor.colorFormat;
 	}
-	gbufferContainer = new PSOContainer(DXGI_FORMAT_D24_UNORM_S8_UINT, colorFormats.size(), colorFormats.data());
+	gbufferContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, colorFormats.size(), colorFormats.data());
+	depthPrepassContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, 0, nullptr);
 	prepareComponent = (PrepareComponent*)RenderPipeline::GetComponent(typeid(PrepareComponent).name());
+	
 }
 
 void GBufferComponent::Dispose()
 {
 	delete gbufferContainer;
+	delete depthPrepassContainer;
 }
