@@ -5,6 +5,7 @@
 #include "../Singleton/Graphics.h"
 #include "../LogicComponent/World.h"
 #include "../RenderComponent/Texture.h"
+#include "CommandBuffer.h"
 Shader* postShader;
 std::unique_ptr<PSOContainer> postContainer;
 class PostFrameData : public IPipelineResource
@@ -73,6 +74,7 @@ void PostProcessingComponent::RenderEvent(EventData& data, JobBucket& taskFlow, 
 		this,
 		data.resource
 	});
+	data.commandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 }
 
 void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)

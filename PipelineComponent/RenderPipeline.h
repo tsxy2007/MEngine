@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "../Common/MetaLib.h"
 #include "../JobSystem/JobSystem.h"
+#include "CommandBuffer.h"
 class FrameResource;
 class Camera;
 class World;
@@ -13,7 +14,6 @@ struct RenderPipelineData
 	ID3D12Device* device;
 	ID3D12Resource* backBufferResource;
 	D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
-	ID3D12CommandQueue* commandQueue;
 	FrameResource* lastResource;
 	FrameResource* resource;
 	std::vector<Camera*>* allCameras;
@@ -35,6 +35,7 @@ private:
 		UINT startComponent;
 		UINT endComponent;
 	};
+	Storage<CommandBuffer, 2> buffers;
 	UINT initCount = 0;
 	std::vector<PipelineComponent*> components;
 	TempRTAllocator tempRTAllocator;
@@ -50,11 +51,12 @@ private:
 		components.emplace_back(ptr);
 		componentsLink.insert_or_assign(typeid(T).name(), ptr);
 	}
-	std::vector<ID3D12CommandList*> executableCommandList[2];
+	CommandBuffer* commandBuffers[2];
 	bool currentExecutable = false;
-	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList,
+		ID3D12CommandQueue* graphicsCommandQueue, ID3D12CommandQueue* computeCommandQueue);
 public:
-	static RenderPipeline* GetInstance(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
+	static RenderPipeline* GetInstance(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12CommandQueue* graphicsCommandQueue, ID3D12CommandQueue* computeCommandQueue);
 	static void DestroyInstance();
 	~RenderPipeline();
 	void RenderCamera(RenderPipelineData& data, JobSystem* jobSys);

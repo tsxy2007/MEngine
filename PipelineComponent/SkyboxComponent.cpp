@@ -83,7 +83,7 @@ void SkyboxComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCo
 			 data.device,
 			 data.camera
 		});
-	//prepareComp->taskHandle.Precede(hand);
+	data.commandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 }
 
 

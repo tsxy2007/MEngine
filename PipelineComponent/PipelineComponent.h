@@ -22,6 +22,7 @@ struct TemporalRTCommand
 	bool operator=(const TemporalRTCommand& other) const;
 };
 class PerCameraRenderingEvent;
+class CommandBuffer;
 class PipelineComponent
 {
 	friend class RenderPipeline;
@@ -54,6 +55,7 @@ public:
 		FrameResource* resource;
 		World* world;
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
+		CommandBuffer* commandBuffer;
 	};
 	virtual void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) = 0;
 	virtual void Dispose() = 0;

@@ -44,10 +44,20 @@ private:
 	UINT executeCount = 0;
 	void ChangeExecuteState(ExecuteType state);
 public:
+	ID3D12CommandQueue* GetGraphicsQueue() const {
+		return graphicsCommandQueue;
+	}
+	ID3D12CommandQueue* GetComputeQueue() const {
+		return computeCommandQueue;
+	}
 	void Wait(ID3D12Fence* computeFence, UINT currentFrame);
 	void Signal(ID3D12Fence* computeFence, UINT currentFrame);
 	void ExecuteGraphicsCommandList(ID3D12GraphicsCommandList* commandList);
 	void ExecuteComputeCommandList(ID3D12GraphicsCommandList* commandList);
 	void ExecuteCommands();
 	void Clear();
+	CommandBuffer(
+		ID3D12CommandQueue* graphicsCommandQueue,
+		ID3D12CommandQueue* computeCommandQueue
+	);
 };

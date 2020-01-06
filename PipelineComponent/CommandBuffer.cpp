@@ -73,7 +73,6 @@ void CommandBuffer::ExecuteCommands()
 			break;
 		}
 	}
-	Clear();
 }
 
 void CommandBuffer::Wait(ID3D12Fence* computeFence, UINT currentFrame)
@@ -92,6 +91,7 @@ void CommandBuffer::Signal(ID3D12Fence* computeFence, UINT currentFrame)
 	cmd.type = InnerCommand::CommandType_Signal;
 	cmd.signalFence.fence = computeFence;
 	cmd.signalFence.frameIndex = currentFrame;
+	executeCommands.push_back(cmd);
 }
 void CommandBuffer::ExecuteGraphicsCommandList(ID3D12GraphicsCommandList* commandList)
 {
@@ -104,4 +104,13 @@ void CommandBuffer::ExecuteComputeCommandList(ID3D12GraphicsCommandList* command
 	ChangeExecuteState(EXECUTING_COMPUTE);
 	graphicsCmdLists.push_back(commandList);
 	executeCount++;
+}
+
+CommandBuffer::CommandBuffer(
+	ID3D12CommandQueue* graphicsCommandQueue,
+	ID3D12CommandQueue* computeCommandQueue
+) : graphicsCommandQueue(graphicsCommandQueue),
+computeCommandQueue(computeCommandQueue)
+{
+
 }

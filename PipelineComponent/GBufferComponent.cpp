@@ -102,6 +102,7 @@ void GBufferComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadC
 		this
 	};
 	auto hand = taskFlow.GetTask(runnable);
+	data.commandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 	prepareComponent->taskHandle.Precede(hand);
 }
 

@@ -193,7 +193,7 @@ bool CrateApp::Initialize()
 	// Wait until initialization is complete.
 	new (&worldPtr)World(directThreadCommand->GetCmdList(), md3dDevice.Get());
 	rp = RenderPipeline::GetInstance(md3dDevice.Get(),
-		directThreadCommand->GetCmdList());
+		directThreadCommand->GetCmdList(), mCommandQueue.Get(), mComputeCommandQueue.Get());
 	Graphics::Initialize(md3dDevice.Get(), directThreadCommand->GetCmdList());
 	directThreadCommand->CloseCommand();
 	ID3D12CommandList* lst = directThreadCommand->GetCmdList();
@@ -320,7 +320,6 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.device = md3dDevice.Get();
 	data.backBufferHandle = CurrentBackBufferView();
 	data.backBufferResource = CurrentBackBuffer();
-	data.commandQueue = mCommandQueue.Get();
 	data.lastResource = lastResource;
 	data.resource = FrameResource::mCurrFrameResource;
 	data.allCameras = &cam;
