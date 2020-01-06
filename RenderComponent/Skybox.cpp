@@ -48,7 +48,7 @@ skyboxTex(tex)
 {
 	texDescHeap = new DescriptorHeap();
 	texDescHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
-	tex->BindToDescriptorHeap(texDescHeap.operator->(), 0, device);
+	tex->BindColorBufferToSRVHeap(texDescHeap.operator->(), 0, device);
 	ObjectPtr<UploadBuffer> noProperty = nullptr;
 	skyboxMat = new Material(ShaderCompiler::GetShader("Skybox"), noProperty, 0, texDescHeap);
 	skyboxMat->SetBindlessResource(ShaderID::PropertyToID("cubemap"), 0);

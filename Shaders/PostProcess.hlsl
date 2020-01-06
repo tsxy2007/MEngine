@@ -28,6 +28,6 @@ v2f vert(appdata v)
 float4 frag(v2f i) : SV_TARGET
 {
     float4 color = _MainTex.SampleLevel(pointClampSampler, i.uv, 0);
-    color.xyz = dot(color.xyz, 0.3333333);
+    //color.xyz = dot(color.xyz, 0.3333333);
     return color;
 }

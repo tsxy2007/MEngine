@@ -4,6 +4,7 @@
 #include "../Singleton/ShaderCompiler.h"
 #include "../Singleton/Graphics.h"
 #include "../LogicComponent/World.h"
+#include "../RenderComponent/Texture.h"
 Shader* postShader;
 std::unique_ptr<PSOContainer> postContainer;
 class PostFrameData : public IPipelineResource
@@ -15,6 +16,7 @@ public:
 		postSRVHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
 	}
 };
+ObjectPtr<Texture> tex;
 class PostRunnable
 {
 public:
@@ -36,7 +38,7 @@ public:
 		{
 			return new PostFrameData(device);
 		});
-		renderTarget->BindColorBufferToSRVHeap(&frameRes->postSRVHeap, 0, device);
+		tex->BindColorBufferToSRVHeap(&frameRes->postSRVHeap, 0, device);
 		ID3D12GraphicsCommandList* commandList = threadCmd->GetCmdList();
 		Graphics::TransformBackBufferState<BackBufferState_RenderTarget>(commandList, backBuffer);
 		postShader->BindRootSignature(commandList);
@@ -82,9 +84,11 @@ void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCom
 	postContainer = std::unique_ptr<PSOContainer>(
 		new PSOContainer(DXGI_FORMAT_UNKNOWN, 1, &backBufferFormat)
 		);
+	tex = new Texture(commandList, device, "woodCrateTex", L"Textures/WoodCrate01.dds");
 }
 
 void PostProcessingComponent::Dispose()
 {
 	postContainer = nullptr;
+	tex->Destroy();
 }

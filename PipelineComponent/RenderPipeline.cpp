@@ -54,7 +54,7 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 	}
 }
 
-void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
+void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* jobSys)
 {
 	std::vector <JobBucket>& bucketArray = buckets[bucketsFlag];
 	bucketsFlag = !bucketsFlag;
@@ -133,7 +133,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData)
 		commandList->CloseCommand();
 	});
 	renderData.resource->executableCommandList.emplace_back(commandList->GetCmdList());*/
-	JobSystem::ExecuteBucket(bucketArray.data(), bucketArray.size());
+	jobSys->ExecuteBucket(bucketArray.data(), bucketArray.size());
 	
 	if (renderData.lastResource != nullptr)
 	{

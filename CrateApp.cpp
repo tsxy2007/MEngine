@@ -87,7 +87,7 @@ public:
 	//void AnimateMaterials(const GameTimer& gt);
 	//void UpdateObjectCBs(const GameTimer& gt);
 	void UpdateMaterialCBs(const GameTimer& gt);
-
+	std::unique_ptr<JobSystem> pipelineJobSys;
 	void LoadTextures();
 	void BuildDescriptorHeaps();
 	void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh);
@@ -157,14 +157,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 CrateApp::CrateApp(HINSTANCE hInstance)
 	: D3DApp(hInstance)
 {
-	JobSystem::Initialize(10);
+	pipelineJobSys = std::unique_ptr<JobSystem>(new JobSystem(10));
 }
 
 CrateApp::~CrateApp()
 {
 	if (md3dDevice != nullptr)
 		FlushCommandQueue();
-	JobSystem::Dispose();
+	pipelineJobSys = nullptr;
 	RenderPipeline::DestroyInstance();
 	((World*)&worldPtr)->~World();
 }
@@ -331,7 +331,7 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.world = (World*)&worldPtr;
 	data.world->windowWidth = mClientWidth;
 	data.world->windowHeight = mClientHeight;
-	rp->RenderCamera(data);
+	rp->RenderCamera(data, pipelineJobSys.get());
 
 	lastFrameExecute = true;
 }

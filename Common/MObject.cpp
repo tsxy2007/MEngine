@@ -29,9 +29,9 @@ void MObject::Destroy()
 	{
 		return;
 	}
-	for (int i = 0; i < allPtrs.size(); ++i)
+	for (auto ite = allPtrs.begin(); ite != allPtrs.end(); ++ite)
 	{
-		allPtrs[i]->mPtr = nullptr;
+		(*ite)->mPtr = nullptr;
 	}
 	allPtrs.clear();
 	delete this;
@@ -41,9 +41,9 @@ MObject::~MObject()
 {
 	if (allPtrs.size() <= 0) return;
 	std::lock_guard<std::mutex> lck(mtx);
-	for (int i = 0; i < allPtrs.size(); ++i)
+	for (auto ite = allPtrs.begin(); ite != allPtrs.end(); ++ite)
 	{
-		allPtrs[i]->mPtr = nullptr;
+		(*ite)->mPtr = nullptr;
 	}
 	allPtrs.clear();
 }

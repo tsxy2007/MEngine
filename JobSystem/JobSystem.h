@@ -7,13 +7,13 @@ class JobSystem
 {
 	friend class JobThreadRunnable;
 private:
-	static void UpdateNewBucket();
-	static int mThreadCount;
+	void UpdateNewBucket();
+	int mThreadCount;
 public:
-	static void Initialize(int threadCount);
-	static void ExecuteBucket(JobBucket** bucket, int bucketCount);
-	static void ExecuteBucket(JobBucket* bucket, int bucketCount);
-	static void Wait();
-	static void Dispose();
+	JobSystem(int threadCount);
+	void ExecuteBucket(JobBucket** bucket, int bucketCount);
+	void ExecuteBucket(JobBucket* bucket, int bucketCount);
+	void Wait();
+	~JobSystem();
 };
 
