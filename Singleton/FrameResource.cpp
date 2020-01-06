@@ -6,7 +6,7 @@ Pool<FrameResource::FrameResCamera> FrameResource::perCameraDataMemPool(50);
 std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> FrameResource::needClearResourcesAfterFlush;
 FrameResource* FrameResource::mCurrFrameResource = nullptr;
 CBufferPool FrameResource::cameraCBufferPool(sizeof(PassConstants), 256);
-FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount)
+FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount) : resourceManager(20)
 {
 	perCameraDatas.reserve(20);
 	cameraCBs.reserve(50);
@@ -29,16 +29,7 @@ void FrameResource::UpdateBeforeFrame(ID3D12Fence* mFence)
 		}
 		needClearResources.clear();
 		needClearResourcesAfterFlush.clear();
-		for (auto i = needRemovePipelineResource.begin(); i != needRemovePipelineResource.end(); ++i)
-		{
-			auto&& ite = perFrameResources.find(*i);
-			if (ite != perFrameResources.end())
-			{
-				delete ite->second;
-				perFrameResources.erase(ite);
-			}
-		}
-		needRemovePipelineResource.clear();
+		resourceManager.DisposeAllInList();
 	}
 }
 void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* commandQueue, ID3D12Fence* mFence)
@@ -110,17 +101,5 @@ FrameResource::~FrameResource()
 {
 	if (mCurrFrameResource == this)
 		mCurrFrameResource = nullptr;
-	for (auto ite = perFrameResources.begin(); ite != perFrameResources.end(); ++ite)
-	{
-		if (ite->second != nullptr)
-		{
-			delete ite->second;
-		}
-	}
 	delete commmonThreadCommand;
-}
-
-void FrameResource::ReleasePipelineResAfterFlush(void* key)
-{
-	needRemovePipelineResource.push_back(key);
 }

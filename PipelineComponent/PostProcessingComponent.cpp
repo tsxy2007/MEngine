@@ -27,17 +27,18 @@ public:
 	ID3D12Device* device;
 	UINT width;
 	UINT height;
-	void* selfPtr;
+	PostProcessingComponent* selfPtr;
 	FrameResource* resource;
 	void operator()()
 	{
 		threadCmd->ResetCommand();
-		PostFrameData* frameRes = (PostFrameData*)resource->GetResource(
+		PostFrameData* frameRes = (PostFrameData*)selfPtr->resContainer.GetResource(
+			&resource->resourceManager,
 			selfPtr,
 			[=]()->PostFrameData*
 		{
 			return new PostFrameData(device);
-		});
+		}).GetResource();
 		tex->BindColorBufferToSRVHeap(&frameRes->postSRVHeap, 0, device);
 		ID3D12GraphicsCommandList* commandList = threadCmd->GetCmdList();
 		Graphics::TransformBackBufferState<BackBufferState_RenderTarget>(commandList, backBuffer);

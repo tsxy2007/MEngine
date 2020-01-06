@@ -50,10 +50,10 @@ public:
 	{
 		tcmd->ResetCommand();
 		ID3D12GraphicsCommandList* commandList = tcmd->GetCmdList();
-		GBufferFrameResource* frameRes = (GBufferFrameResource*)resource->GetResource(component, [=]()->GBufferFrameResource*
+		GBufferFrameResource* frameRes = (GBufferFrameResource*)component->container.GetResource(&resource->resourceManager, component, [=]()->GBufferFrameResource*
 		{
 			return new GBufferFrameResource(device);
-		});
+		}).GetResource();
 		//Bind To RTV Heap
 		ALBEDO_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 0, 0);
 		SPECULAR_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 1, 0);

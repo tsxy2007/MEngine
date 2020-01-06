@@ -8,6 +8,7 @@ class GBufferComponent : public PipelineComponent
 {
 	friend class GBufferRunnable;
 protected:
+	PipelineResourceContainer container;
 	PrepareComponent* prepareComponent;
 	std::vector<TemporalRTCommand> tempRTRequire;
 	virtual bool NeedCommandList() const { return true; }

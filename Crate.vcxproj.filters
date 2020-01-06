@@ -356,6 +356,9 @@
     <ClCompile Include="PipelineComponent\PostProcessingComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PipelineComponent\IPerCameraResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Crate.rc">

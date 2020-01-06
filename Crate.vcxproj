@@ -86,6 +86,7 @@
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Common\MObject.cpp" />
     <ClCompile Include="CrateApp.cpp" />
+    <ClCompile Include="PipelineComponent\IPerCameraResource.cpp" />
     <ClCompile Include="PipelineComponent\PostProcessingComponent.cpp" />
     <ClCompile Include="RenderComponent\GPU Driven\GRP_Renderer.cpp" />
     <ClCompile Include="JobSystem\JobBucket.cpp" />

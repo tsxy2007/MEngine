@@ -1,8 +1,11 @@
 #pragma once
 #include "PipelineComponent.h"
+class PostRunnable;
 class PostProcessingComponent : public PipelineComponent
 {
+	friend class PostRunnable;
 protected:
+	PipelineResourceContainer resContainer;
 	std::vector<TemporalRTCommand> tempRT;
 	virtual bool NeedCommandList() const { return true; }
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt)

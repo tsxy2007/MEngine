@@ -51,9 +51,8 @@ private:
 	static Pool<FrameResCamera> perCameraDataMemPool;
 	static std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResourcesAfterFlush;
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResources;
-	std::unordered_map<void*, IPipelineResource*> perFrameResources;
-	std::vector<void*> needRemovePipelineResource;
 public:
+	PipelineResourceManager resourceManager;
 	ThreadCommand* commmonThreadCommand;
 	static CBufferPool cameraCBufferPool;
 	static std::vector<std::unique_ptr<FrameResource>> mFrameResources;
@@ -70,7 +69,6 @@ public:
 	void ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd);
 	void OnLoadCamera(Camera* targetCamera, ID3D12Device* device);
 	void OnUnloadCamera(Camera* targetCamera);
-	void ReleasePipelineResAfterFlush(void* key);
     // We cannot reset the allocator until the GPU is done processing the commands.
     // So each frame needs their own allocator.
     //Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CmdListAlloc;
@@ -85,27 +83,4 @@ public:
 	//Rendering Events
 	std::vector<ID3D12CommandList*> executableCommandList;
 	std::unordered_map<Camera*, FrameResCamera*> perCameraDatas;
-	std::mutex mtx;
-	template <typename Func>
-	inline IPipelineResource* GetResource(void* targetComponent, const Func&& func)
-	{
-		std::lock_guard<std::mutex> lck(mtx);
-		auto&& ite = perFrameResources.find(targetComponent);
-		if (ite == perFrameResources.end())
-		{
-			if (ite == perFrameResources.end())
-			{
-				IPipelineResource* newComp = func();
-				perFrameResources.insert_or_assign(targetComponent, newComp);
-				return newComp;
-			}
-		}
-		return ite->second;
-	}
-	template <typename Func>
-	inline IPipelineResource* GetResource(void* targetComponent, const Func& func)
-	{
-		return GetResource(targetComponent, std::move(func));
-	}
-
 };

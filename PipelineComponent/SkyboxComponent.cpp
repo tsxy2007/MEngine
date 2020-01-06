@@ -5,7 +5,7 @@
 #include "RenderPipeline.h"
 #include "PrepareComponent.h"
 Skybox* defaultSkybox;
-std::unique_ptr<PSOContainer> container;
+std::unique_ptr<PSOContainer> psoContainer;
 class SkyboxPerFrameData : public IPipelineResource
 {
 public:
@@ -22,7 +22,7 @@ class SkyboxRunnable
 public:
 	RenderTexture* gbufferTex;
 	RenderTexture* mvTex;
-	void* selfPtr;
+	SkyboxComponent* selfPtr;
 	ThreadCommand* commandList;
 	FrameResource* resource;
 	ID3D12Device* device;
@@ -30,22 +30,22 @@ public:
 	void operator()()
 	{
 		commandList->ResetCommand();
-		if (container == nullptr ||
-			container->GetColorFormats()[0] != gbufferTex->GetColorFormat() ||
-			container->GetColorFormats()[1] != mvTex->GetColorFormat() ||
-			container->GetDepthFormat() != gbufferTex->GetDepthFormat())
+		if (psoContainer == nullptr ||
+			psoContainer->GetColorFormats()[0] != gbufferTex->GetColorFormat() ||
+			psoContainer->GetColorFormats()[1] != mvTex->GetColorFormat() ||
+			psoContainer->GetDepthFormat() != gbufferTex->GetDepthFormat())
 		{
 			DXGI_FORMAT rtFormats[2];
 			rtFormats[0] = gbufferTex->GetColorFormat();
 			rtFormats[1] = mvTex->GetColorFormat();
-			container = std::unique_ptr<PSOContainer>(
+			psoContainer = std::unique_ptr<PSOContainer>(
 				new PSOContainer(gbufferTex->GetDepthFormat(), 2, rtFormats)
 				);
 		}
-		SkyboxPerFrameData* frameData = (SkyboxPerFrameData*)resource->GetResource(selfPtr, [&]()->SkyboxPerFrameData*
+		SkyboxPerFrameData* frameData = (SkyboxPerFrameData*)selfPtr->container.GetResource(&resource->resourceManager, selfPtr, [&]()->SkyboxPerFrameData*
 		{
 			return new SkyboxPerFrameData(device);
-		});
+		}).GetResource();
 		gbufferTex->BindRTVToHeap(device, &frameData->heap, 0, 0);
 		mvTex->BindRTVToHeap(device, &frameData->heap, 1, 0);
 		ID3D12GraphicsCommandList* cmdList = commandList->GetCmdList();
@@ -66,7 +66,7 @@ public:
 			device,
 			&resource->cameraCBs[cam->GetInstanceID()],
 			resource,
-			container.get()
+			psoContainer.get()
 		);
 		commandList->CloseCommand();
 	}
@@ -110,6 +110,6 @@ void SkyboxComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList
 }
 void SkyboxComponent::Dispose()
 {
-	container = nullptr;
+	psoContainer = nullptr;
 	delete defaultSkybox;
 }
