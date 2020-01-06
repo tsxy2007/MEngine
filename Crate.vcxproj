@@ -33,6 +33,7 @@
     <ClInclude Include="Common\MQueue.h" />
     <ClInclude Include="Common\Pool.h" />
     <ClInclude Include="Common\RandomVector.h" />
+    <ClInclude Include="PipelineComponent\CommandBuffer.h" />
     <ClInclude Include="PipelineComponent\PostProcessingComponent.h" />
     <ClInclude Include="RenderComponent\GPU Driven\GRP_Renderer.h" />
     <ClInclude Include="JobSystem\ConcurrentQueue.h" />
@@ -86,6 +87,7 @@
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Common\MObject.cpp" />
     <ClCompile Include="CrateApp.cpp" />
+    <ClCompile Include="PipelineComponent\CommandBuffer.cpp" />
     <ClCompile Include="PipelineComponent\IPerCameraResource.cpp" />
     <ClCompile Include="PipelineComponent\PostProcessingComponent.cpp" />
     <ClCompile Include="RenderComponent\GPU Driven\GRP_Renderer.cpp" />

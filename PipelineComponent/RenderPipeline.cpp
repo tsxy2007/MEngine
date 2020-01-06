@@ -34,6 +34,8 @@ PipelineComponent* RenderPipeline::GetComponent(const char* typeName)
 
 RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) : renderPathComponents(3)
 {
+	executableCommandList[0].reserve(20);
+	executableCommandList[1].reserve(20);
 	current = this;
 	//TODO
 	//Init All Events Here
@@ -56,6 +58,10 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 
 void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* jobSys)
 {
+	auto& currentExecutableList = executableCommandList[currentExecutable];
+	auto& lastExecutableList = executableCommandList[!currentExecutable];
+	currentExecutable = !currentExecutable;
+
 	std::vector <JobBucket>& bucketArray = buckets[bucketsFlag];
 	bucketsFlag = !bucketsFlag;
 	bucketArray.resize(renderData.allCameras->size());
@@ -123,7 +129,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 		for (UINT i = 0, size = waitingComponents.size(); i < size; ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
-			ExecuteThreadCommand(renderData.resource->executableCommandList, cam, component->threadCommand);
+			ExecuteThreadCommand(currentExecutableList, cam, component->threadCommand);
 		}
 	}
 	/*ThreadCommand* commandList = renderData.resource->commmonThreadCommand;
@@ -138,13 +144,13 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	if (renderData.lastResource != nullptr)
 	{
 		//Final Execute
-		if (renderData.executeLastFrame && renderData.lastResource->executableCommandList.size() > 0)
-			renderData.commandQueue->ExecuteCommandLists(renderData.lastResource->executableCommandList.size(), renderData.lastResource->executableCommandList.data());
+		if (renderData.executeLastFrame && lastExecutableList.size() > 0)
+			renderData.commandQueue->ExecuteCommandLists(lastExecutableList.size(), lastExecutableList.data());
 		//Finalize Frame
-		renderData.lastResource->executableCommandList.clear();
+		
 		renderData.lastResource->UpdateAfterFrame(*renderData.fenceIndex, renderData.commandQueue, renderData.fence);
 	}
-
+	lastExecutableList.clear();
 	ThrowIfFailed(renderData.swap->Present(0, 0));
 	tempRTAllocator.CumulateReleaseAfterFrame();
 }

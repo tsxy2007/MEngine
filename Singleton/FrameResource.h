@@ -81,6 +81,5 @@ public:
     // check if these frame resources are still in use by the GPU.
     UINT64 Fence = 0;
 	//Rendering Events
-	std::vector<ID3D12CommandList*> executableCommandList;
 	std::unordered_map<Camera*, FrameResCamera*> perCameraDatas;
 };
