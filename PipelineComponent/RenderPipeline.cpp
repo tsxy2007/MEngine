@@ -1,4 +1,5 @@
 #include "RenderPipeline.h"
+#include "PipelineComponent.h"
 #include "../Common/Camera.h"
 #include "../PipelineComponent/ThreadCommand.h"
 #include "PrepareComponent.h"
@@ -20,15 +21,6 @@ void ExecuteThreadCommand(Camera* cam, ThreadCommand* command)
 	if (command != nullptr) {
 		FrameResource::mCurrFrameResource->ReleaseThreadCommand(cam, command);
 	}
-}
-
-PipelineComponent* RenderPipeline::GetComponent(const char* typeName)
-{
-	std::string str(typeName);
-	auto&& ite = componentsLink.find(str);
-	if (ite != componentsLink.end())
-		return ite->second;
-	else return nullptr;
 }
 
 RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList,
@@ -69,15 +61,31 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	bucketArray.resize(renderData.allCameras->size());
 	PipelineComponent::EventData data;
 	data.device = renderData.device;
-	data.backBuffer = renderData.backBufferResource;
 	data.resource = renderData.resource;
-	data.backBufferHandle = renderData.backBufferHandle;
 	data.world = renderData.world;
+	data.frameNum = *renderData.fenceIndex + 1;
 	data.commandBuffer = currentExecutableList;
 	for (UINT camIndex = 0; camIndex < renderData.allCameras->size(); ++camIndex)
 	{
 		JobBucket& bucket = bucketArray[camIndex];
 		Camera* cam = (*renderData.allCameras)[camIndex];
+
+		if (cam->renderTarget)
+		{
+			data.width = cam->renderTarget->GetWidth();
+			data.height = cam->renderTarget->GetHeight();
+			data.isBackBufferForPresent = false;
+			data.backBufferHandle = cam->renderTarget->GetColorDescriptor(0);
+			data.backBuffer = cam->renderTarget->GetColorResource();
+		}
+		else
+		{
+			data.width = data.world->windowWidth;
+			data.height = data.world->windowHeight;
+			data.isBackBufferForPresent = true;
+			data.backBuffer = renderData.backBufferResource;
+			data.backBufferHandle = renderData.backBufferHandle;
+		}
 		data.camera = cam;
 		std::vector<PipelineComponent*>& waitingComponents = renderPathComponents[(UINT)cam->GetRenderingPath()];
 		renderTextureMarks.Clear();
@@ -121,17 +129,20 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 			waitingComponents[mark.endComponent]->unLoadRTCommands.emplace_back(mark.id);
 		}
 
-
-		for (UINT i = 0, size = waitingComponents.size(); i < size; ++i)
+		PipelineComponent::bucket = &bucket;
+		for (auto ite = waitingComponents.begin(); ite != waitingComponents.end(); ++ite)
 		{
-			PipelineComponent* component = waitingComponents[i];
+			PipelineComponent* component = *ite;
 			component->threadCommand = InitThreadCommand(renderData.device, cam, renderData.resource, component);
 			component->ExecuteTempRTCommand(renderData.device, &tempRTAllocator);
-			component->RenderEvent(data, bucket, component->threadCommand);
+			component->ClearHandles();
+			component->RenderEvent(data, component->threadCommand);
 		}
 		for (auto ite = waitingComponents.begin(); ite != waitingComponents.end(); ++ite)
 		{
-			ExecuteThreadCommand(cam, (*ite)->threadCommand);
+			PipelineComponent* component = *ite;
+			component->MarkHandles();
+			ExecuteThreadCommand(cam, component->threadCommand);
 		}
 	}
 	/*ThreadCommand* commandList = renderData.resource->commmonThreadCommand;
@@ -142,16 +153,16 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	});
 	renderData.resource->executableCommandList.emplace_back(commandList->GetCmdList());*/
 	jobSys->ExecuteBucket(bucketArray.data(), bucketArray.size());
-	
+
 	if (renderData.lastResource != nullptr)
 	{
 		//Final Execute
 		if (renderData.executeLastFrame)
 		{
-			lastExecutableList->ExecuteCommands();
+			lastExecutableList->Submit();
 		}
 		//Finalize Frame
-		
+
 		renderData.lastResource->UpdateAfterFrame(*renderData.fenceIndex, data.commandBuffer->GetGraphicsQueue(), renderData.fence);
 	}
 	lastExecutableList->Clear();

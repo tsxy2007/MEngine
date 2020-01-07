@@ -1,5 +1,4 @@
 #include "GBufferComponent.h"
-#include "PrepareComponent.h"
 #include "../Common/d3dUtil.h"
 #include "../Singleton/Graphics.h"
 #include "../LogicComponent/World.h"
@@ -9,8 +8,7 @@
 #include "../Singleton/PSOContainer.h"
 #include "../RenderComponent/StructuredBuffer.h"
 #include "../RenderComponent/MeshRenderer.h"
-#include "../PipelineComponent/RenderPipeline.h"
-#include "../PipelineComponent/PrepareComponent.h"
+#include "RenderPipeline.h"
 #include "../LogicComponent/Transform.h"
 #include "../Common/GeometryGenerator.h"
 using namespace DirectX;
@@ -41,19 +39,21 @@ public:
 class GBufferRunnable
 {
 public:
-	ID3D12Device* device;
-	ThreadCommand* tcmd;
-	Camera* cam;
-	FrameResource* resource;
-	GBufferComponent* component;
+	ID3D12Device* device;		//Dx12 Device
+	ThreadCommand* tcmd;		//Command List
+	Camera* cam;				//Camera
+	FrameResource* resource;	//Per Frame Data
+	GBufferComponent* component;//Singleton Component
+	World* world;				//Main Scene
 	void operator()()
 	{
 		tcmd->ResetCommand();
 		ID3D12GraphicsCommandList* commandList = tcmd->GetCmdList();
-		GBufferFrameResource* frameRes = (GBufferFrameResource*)component->container.GetResource(&resource->resourceManager, component, [=]()->GBufferFrameResource*
+		GBufferFrameResource* frameRes = (GBufferFrameResource*)component->
+			container.GetResource(&resource->resourceManager, component, [=]()->GBufferFrameResource*
 		{
 			return new GBufferFrameResource(device);
-		}).GetResource();
+		});
 		//Bind To RTV Heap
 		ALBEDO_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 0, 0);
 		SPECULAR_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 1, 0);
@@ -86,12 +86,12 @@ public:
 std::vector<TemporalRTCommand>& GBufferComponent::SendRenderTextureRequire(EventData& evt) {
 	for (int i = 0; i < tempRTRequire.size(); ++i)
 	{
-		tempRTRequire[i].descriptor.width = evt.world->windowWidth;
-		tempRTRequire[i].descriptor.height = evt.world->windowHeight;
+		tempRTRequire[i].descriptor.width = evt.width;
+		tempRTRequire[i].descriptor.height = evt.height;
 	}
 	return tempRTRequire;
 }
-void GBufferComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
+void GBufferComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 {
 	GBufferRunnable runnable
 	{
@@ -99,13 +99,15 @@ void GBufferComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadC
 		commandList,
 		data.camera,
 		data.resource,
-		this
+		this,
+		data.world
 	};
-	auto hand = taskFlow.GetTask(runnable);
+	//Schedule MultiThread Job
+	ScheduleJob(runnable);
+	//Execute CommandList in CommandQueue
 	data.commandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
-	prepareComponent->taskHandle.Precede(hand);
 }
-
+#include "PrepareComponent.h"
 void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	tempRTRequire.resize(5);
@@ -156,7 +158,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	}
 	gbufferContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, colorFormats.size(), colorFormats.data());
 	depthPrepassContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, 0, nullptr);
-	prepareComponent = (PrepareComponent*)RenderPipeline::GetComponent(typeid(PrepareComponent).name());
+	SetDepending<PrepareComponent>();
 	
 }
 

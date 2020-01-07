@@ -21,34 +21,15 @@ public:
 		PSOContainer* container,
 		UINT width, UINT height,
 		Shader* shader, UINT pass);
-	template <BackBufferState targetState>
-	static void TransformBackBufferState(
+	template <D3D12_RESOURCE_STATES beforeState, D3D12_RESOURCE_STATES afterState>
+	static void ResourceStateTransform(
 		ID3D12GraphicsCommandList* commandList,
-		ID3D12Resource* resource
-	) {}
-
-	template <>
-	static void TransformBackBufferState<BackBufferState_Present>(
-		ID3D12GraphicsCommandList* commandList,
-		ID3D12Resource* resource
-		)
-	{
-			commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
-				resource,
-				D3D12_RESOURCE_STATE_RENDER_TARGET,
-				D3D12_RESOURCE_STATE_PRESENT
-			));
-	}
-	template <>
-	static void TransformBackBufferState<BackBufferState_RenderTarget>(
-		ID3D12GraphicsCommandList* commandList,
-		ID3D12Resource* resource
-		)
+		ID3D12Resource* resource) 
 	{
 		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
 			resource,
-			D3D12_RESOURCE_STATE_PRESENT,
-			D3D12_RESOURCE_STATE_RENDER_TARGET
+			beforeState,
+			afterState
 		));
 	}
 };

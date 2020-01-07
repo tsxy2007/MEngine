@@ -3,7 +3,6 @@
 #include "../RenderComponent/Skybox.h"
 #include "../Singleton/PSOContainer.h"
 #include "RenderPipeline.h"
-#include "PrepareComponent.h"
 Skybox* defaultSkybox;
 std::unique_ptr<PSOContainer> psoContainer;
 class SkyboxPerFrameData : public IPipelineResource
@@ -16,7 +15,6 @@ public:
 			D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 	}
 };
-PrepareComponent* prepareComp;
 class SkyboxRunnable
 {
 public:
@@ -45,7 +43,7 @@ public:
 		SkyboxPerFrameData* frameData = (SkyboxPerFrameData*)selfPtr->container.GetResource(&resource->resourceManager, selfPtr, [&]()->SkyboxPerFrameData*
 		{
 			return new SkyboxPerFrameData(device);
-		}).GetResource();
+		});
 		gbufferTex->BindRTVToHeap(device, &frameData->heap, 0, 0);
 		mvTex->BindRTVToHeap(device, &frameData->heap, 1, 0);
 		ID3D12GraphicsCommandList* cmdList = commandList->GetCmdList();
@@ -71,9 +69,9 @@ public:
 		commandList->CloseCommand();
 	}
 };
-void SkyboxComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
+void SkyboxComponent::RenderEvent(EventData& data,  ThreadCommand* commandList)
 {
-	JobHandle hand = taskFlow.GetTask<SkyboxRunnable>(
+	ScheduleJob<SkyboxRunnable>(
 		{
 			 GetTempRT(0),
 			 GetTempRT(1),
@@ -89,7 +87,6 @@ void SkyboxComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCo
 
 void SkyboxComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
-	prepareComp = (PrepareComponent*)RenderPipeline::GetComponent(typeid(PrepareComponent).name());
 	tempRT.resize(2);
 	tempRT[0].type = TemporalRTCommand::Require;
 	tempRT[0].uID = ShaderID::PropertyToID("_CameraRenderTarget");

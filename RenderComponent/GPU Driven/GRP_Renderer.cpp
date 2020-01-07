@@ -256,7 +256,7 @@ GRP_Renderer::RenderElement& GRP_Renderer::AddRenderElement(
 		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&FrameResource::mFrameResources[i]->resourceManager, this, [=]()->GpuDrivenRenderer*
 		{
 			return new GpuDrivenRenderer(device, capacity);
-		}).GetResource();
+		});
 		perFrameData->AddCommand(cmd);
 	}
 
@@ -287,7 +287,7 @@ void GRP_Renderer::UpdateRenderer(Transform* targetTrans, Mesh* mesh, ID3D12Devi
 		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&FrameResource::mFrameResources[i]->resourceManager, this, [=]()->GpuDrivenRenderer*
 		{
 			return new GpuDrivenRenderer(device, capacity);
-		}).GetResource();
+		});
 		perFrameData->AddCommand(cmd);
 	}
 }
@@ -316,7 +316,7 @@ void GRP_Renderer::RemoveElement(Transform* trans, ID3D12Device* device)
 		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&FrameResource::mFrameResources[i]->resourceManager, this, [=]()->GpuDrivenRenderer*
 		{
 			return new GpuDrivenRenderer(device, capacity);
-		}).GetResource();
+		});
 		perFrameData->AddCommand(cmd);
 	}
 
@@ -339,7 +339,7 @@ void GRP_Renderer::UpdateTransform(Transform* targetTrans, ID3D12Device* device)
 		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&FrameResource::mFrameResources[i]->resourceManager, this, [=]()->GpuDrivenRenderer*
 		{
 			return new GpuDrivenRenderer(device, capacity);
-		}).GetResource();
+		});
 		perFrameData->AddCommand(cmd);
 	}
 }
@@ -378,7 +378,7 @@ void  GRP_Renderer::DrawCommand(
 	GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&targetResource->resourceManager, this, [=]()->GpuDrivenRenderer*
 	{
 		return new GpuDrivenRenderer(device, capacity);
-	}).GetResource();
+	});
 	CullData cullD;
 	cullD._Count = elements.size();
 	memcpy(cullD.planes, frustumPlanes, sizeof(DirectX::XMFLOAT4) * 6);

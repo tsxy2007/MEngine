@@ -30,6 +30,7 @@ public:
 	UINT height;
 	PostProcessingComponent* selfPtr;
 	FrameResource* resource;
+	bool isForPresent;
 	void operator()()
 	{
 		threadCmd->ResetCommand();
@@ -39,10 +40,14 @@ public:
 			[=]()->PostFrameData*
 		{
 			return new PostFrameData(device);
-		}).GetResource();
-		tex->BindColorBufferToSRVHeap(&frameRes->postSRVHeap, 0, device);
+		});
+		renderTarget->BindColorBufferToSRVHeap(&frameRes->postSRVHeap, 0, device);
 		ID3D12GraphicsCommandList* commandList = threadCmd->GetCmdList();
-		Graphics::TransformBackBufferState<BackBufferState_RenderTarget>(commandList, backBuffer);
+		if (isForPresent)
+		{
+			Graphics::ResourceStateTransform
+				<D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET>(commandList, backBuffer);
+		}
 		postShader->BindRootSignature(commandList);
 		postShader->SetResource(commandList, ShaderID::GetMainTex(), &frameRes->postSRVHeap, 0);
 		Graphics::Blit(
@@ -56,27 +61,30 @@ public:
 			postShader,
 			0
 		);
-		Graphics::TransformBackBufferState<BackBufferState_Present>(commandList, backBuffer);
+		if (isForPresent) {
+			Graphics::ResourceStateTransform
+				<D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT>(commandList, backBuffer);
+		}
 		threadCmd->CloseCommand();
 	}
 };
 
-void PostProcessingComponent::RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList)
+void PostProcessingComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 {
-	taskFlow.GetTask<PostRunnable>({
+	JobHandle handle = ScheduleJob<PostRunnable>({
 		GetTempRT(0),
 		commandList,
 		data.backBufferHandle,
 		data.backBuffer,
 		data.device,
-		data.world->windowWidth,
-		data.world->windowHeight,
+		data.width,
+		data.height,
 		this,
-		data.resource
-	});
+		data.resource,
+		data.isBackBufferForPresent
+		});
 	data.commandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 }
-
 void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	tempRT.resize(1);
@@ -87,7 +95,6 @@ void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCom
 	postContainer = std::unique_ptr<PSOContainer>(
 		new PSOContainer(DXGI_FORMAT_UNKNOWN, 1, &backBufferFormat)
 		);
-	tex = new Texture(commandList, device, "woodCrateTex", L"Textures/WoodCrate01.dds");
 }
 
 void PostProcessingComponent::Dispose()

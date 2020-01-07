@@ -1,4 +1,5 @@
 #include "CommandBuffer.h"
+
 void CommandBuffer::ChangeExecuteState(ExecuteType state)
 {
 	if (state == executeChoose) return;
@@ -49,7 +50,7 @@ void CommandBuffer::Clear()
 	executeChoose = NOT_EXECUTING;
 }
 
-void CommandBuffer::ExecuteCommands()
+void CommandBuffer::Submit()
 {
 	ChangeExecuteState(NOT_EXECUTING);
 	UINT graphicsIndex = 0;

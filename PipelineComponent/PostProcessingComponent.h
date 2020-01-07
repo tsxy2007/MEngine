@@ -5,6 +5,7 @@ class PostProcessingComponent : public PipelineComponent
 {
 	friend class PostRunnable;
 protected:
+	PipelineResourceContainer container;
 	PipelineResourceContainer resContainer;
 	std::vector<TemporalRTCommand> tempRT;
 	virtual bool NeedCommandList() const { return true; }
@@ -12,7 +13,7 @@ protected:
 	{
 		return tempRT;
 	}
-	virtual void RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList);
+	virtual void RenderEvent(EventData& data, ThreadCommand* commandList);
 public:
 	virtual void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 	virtual void Dispose();

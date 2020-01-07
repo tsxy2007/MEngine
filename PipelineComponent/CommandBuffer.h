@@ -1,5 +1,9 @@
 #pragma once
-#include "../Common/d3dUtil.h"
+#include <d3d12.h>
+#include <DirectXMath.h>
+#include <memory>
+#include <vector>
+
 class CommandBuffer
 {
 private:
@@ -54,7 +58,7 @@ public:
 	void Signal(ID3D12Fence* computeFence, UINT currentFrame);
 	void ExecuteGraphicsCommandList(ID3D12GraphicsCommandList* commandList);
 	void ExecuteComputeCommandList(ID3D12GraphicsCommandList* commandList);
-	void ExecuteCommands();
+	void Submit();
 	void Clear();
 	CommandBuffer(
 		ID3D12CommandQueue* graphicsCommandQueue,

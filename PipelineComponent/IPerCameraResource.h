@@ -52,7 +52,7 @@ private:
 public:
 	PipelineResourceContainer();
 	template<typename Func>
-	PipelineResource GetResource(PipelineResourceManager* manager, void* targetPtr, Func&& func)
+	IPipelineResource* GetResource(PipelineResourceManager* manager, void* targetPtr, Func&& func)
 	{
 		auto&& ite = allResource.find(manager);
 		std::unordered_map<void*, PipelineResource>* map = nullptr;
@@ -72,14 +72,14 @@ public:
 			UINT target = manager->InitResource(pipePtr);
 			PipelineResource result(manager, target);
 			map->insert_or_assign(targetPtr, result);
-			return result;
+			return result.GetResource();
 		}
-		return resultIte->second;
+		return resultIte->second.GetResource();
 	}
 	template<typename Func>
-	PipelineResource GetResource(PipelineResourceManager* manager, void* targetPtr, Func& func)
+	IPipelineResource* GetResource(PipelineResourceManager* manager, void* targetPtr, Func& func)
 	{
-		GetResource<Func>(manager, targetPtr, std::forward<Func>(func));
+		return GetResource<Func>(manager, targetPtr, std::forward<Func>(func));
 	}
 	~PipelineResourceContainer();
 	void DisposeResource(PipelineResourceManager* manager, void* targetPtr);

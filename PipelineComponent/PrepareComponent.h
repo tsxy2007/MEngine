@@ -8,14 +8,13 @@ class PrepareComponent : public PipelineComponent
 {
 	friend class PrepareRunnable;
 public:
-	JobHandle taskHandle;
 	PassConstants passConstants;
 	DirectX::XMFLOAT4 frustumPlanes[6];
 protected:
 	std::vector<TemporalRTCommand> useless;
 	virtual bool NeedCommandList() const { return false; }
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt) { return useless; }
-	virtual void RenderEvent(EventData& data, JobBucket& taskFlow, ThreadCommand* commandList);
+	virtual void RenderEvent(EventData& data, ThreadCommand* commandList);
 	virtual void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) {
 
 	};

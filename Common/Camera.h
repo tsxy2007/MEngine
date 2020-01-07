@@ -16,6 +16,7 @@
 #include "../Singleton/FrameResource.h"
 #include "../PipelineComponent/IPerCameraResource.h"
 class PipelineComponent;
+class RenderTexture;
 class Camera : public MObject
 {
 	friend class PipelineComponent;
@@ -25,6 +26,7 @@ public:
 		DefaultPipeline = 0,
 		Depth = 1
 	};
+	RenderTexture* renderTarget = nullptr;
 	virtual ~Camera();
 	Camera(ID3D12Device* device, CameraRenderPath rtType);
 	// Get/Set world camera position.

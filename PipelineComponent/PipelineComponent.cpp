@@ -2,6 +2,7 @@
 #include "../Singleton/FrameResource.h"
 #include "TempRTAllocator.h"
 std::mutex PipelineComponent::mtx;
+JobBucket* PipelineComponent::bucket (nullptr);
 RenderTexture* PipelineComponent::GetTempRT(UINT index)
 {
 	return allTempRT[index];
@@ -38,4 +39,31 @@ bool TemporalRTCommand::operator=(const TemporalRTCommand& other) const
 	{
 		return eq;
 	}
+}
+
+void PipelineComponent::ClearHandles()
+{
+	jobHandles.clear();
+}
+void PipelineComponent::MarkHandles()
+{
+	for (auto ite = dependedComponents.begin(); ite != dependedComponents.end(); ++ite)
+	{
+		auto& vec = (*ite)->jobHandles;
+		for (auto selfIte = jobHandles.begin(); selfIte != jobHandles.end(); ++selfIte)
+		{
+			for (auto dependIte = vec.begin(); dependIte != vec.end(); ++dependIte)
+			{
+				dependIte->Precede(*selfIte);
+			}
+		}
+	}
+}
+PipelineComponent::PipelineComponent()
+{
+	loadRTCommands.reserve(10);
+	requiredRTs.reserve(10);
+	unLoadRTCommands.reserve(10);
+	jobHandles.reserve(10);
+	dependedComponents.reserve(10);
 }

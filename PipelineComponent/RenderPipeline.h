@@ -1,5 +1,4 @@
 #pragma once
-#include "PipelineComponent.h"
 #include "TempRTAllocator.h"
 #include "../Common/d3dUtil.h"
 #include <unordered_map>
@@ -9,6 +8,7 @@
 class FrameResource;
 class Camera;
 class World;
+class PipelineComponent;
 struct RenderPipelineData
 {
 	ID3D12Device* device;
@@ -60,5 +60,13 @@ public:
 	static void DestroyInstance();
 	~RenderPipeline();
 	void RenderCamera(RenderPipelineData& data, JobSystem* jobSys);
-	static PipelineComponent* GetComponent(const char* typeName);
+	template <typename T>
+	static T* GetComponent()
+	{
+		std::string str(typeid(T).name());
+		auto&& ite = componentsLink.find(str);
+		if (ite != componentsLink.end())
+			return (T*)ite->second;
+		else return nullptr;
+	}
 };
