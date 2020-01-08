@@ -1,5 +1,4 @@
 #pragma once
-#include <unordered_map>
 #include "../Common/d3dUtil.h"
 #include <mutex>
 class Camera;

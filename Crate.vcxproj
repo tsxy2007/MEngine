@@ -32,7 +32,9 @@
     <ClInclude Include="Common\MObject.h" />
     <ClInclude Include="Common\MQueue.h" />
     <ClInclude Include="Common\Pool.h" />
+    <ClInclude Include="Common\Random.h" />
     <ClInclude Include="Common\RandomVector.h" />
+    <ClInclude Include="PipelineComponent\CameraData\CameraTransformData.h" />
     <ClInclude Include="PipelineComponent\CommandBuffer.h" />
     <ClInclude Include="PipelineComponent\PostProcessingComponent.h" />
     <ClInclude Include="RenderComponent\GPU Driven\GRP_Renderer.h" />
@@ -212,10 +214,11 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -241,7 +244,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
@@ -249,6 +252,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

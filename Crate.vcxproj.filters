@@ -213,6 +213,12 @@
     <ClInclude Include="PipelineComponent\CommandBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PipelineComponent\CameraData\CameraTransformData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">

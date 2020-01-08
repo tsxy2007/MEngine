@@ -34,7 +34,7 @@ public:
 	DirectX::XMFLOAT3 GetPosition3f()const;
 	void SetPosition(float x, float y, float z);
 	void SetPosition(const DirectX::XMFLOAT3& v);
-	
+
 	// Get camera basis vectors.
 	DirectX::XMVECTOR GetRight()const;
 	DirectX::XMFLOAT3 GetRight3f()const;
@@ -55,7 +55,7 @@ public:
 	float GetNearWindowHeight()const;
 	float GetFarWindowWidth()const;
 	float GetFarWindowHeight()const;
-	
+
 	// Set frustum.
 	void SetLens(float fovY, float aspect, float zn, float zf);
 
@@ -69,7 +69,8 @@ public:
 
 	DirectX::XMFLOAT4X4 GetView4x4f()const;
 	DirectX::XMFLOAT4X4 GetProj4x4f()const;
-
+	void SetProj(const DirectX::XMFLOAT4X4* data);
+	void SetView(const DirectX::XMFLOAT4X4* data);
 	// Strafe/Walk the camera a distance d.
 	void Strafe(float d);
 	void Walk(float d);
@@ -89,12 +90,9 @@ public:
 		auto&& ite = perCameraResource.find(targetComponent);
 		if (ite == perCameraResource.end())
 		{
-			if (ite == perCameraResource.end())
-			{
-				IPipelineResource* newComp = func();
-				perCameraResource.insert_or_assign(targetComponent, newComp);
-				return newComp;
-			}
+			IPipelineResource* newComp = func();
+			perCameraResource.insert_or_assign(targetComponent, newComp);
+			return newComp;
 		}
 		return ite->second;
 	}
@@ -103,6 +101,7 @@ public:
 	{
 		return GetResource(targetComponent, std::move(func));
 	}
+	
 private:
 	std::unordered_map<PipelineComponent*, IPipelineResource*> perCameraResource;
 	std::mutex mtx;
@@ -119,14 +118,14 @@ private:
 	float mFovY = 0.0f;
 	float mNearWindowHeight = 0.0f;
 	float mFarWindowHeight = 0.0f;
-	
+
 
 	bool mViewDirty = true;
 
 	// Cache View/Proj matrices.
 	DirectX::XMFLOAT4X4 mView = MathHelper::Identity4x4();
 	DirectX::XMFLOAT4X4 mProj = MathHelper::Identity4x4();
-
+	
 };
 
 #endif

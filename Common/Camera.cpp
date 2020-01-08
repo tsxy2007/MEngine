@@ -195,18 +195,27 @@ void Camera::LookAt(const XMFLOAT3& pos, const XMFLOAT3& target, const XMFLOAT3&
 
 XMMATRIX Camera::GetView()const
 {
-	return XMLoadFloat4x4(&mView);
+	return *(XMMATRIX*)(&mView);
 }
 
 XMMATRIX Camera::GetProj()const
 {
-	return XMLoadFloat4x4(&mProj);
+	return *(XMMATRIX*)(&mProj);
 }
 
 
 XMFLOAT4X4 Camera::GetView4x4f()const
 {
 	return mView;
+}
+
+void Camera::SetProj(const DirectX::XMFLOAT4X4* data)
+{
+	mProj = *data;
+}
+void Camera::SetView(const DirectX::XMFLOAT4X4* data)
+{
+	mView = *data;
 }
 
 XMFLOAT4X4 Camera::GetProj4x4f()const
