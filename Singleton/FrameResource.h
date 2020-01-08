@@ -45,14 +45,28 @@ struct FrameResource
 private:
 	struct FrameResCamera
 	{
+		std::unordered_map<void*, IPipelineResource*> perCameraResource;
 		std::vector<ThreadCommand*> threadCommands;
+		FrameResCamera()
+		{
+			perCameraResource.reserve(50);
+		}
+		~FrameResCamera()
+		{
+			for (auto ite = perCameraResource.begin(); ite != perCameraResource.end(); ++ite)
+			{
+				delete ite->second;
+			}
+		}
 	};
 	static Pool<ThreadCommand> threadCommandMemoryPool;
 	static Pool<FrameResCamera> perCameraDataMemPool;
 	static std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResourcesAfterFlush;
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> needClearResources;
+	std::mutex mtx;
+	std::unordered_map<Camera*, FrameResCamera*> perCameraDatas;
+	std::unordered_map<void*, IPipelineResource*> perFrameResource;
 public:
-	PipelineResourceManager resourceManager;
 	ThreadCommand* commmonThreadCommand;
 	static CBufferPool cameraCBufferPool;
 	static std::vector<std::unique_ptr<FrameResource>> mFrameResources;
@@ -81,5 +95,61 @@ public:
     // check if these frame resources are still in use by the GPU.
     UINT64 Fence = 0;
 	//Rendering Events
-	std::unordered_map<Camera*, FrameResCamera*> perCameraDatas;
+
+	template <typename Func>
+	inline IPipelineResource* GetResource(void* targetComponent, Camera* cam, const Func&& func)
+	{
+		std::lock_guard<std::mutex> lck(mtx);
+		FrameResCamera* ptr = perCameraDatas[cam];
+		auto&& ite = ptr->perCameraResource.find(targetComponent);
+		if (ite == ptr->perCameraResource.end())
+		{
+			IPipelineResource* newComp = func();
+			ptr->perCameraResource.insert_or_assign(targetComponent, newComp);
+			return newComp;
+		}
+		return ite->second;
+	}
+	template <typename Func>
+	inline IPipelineResource* GetResource(void* targetComponent, Camera* cam, const Func& func)
+	{
+		return GetResource(targetComponent, cam, std::move(func));
+	}
+	template <typename Func>
+	inline IPipelineResource* GetResource(void* targetComponent, const Func&& func)
+	{
+		std::lock_guard<std::mutex> lck(mtx);
+		auto&& ite = perFrameResource.find(targetComponent);
+		if (ite == perFrameResource.end())
+		{
+			IPipelineResource* newComp = func();
+			perFrameResource.insert_or_assign(targetComponent, newComp);
+			return newComp;
+		}
+		return ite->second;
+	}
+	template <typename Func>
+	inline IPipelineResource* GetResource(void* targetComponent, const Func& func)
+	{
+		return GetResource(targetComponent, std::move(func));
+	}
+
+	void DisposeResource(void* targetComponent)
+	{
+		std::lock_guard<std::mutex> lck(mtx);
+		auto&& ite = perFrameResource.find(targetComponent);
+		if (ite == perFrameResource.end()) return;
+		delete ite->second;
+		perFrameResource.erase(ite);
+	}
+
+	void DisposeResource(void* targetComponent, Camera* cam)
+	{
+		std::lock_guard<std::mutex> lck(mtx);
+		FrameResCamera* ptr = perCameraDatas[cam];
+		auto&& ite = ptr->perCameraResource.find(targetComponent);
+		if (ite == ptr->perCameraResource.end()) return;
+		delete ite->second;
+		ptr->perCameraResource.erase(ite);
+	}
 };

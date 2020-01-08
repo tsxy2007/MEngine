@@ -47,6 +47,7 @@ private:
 		using Storage = std::aligned_storage_t<sizeof(Func), alignof(Func)>;
 		if (sizeof(Storage) >= sizeof(FuncStorage))	//Create in heap
 		{
+			assert(false);
 			ptr = new Func(std::forward<Func>(func));
 			destructorFunc = [](void* currPtr)->void
 			{

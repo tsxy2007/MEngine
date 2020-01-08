@@ -31,12 +31,11 @@ public:
 	PostProcessingComponent* selfPtr;
 	FrameResource* resource;
 	bool isForPresent;
+	Camera* cam;
 	void operator()()
 	{
 		threadCmd->ResetCommand();
-		PostFrameData* frameRes = (PostFrameData*)selfPtr->resContainer.GetResource(
-			&resource->resourceManager,
-			selfPtr,
+		PostFrameData* frameRes = (PostFrameData*)resource->GetResource(selfPtr, cam,
 			[=]()->PostFrameData*
 		{
 			return new PostFrameData(device);
@@ -81,7 +80,8 @@ void PostProcessingComponent::RenderEvent(EventData& data, ThreadCommand* comman
 		data.height,
 		this,
 		data.resource,
-		data.isBackBufferForPresent
+		data.isBackBufferForPresent,
+		data.camera
 		});
 	data.commandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 }

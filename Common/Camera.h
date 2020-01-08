@@ -69,8 +69,10 @@ public:
 
 	DirectX::XMFLOAT4X4 GetView4x4f()const;
 	DirectX::XMFLOAT4X4 GetProj4x4f()const;
-	void SetProj(const DirectX::XMFLOAT4X4* data);
-	void SetView(const DirectX::XMFLOAT4X4* data);
+	void SetProj(const DirectX::XMFLOAT4X4& data);
+	void SetProj(const DirectX::XMMATRIX& data);
+	void SetView(const DirectX::XMFLOAT4X4& data);
+	void SetView(const DirectX::XMMATRIX& data);
 	// Strafe/Walk the camera a distance d.
 	void Strafe(float d);
 	void Walk(float d);

@@ -365,9 +365,6 @@
     <ClCompile Include="PipelineComponent\PostProcessingComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PipelineComponent\IPerCameraResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PipelineComponent\CommandBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

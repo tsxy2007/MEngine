@@ -49,8 +49,7 @@ public:
 	{
 		tcmd->ResetCommand();
 		ID3D12GraphicsCommandList* commandList = tcmd->GetCmdList();
-		GBufferFrameResource* frameRes = (GBufferFrameResource*)component->
-			container.GetResource(&resource->resourceManager, component, [=]()->GBufferFrameResource*
+		GBufferFrameResource* frameRes = (GBufferFrameResource*)resource->GetResource(component, cam, [=]()->GBufferFrameResource*
 		{
 			return new GBufferFrameResource(device);
 		});

@@ -40,7 +40,7 @@ public:
 				new PSOContainer(gbufferTex->GetDepthFormat(), 2, rtFormats)
 				);
 		}
-		SkyboxPerFrameData* frameData = (SkyboxPerFrameData*)selfPtr->container.GetResource(&resource->resourceManager, selfPtr, [&]()->SkyboxPerFrameData*
+		SkyboxPerFrameData* frameData = (SkyboxPerFrameData*)resource->GetResource(selfPtr, cam, [&]()->SkyboxPerFrameData*
 		{
 			return new SkyboxPerFrameData(device);
 		});

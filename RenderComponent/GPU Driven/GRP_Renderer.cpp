@@ -10,6 +10,7 @@
 #include "../../Singleton/ShaderID.h"
 #include "../../Singleton/PSOContainer.h"
 #include <mutex>
+#include "../../PipelineComponent/IPerCameraResource.h"
 struct ObjectData
 {
 	DirectX::XMFLOAT4X4 localToWorld;
@@ -253,7 +254,7 @@ GRP_Renderer::RenderElement& GRP_Renderer::AddRenderElement(
 	*ptr = targetTrans->GetLocalToWorldMatrix();
 	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
 	{
-		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&FrameResource::mFrameResources[i]->resourceManager, this, [=]()->GpuDrivenRenderer*
+		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)FrameResource::mFrameResources[i]->GetResource( this, [=]()->GpuDrivenRenderer*
 		{
 			return new GpuDrivenRenderer(device, capacity);
 		});
@@ -284,7 +285,7 @@ void GRP_Renderer::UpdateRenderer(Transform* targetTrans, Mesh* mesh, ID3D12Devi
 	cmd.cmd.drawArgs.StartInstanceLocation = 0;
 	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
 	{
-		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&FrameResource::mFrameResources[i]->resourceManager, this, [=]()->GpuDrivenRenderer*
+		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)FrameResource::mFrameResources[i]->GetResource(this, [=]()->GpuDrivenRenderer*
 		{
 			return new GpuDrivenRenderer(device, capacity);
 		});
@@ -313,7 +314,7 @@ void GRP_Renderer::RemoveElement(Transform* trans, ID3D12Device* device)
 	cmd.type = Command::CommandType_Remove;
 	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
 	{
-		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&FrameResource::mFrameResources[i]->resourceManager, this, [=]()->GpuDrivenRenderer*
+		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)FrameResource::mFrameResources[i]->GetResource(this, [=]()->GpuDrivenRenderer*
 		{
 			return new GpuDrivenRenderer(device, capacity);
 		});
@@ -336,7 +337,7 @@ void GRP_Renderer::UpdateTransform(Transform* targetTrans, ID3D12Device* device)
 	*ptr = targetTrans->GetLocalToWorldMatrix();
 	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
 	{
-		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&FrameResource::mFrameResources[i]->resourceManager, this, [=]()->GpuDrivenRenderer*
+		GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)FrameResource::mFrameResources[i]->GetResource(this, [=]()->GpuDrivenRenderer*
 		{
 			return new GpuDrivenRenderer(device, capacity);
 		});
@@ -375,7 +376,7 @@ void  GRP_Renderer::DrawCommand(
 	cullShader->BindRootSignature(commandList, nullptr);
 	UINT dispatchCount = (UINT)ceil(elements.size() / 64.0);
 	UINT capacity = this->capacity;
-	GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)this->container.GetResource(&targetResource->resourceManager, this, [=]()->GpuDrivenRenderer*
+	GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)targetResource->GetResource(  this, [=]()->GpuDrivenRenderer*
 	{
 		return new GpuDrivenRenderer(device, capacity);
 	});
@@ -426,7 +427,7 @@ GRP_Renderer::~GRP_Renderer()
 {
 	for (UINT i = 0, size = FrameResource::mFrameResources.size(); i < size; ++i)
 	{
-		container.DisposeResource(&FrameResource::mFrameResources[i]->resourceManager, this);
+		FrameResource::mFrameResources[i]->DisposeResource(this);
 	}
 	delete allocatedIndices;
 }

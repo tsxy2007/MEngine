@@ -3,7 +3,6 @@
 #include "../CBufferPool.h"
 #include "../CommandSignature.h"
 #include "../../Common/MetaLib.h"
-#include "../../PipelineComponent/IPerCameraResource.h"
 class DescriptorHeap;
 class Mesh;
 class Transform;
@@ -31,7 +30,6 @@ public:
 		) : propertyBuffer(anotherBuffer), transform(*anotherTrans), textures(textures), boundingCenter(boundingCenter), boundingExtent(boundingExtent) {}
 	};
 private:
-	PipelineResourceContainer container;
 	CBufferPool pool;
 	ObjectPtr<DescriptorHeap> textureHeap;
 	size_t cbufferStride;

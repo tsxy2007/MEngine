@@ -209,14 +209,23 @@ XMFLOAT4X4 Camera::GetView4x4f()const
 	return mView;
 }
 
-void Camera::SetProj(const DirectX::XMFLOAT4X4* data)
+void Camera::SetProj(const DirectX::XMFLOAT4X4& data)
 {
-	mProj = *data;
+	memcpy(&mProj, &data, sizeof(XMFLOAT4X4));
 }
-void Camera::SetView(const DirectX::XMFLOAT4X4* data)
+void Camera::SetView(const DirectX::XMFLOAT4X4& data)
 {
-	mView = *data;
+	memcpy(&mView, &data, sizeof(XMFLOAT4X4));
 }
+void Camera::SetProj(const DirectX::XMMATRIX& data)
+{
+	memcpy(&mProj, &data, sizeof(XMFLOAT4X4));
+}
+void Camera::SetView(const DirectX::XMMATRIX& data)
+{
+	memcpy(&mView, &data, sizeof(XMFLOAT4X4));
+}
+
 
 XMFLOAT4X4 Camera::GetProj4x4f()const
 {

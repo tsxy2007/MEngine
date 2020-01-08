@@ -5,7 +5,7 @@
 #include "../Common/Random.h"
 #include "../Singleton/MathLib.h"
 using namespace DirectX;
-UINT sampleIndex;
+UINT sampleIndex = 0;
 const UINT k_SampleCount = 8;
 double GetHalton(int index, int radix)
 {
@@ -25,8 +25,8 @@ double GetHalton(int index, int radix)
 XMVECTOR GenerateRandomOffset()
 {
 	XMVECTOR offset = {
-		GetHalton((sampleIndex & 1023) + 1, 2) - 0.5f,
-		GetHalton((sampleIndex & 1023) + 1, 3) - 0.5f,
+		GetHalton((sampleIndex & 1023) + 1, 2) - 0.5,
+		GetHalton((sampleIndex & 1023) + 1, 3) - 0.5,
 		0, 0
 	};
 
@@ -51,10 +51,9 @@ void GetJitteredPerspectiveProjectionMatrix(
 	offset.x *= horizontal / (0.5f * pixelWidth);
 	offset.y *= vertical / (0.5f * pixelHeight);
 
-	XMFLOAT4* firstRow = (XMFLOAT4*)&projectionMatrix->r[0];
-	XMFLOAT4* secondRow = (XMFLOAT4*)&projectionMatrix->r[1];
-	firstRow->z += offset.x / horizontal;
-	secondRow->z -= offset.y / vertical;		//TODD: dont know difference between ogl & dx
+	XMFLOAT4X4* projPt = (XMFLOAT4X4*)projectionMatrix;
+	projPt->m[2][0] += offset.x / horizontal;
+	projPt->m[2][1] -= offset.y / vertical;		//TODD: dont know difference between ogl & dx
 }
 void GetJitteredProjectionMatrix(
 	double nearClipPlane,
@@ -79,10 +78,12 @@ void GetJitteredProjectionMatrix(
 	);
 	*jitterPtr = { jitterPtr->x / pixelWidth, jitterPtr->y / pixelHeight };
 }
-void ConfigureJitteredProjectionMatrix(Camera* camera, UINT height, UINT width, double jitterOffset, CameraTransformData* data, XMVECTOR& jitter)
+void ConfigureJitteredProjectionMatrix(Camera* camera, UINT height, UINT width, double jitterOffset, CameraTransformData* data)
 {
 	data->nonJitteredMatrix = camera->GetProj();
 	XMMATRIX jitteredMat = data->nonJitteredMatrix;
+	data->lastFrameJitter = data->jitter;
+	XMVECTOR jitterVec = XMLoadFloat2(&data->jitter);
 	GetJitteredProjectionMatrix(
 		camera->GetNearZ(),
 		camera->GetFarZ(),
@@ -91,8 +92,10 @@ void ConfigureJitteredProjectionMatrix(Camera* camera, UINT height, UINT width, 
 		jitterOffset,
 		width, height, 
 		jitteredMat,
-		jitter
+		jitterVec
 	);
+	memcpy(&data->jitter, &jitterVec, sizeof(XMFLOAT2));
+	camera->SetProj(jitteredMat);
 }
 
 struct PrepareRunnable
@@ -101,13 +104,18 @@ struct PrepareRunnable
 	ThreadCommand* threadCommand;
 	FrameResource* resource;
 	Camera* camera;
+	UINT width, height;
 	void operator()()
 	{
 		CameraTransformData* transData = (CameraTransformData*)camera->GetResource(ths, []()->CameraTransformData*
 		{
 			return new CameraTransformData;
 		});
-		
+		ConfigureJitteredProjectionMatrix(
+			camera,
+			width, height,
+			1, transData
+		);
 		camera->UploadCameraBuffer(ths->passConstants);
 		ConstBufferElement ele = resource->cameraCBs[camera->GetInstanceID()];
 		ele.buffer->CopyData(ele.element, &ths->passConstants);
@@ -121,7 +129,8 @@ void PrepareComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 		this,
 		commandList,
 		data.resource,
-		data.camera
+		data.camera,
+		data.width, data.height
 	};
 	ScheduleJob(runnable);
 }
