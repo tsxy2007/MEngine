@@ -64,6 +64,7 @@
     <ClInclude Include="RenderComponent\Material.h" />
     <ClInclude Include="RenderComponent\Mesh.h" />
     <ClInclude Include="RenderComponent\MeshRenderer.h" />
+    <ClInclude Include="RenderComponent\RenderCommand.h" />
     <ClInclude Include="RenderComponent\RenderTexture.h" />
     <ClInclude Include="RenderComponent\Shader.h" />
     <ClInclude Include="RenderComponent\Skybox.h" />
@@ -76,7 +77,6 @@
     <ClInclude Include="Singleton\MathLib.h" />
     <ClInclude Include="Singleton\MeshLayout.h" />
     <ClInclude Include="Singleton\PSOContainer.h" />
-    <ClInclude Include="Singleton\RenderCommand.h" />
     <ClInclude Include="Singleton\ShaderCompiler.h" />
     <ClInclude Include="Singleton\ShaderID.h" />
     <ClInclude Include="PipelineComponent\SkyboxComponent.h" />
@@ -118,6 +118,7 @@
     <ClCompile Include="RenderComponent\Material.cpp" />
     <ClCompile Include="RenderComponent\Mesh.cpp" />
     <ClCompile Include="RenderComponent\MeshRenderer.cpp" />
+    <ClCompile Include="RenderComponent\RenderCommand.cpp" />
     <ClCompile Include="RenderComponent\RenderTexture.cpp" />
     <ClCompile Include="RenderComponent\Shader.cpp" />
     <ClCompile Include="RenderComponent\Skybox.cpp" />
@@ -129,7 +130,6 @@
     <ClCompile Include="Singleton\MathLib.cpp" />
     <ClCompile Include="Singleton\MeshLayout.cpp" />
     <ClCompile Include="Singleton\PSOContainer.cpp" />
-    <ClCompile Include="Singleton\RenderCommand.cpp" />
     <ClCompile Include="Singleton\ShaderCompiler.cpp" />
     <ClCompile Include="Singleton\ShaderID.cpp" />
     <ClCompile Include="PipelineComponent\SkyboxComponent.cpp" />

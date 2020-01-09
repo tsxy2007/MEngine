@@ -6,7 +6,6 @@
 #include "ConcurrentQueue.h"
 #include "../Common/Pool.h"
 #include <DirectXMath.h>
-#include "../Common/Pool.h"
 class JobHandle;
 class JobThreadRunnable;
 class JobBucket;

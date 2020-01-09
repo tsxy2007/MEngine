@@ -219,10 +219,10 @@
     <ClInclude Include="Common\Random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Singleton\RenderCommand.h">
+    <ClInclude Include="Common\RingQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\RingQueue.h">
+    <ClInclude Include="RenderComponent\RenderCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -374,10 +374,10 @@
     <ClCompile Include="PipelineComponent\CommandBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Singleton\RenderCommand.cpp">
+    <ClCompile Include="Common\Random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Random.cpp">
+    <ClCompile Include="RenderComponent\RenderCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

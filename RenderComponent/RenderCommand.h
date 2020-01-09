@@ -15,7 +15,7 @@ public:
 		ID3D12GraphicsCommandList* commandList,
 		FrameResource* resource) = 0;
 	static void AddCommand(RenderCommand* command);
-	static void ExecuteCommand(
+	static bool ExecuteCommand(
 		ID3D12Device* device,
 		ID3D12GraphicsCommandList* commandList,
 		FrameResource* resource);

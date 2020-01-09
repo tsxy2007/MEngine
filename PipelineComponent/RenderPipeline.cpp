@@ -7,6 +7,7 @@
 #include "../LogicComponent/World.h"
 #include "SkyboxComponent.h"
 #include "PostProcessingComponent.h"
+#include "../RenderComponent/RenderCommand.h"
 //ThreadCommand* threadCommand;
 RenderPipeline* RenderPipeline::current(nullptr);
 std::unordered_map<std::string, PipelineComponent*> RenderPipeline::componentsLink;
@@ -72,6 +73,10 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	bucketArray[0].GetTask([=]()->void
 	{
 		commandList->ResetCommand();
+		while (RenderCommand::ExecuteCommand(
+			data.device, commandList->GetCmdList(), renderData.resource))
+		{
+		}
 		commandList->CloseCommand();
 	});
 	currentExecutableList->ExecuteComputeCommandList(commandList->GetCmdList());
