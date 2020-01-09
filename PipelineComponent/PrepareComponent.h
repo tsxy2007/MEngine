@@ -12,7 +12,9 @@ public:
 	DirectX::XMFLOAT4 frustumPlanes[6];
 protected:
 	std::vector<TemporalRTCommand> useless;
-	virtual bool NeedCommandList() const { return false; }
+	virtual CommandListType GetCommandListType() {
+		return CommandListType_None;
+	}
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt) { return useless; }
 	virtual void RenderEvent(EventData& data, ThreadCommand* commandList);
 	virtual void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) {

@@ -1,3 +1,4 @@
+#include "../PipelineComponent/CommandBuffer.h"
 #include "FrameResource.h"
 #include "../Common/Camera.h"
 std::vector<std::unique_ptr<FrameResource>> FrameResource::mFrameResources;
@@ -13,25 +14,28 @@ FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCo
 	objectCBs.reserve(50);
 	needClearResources.reserve(10);
 	needClearResourcesAfterFlush.reserve(10);
-	commmonThreadCommand = new ThreadCommand(device);
+	commmonThreadCommand = new ThreadCommand(device, D3D12_COMMAND_LIST_TYPE_COMPUTE);
 }
 
-void FrameResource::UpdateBeforeFrame(ID3D12Fence* mFence)
+void FrameResource::UpdateBeforeFrame(ID3D12Fence** mFence, UINT fenceCount)
 {
 	if (Fence != 0)
 	{
-		if (mFence->GetCompletedValue() < Fence)
+		for (UINT i = 0; i < fenceCount; ++i)
 		{
-			HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-			ThrowIfFailed(mFence->SetEventOnCompletion(Fence, eventHandle));
-			WaitForSingleObject(eventHandle, INFINITE);
-			CloseHandle(eventHandle);
+			if (mFence[i]->GetCompletedValue() < Fence)
+			{
+				HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+				ThrowIfFailed(mFence[i]->SetEventOnCompletion(Fence, eventHandle));
+				WaitForSingleObject(eventHandle, INFINITE);
+				CloseHandle(eventHandle);
+			}
 		}
 		needClearResources.clear();
 		needClearResourcesAfterFlush.clear();
 	}
 }
-void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* commandQueue, ID3D12Fence* mFence)
+void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue** commandQueue, ID3D12Fence** mFence, UINT commandQueueCount)
 {
 	// Advance the fence value to mark commands up to this fence point.
 	Fence = ++currentFence;
@@ -39,7 +43,8 @@ void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* c
 	// Add an instruction to the command queue to set a new fence point. 
 	// Because we are on the GPU timeline, the new fence point won't be 
 	// set until the GPU finishes processing all the commands prior to this Signal().
-	commandQueue->Signal(mFence, currentFence);
+	for(UINT i= 0; i < commandQueueCount; ++i)
+		commandQueue[i]->Signal(mFence[i], currentFence);
 }
 
 void FrameResource::OnLoadCamera(Camera* targetCamera, ID3D12Device* device)
@@ -71,12 +76,12 @@ void FrameResource::ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resou
 }
 
 
-ThreadCommand* FrameResource::GetNewThreadCommand(Camera* cam, ID3D12Device* device)
+ThreadCommand* FrameResource::GetNewThreadCommand(Camera* cam, ID3D12Device* device, D3D12_COMMAND_LIST_TYPE cmdListType)
 {
 	std::vector<ThreadCommand*>& threadCommands = perCameraDatas[cam]->threadCommands;
 	if (threadCommands.size() <= 0)
 	{
-		return threadCommandMemoryPool.New(device);
+		return threadCommandMemoryPool.New(device, cmdListType);
 	}
 	else
 	{

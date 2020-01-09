@@ -134,7 +134,6 @@ void SkyboxComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 			 data.device,
 			 data.camera
 		});
-	data.commandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 }
 
 

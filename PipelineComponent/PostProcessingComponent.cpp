@@ -83,7 +83,6 @@ void PostProcessingComponent::RenderEvent(EventData& data, ThreadCommand* comman
 		data.isBackBufferForPresent,
 		data.camera
 		});
-	data.commandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 }
 void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {

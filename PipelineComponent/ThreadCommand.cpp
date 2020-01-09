@@ -8,14 +8,14 @@ void ThreadCommand::CloseCommand()
 {
 	cmdList->Close();
 }
-ThreadCommand::ThreadCommand(ID3D12Device* device)
+ThreadCommand::ThreadCommand(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type)
 {
 	ThrowIfFailed(device->CreateCommandAllocator(
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		type,
 		IID_PPV_ARGS(&cmdAllocator)));
 	ThrowIfFailed(device->CreateCommandList(
 		0,
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		type,
 		cmdAllocator.Get(), // Associated command allocator
 		nullptr,                   // Initial PipelineStateObject
 		IID_PPV_ARGS(&cmdList)));

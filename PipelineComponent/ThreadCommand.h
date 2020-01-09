@@ -11,7 +11,7 @@ private:
 public:
 	inline ID3D12CommandAllocator* GetAllocator() const { return cmdAllocator.Get(); }
 	inline ID3D12GraphicsCommandList* GetCmdList() const { return cmdList.Get(); }
-	ThreadCommand(ID3D12Device* device);
+	ThreadCommand(ID3D12Device* device, D3D12_COMMAND_LIST_TYPE type);
 	void ResetCommand();
 	void CloseCommand();
 };

@@ -29,6 +29,7 @@ class PipelineComponent
 	friend class RenderPipeline;
 	friend class PerCameraRenderingEvent;
 private:
+
 	static std::mutex mtx;
 	static JobBucket* bucket;
 	ThreadCommand* threadCommand;//thread command cache
@@ -44,8 +45,11 @@ private:
 	std::vector<JobHandle> jobHandles;
 	std::vector<LoadTempRTCommand> loadRTCommands;
 	std::vector<UINT> unLoadRTCommands;
-	std::vector<PipelineComponent*> dependedComponents;
+	std::vector<PipelineComponent*> cpuDepending;
+	std::vector<PipelineComponent*> gpuDepending;
 	std::vector<std::pair<UINT, UINT>> requiredRTs;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
+	void CreateFence(ID3D12Device* device);
 	void ExecuteTempRTCommand(ID3D12Device* device, TempRTAllocator* allocator);
 	template <typename ... T>
 	class Depending;
@@ -67,14 +71,26 @@ private:
 			Depending<Args...> d(vec);
 		}
 	};
+
 protected:
 	RenderTexture* GetTempRT(UINT index);
 	template <typename... Args>
-	void SetDepending()
+	void SetCPUDepending()
 	{
-		Depending<Args...> d(dependedComponents);
+		Depending<Args...> d(cpuDepending);
+	}
+	template <typename... Args>
+	void SetGPUDepending()
+	{
+		Depending<Args...> d(gpuDepending);
 	}
 public:
+	enum CommandListType
+	{
+		CommandListType_None,
+		CommandListType_Graphics,
+		CommandListType_Compute
+	};
 	struct EventData
 	{
 		ID3D12Device* device;
@@ -83,8 +99,6 @@ public:
 		FrameResource* resource;
 		World* world;
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
-		CommandBuffer* commandBuffer;
-		UINT64 frameNum;
 		UINT width, height;
 		bool isBackBufferForPresent;
 	};
@@ -101,10 +115,10 @@ public:
 	{
 		return ScheduleJob(std::move(func));
 	}
+	virtual CommandListType GetCommandListType() = 0;
 	virtual void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) = 0;
 	virtual void Dispose() = 0;
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt) = 0;
-	virtual bool NeedCommandList() const = 0;
 	virtual void RenderEvent(EventData& data, ThreadCommand* commandList) = 0;
 	void ClearHandles();
 	void MarkHandles();

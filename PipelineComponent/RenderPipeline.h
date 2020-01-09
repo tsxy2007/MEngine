@@ -17,7 +17,7 @@ struct RenderPipelineData
 	FrameResource* lastResource;
 	FrameResource* resource;
 	std::vector<Camera*>* allCameras;
-	ID3D12Fence* fence;
+	ID3D12Fence** fence;
 	UINT64* fenceIndex;
 	bool executeLastFrame;
 	IDXGISwapChain* swap;
@@ -35,7 +35,6 @@ private:
 		UINT startComponent;
 		UINT endComponent;
 	};
-	Storage<CommandBuffer, 2> buffers;
 	UINT initCount = 0;
 	std::vector<PipelineComponent*> components;
 	TempRTAllocator tempRTAllocator;
@@ -51,12 +50,9 @@ private:
 		components.emplace_back(ptr);
 		componentsLink.insert_or_assign(typeid(T).name(), ptr);
 	}
-	CommandBuffer* commandBuffers[2];
-	bool currentExecutable = false;
-	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList,
-		ID3D12CommandQueue* graphicsCommandQueue, ID3D12CommandQueue* computeCommandQueue);
+	RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 public:
-	static RenderPipeline* GetInstance(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, ID3D12CommandQueue* graphicsCommandQueue, ID3D12CommandQueue* computeCommandQueue);
+	static RenderPipeline* GetInstance(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 	static void DestroyInstance();
 	~RenderPipeline();
 	void RenderCamera(RenderPipelineData& data, JobSystem* jobSys);

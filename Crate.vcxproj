@@ -34,6 +34,7 @@
     <ClInclude Include="Common\Pool.h" />
     <ClInclude Include="Common\Random.h" />
     <ClInclude Include="Common\RandomVector.h" />
+    <ClInclude Include="Common\RingQueue.h" />
     <ClInclude Include="PipelineComponent\CameraData\CameraTransformData.h" />
     <ClInclude Include="PipelineComponent\CommandBuffer.h" />
     <ClInclude Include="PipelineComponent\PostProcessingComponent.h" />
@@ -75,6 +76,7 @@
     <ClInclude Include="Singleton\MathLib.h" />
     <ClInclude Include="Singleton\MeshLayout.h" />
     <ClInclude Include="Singleton\PSOContainer.h" />
+    <ClInclude Include="Singleton\RenderCommand.h" />
     <ClInclude Include="Singleton\ShaderCompiler.h" />
     <ClInclude Include="Singleton\ShaderID.h" />
     <ClInclude Include="PipelineComponent\SkyboxComponent.h" />
@@ -88,6 +90,7 @@
     <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Common\MObject.cpp" />
+    <ClCompile Include="Common\Random.cpp" />
     <ClCompile Include="CrateApp.cpp" />
     <ClCompile Include="PipelineComponent\CommandBuffer.cpp" />
     <ClCompile Include="PipelineComponent\PostProcessingComponent.cpp" />
@@ -126,6 +129,7 @@
     <ClCompile Include="Singleton\MathLib.cpp" />
     <ClCompile Include="Singleton\MeshLayout.cpp" />
     <ClCompile Include="Singleton\PSOContainer.cpp" />
+    <ClCompile Include="Singleton\RenderCommand.cpp" />
     <ClCompile Include="Singleton\ShaderCompiler.cpp" />
     <ClCompile Include="Singleton\ShaderID.cpp" />
     <ClCompile Include="PipelineComponent\SkyboxComponent.cpp" />

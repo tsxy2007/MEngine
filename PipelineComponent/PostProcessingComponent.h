@@ -6,7 +6,9 @@ class PostProcessingComponent : public PipelineComponent
 	friend class PostRunnable;
 protected:
 	std::vector<TemporalRTCommand> tempRT;
-	virtual bool NeedCommandList() const { return true; }
+	virtual CommandListType GetCommandListType() {
+		return CommandListType_Graphics;
+	}
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt)
 	{
 		return tempRT;

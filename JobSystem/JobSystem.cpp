@@ -123,6 +123,8 @@ JobSystem::~JobSystem()
 void JobSystem::ExecuteBucket(JobBucket** bucket, int bucketCount)
 {
 	Wait();
+	JobBucket::jobNodePool.UpdateSwitcher();
+	JobNode::vectorPool.UpdateSwitcher();
 	currentBucketPos = 0;
 	buckets.resize(bucketCount);
 	memcpy(buckets.data(), bucket, sizeof(JobBucket*) * bucketCount);
@@ -134,6 +136,7 @@ void JobSystem::ExecuteBucket(JobBucket* bucket, int bucketCount)
 {
 	Wait();
 	JobBucket::jobNodePool.UpdateSwitcher();
+	JobNode::vectorPool.UpdateSwitcher();
 	currentBucketPos = 0;
 	buckets.resize(bucketCount);
 	for (int i = 0; i < bucketCount; ++i)

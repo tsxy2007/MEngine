@@ -5,7 +5,9 @@ class SkyboxComponent : public PipelineComponent
 	friend class SkyboxRunnable;
 protected:
 	std::vector<TemporalRTCommand> tempRT;
-	virtual bool NeedCommandList() const { return true; }
+	virtual CommandListType GetCommandListType() {
+		return CommandListType_Graphics;
+	}
 	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt)
 	{
 		return tempRT;

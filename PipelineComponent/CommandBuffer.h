@@ -26,8 +26,10 @@ private:
 		{
 			CommandType_ExecuteGraphics,
 			CommandType_ExecuteCompute,
-			CommandType_Wait,
-			CommandType_Signal
+			CommandType_WaitCompute,
+			CommandType_SignalCompute,
+			CommandType_WaitGraphics,
+			CommandType_SignalGraphics
 		};
 		CommandType type;
 		union
@@ -54,8 +56,10 @@ public:
 	ID3D12CommandQueue* GetComputeQueue() const {
 		return computeCommandQueue;
 	}
-	void Wait(ID3D12Fence* computeFence, UINT currentFrame);
-	void Signal(ID3D12Fence* computeFence, UINT currentFrame);
+	void WaitForCompute(ID3D12Fence* computeFence, UINT currentFrame);
+	void WaitForGraphics(ID3D12Fence* graphicsFence, UINT currentFrame);
+	void SignalToCompute(ID3D12Fence* computeFence, UINT currentFrame);
+	void SignalToGraphics(ID3D12Fence* graphicsFence, UINT currentFrame);
 	void ExecuteGraphicsCommandList(ID3D12GraphicsCommandList* commandList);
 	void ExecuteComputeCommandList(ID3D12GraphicsCommandList* commandList);
 	void Submit();

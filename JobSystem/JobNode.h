@@ -1,13 +1,18 @@
 #pragma once
 #include <vector>
 #include <atomic>
+#include <mutex>
 #include <condition_variable>
 #include "ConcurrentQueue.h"
 #include "../Common/Pool.h"
 #include <DirectXMath.h>
+#include "../Common/Pool.h"
 class JobHandle;
 class JobThreadRunnable;
 class JobBucket;
+
+ 
+
 class JobNode
 {
 	friend class JobBucket;
@@ -15,25 +20,34 @@ class JobNode
 	friend class JobHandle;
 	friend class JobThreadRunnable;
 private:
+	class VectorPool
+	{
+	private:
+		struct Array
+		{
+			std::vector<JobNode*>** objs;
+			std::atomic<int64_t> count;
+			int64_t capacity;
+		};
+
+		Array unusedObjects[2];
+		std::mutex mtx;
+		bool objectSwitcher = true;
+	public:
+		void UpdateSwitcher();
+		void Delete(std::vector<JobNode*>* targetPtr);
+
+		std::vector<JobNode*>* New();
+
+		VectorPool(unsigned int initCapacity);
+		~VectorPool();
+	};
 	struct FuncStorage
 	{
 		alignas(__m128) char arr[sizeof(__m128) * 16];
 	};
-	class VectorPool
-	{
-		std::mutex mtx;
-		Pool<std::vector<JobNode*>> pool;
-		std::vector< std::vector<JobNode*>*> cache;
-	public:
-		VectorPool() : pool(50)
-		{
-		}
-		~VectorPool();
-		std::vector<JobNode*>* Get();
-		void Return(std::vector<JobNode*>* node);
-	};
 	static std::mutex threadMtx;
-	static VectorPool vecPool;
+	static VectorPool vectorPool;
 	std::atomic<unsigned int> targetDepending = 0;
 	std::vector<JobNode*>* dependingEvent;
 	FuncStorage stackArr;
@@ -43,8 +57,8 @@ private:
 	template <typename Func>
 	void Create(Func&& func)
 	{
-		dependingEvent = vecPool.Get();
-		using Storage = std::aligned_storage_t<sizeof(Func), alignof(Func)>;
+		dependingEvent = vectorPool.New();
+			using Storage = std::aligned_storage_t<sizeof(Func), alignof(Func)>;
 		if (sizeof(Storage) >= sizeof(FuncStorage))	//Create in heap
 		{
 			assert(false);

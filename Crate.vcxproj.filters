@@ -219,6 +219,12 @@
     <ClInclude Include="Common\Random.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Singleton\RenderCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\RingQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -366,6 +372,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PipelineComponent\CommandBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton\RenderCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

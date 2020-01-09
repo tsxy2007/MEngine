@@ -49,7 +49,6 @@ void CommandBuffer::Clear()
 	executeCount = 0;
 	executeChoose = NOT_EXECUTING;
 }
-
 void CommandBuffer::Submit()
 {
 	ChangeExecuteState(NOT_EXECUTING);
@@ -66,30 +65,54 @@ void CommandBuffer::Submit()
 			computeCommandQueue->ExecuteCommandLists(ite->executeCount, (ID3D12CommandList**)(graphicsCmdLists.data() + graphicsIndex));
 			graphicsIndex += ite->executeCount;
 			break;
-		case InnerCommand::CommandType_Wait:
+		case InnerCommand::CommandType_WaitGraphics:
 			graphicsCommandQueue->Wait(ite->waitFence.fence, ite->waitFence.frameIndex);
 			break;
-		case InnerCommand::CommandType_Signal:
+		case InnerCommand::CommandType_SignalCompute:
 			computeCommandQueue->Signal(ite->signalFence.fence, ite->signalFence.frameIndex);
+			break;
+		case InnerCommand::CommandType_WaitCompute:
+			computeCommandQueue->Wait(ite->waitFence.fence, ite->waitFence.frameIndex);
+			break;
+		case InnerCommand::CommandType_SignalGraphics:
+			graphicsCommandQueue->Signal(ite->signalFence.fence, ite->signalFence.frameIndex);
 			break;
 		}
 	}
 }
 
-void CommandBuffer::Wait(ID3D12Fence* computeFence, UINT currentFrame)
+void CommandBuffer::WaitForCompute(ID3D12Fence* computeFence, UINT currentFrame)
 {
 	ChangeExecuteState(NOT_EXECUTING);
 	InnerCommand cmd;
-	cmd.type = InnerCommand::CommandType_Wait;
+	cmd.type = InnerCommand::CommandType_WaitCompute;
 	cmd.waitFence.fence = computeFence;
 	cmd.waitFence.frameIndex = currentFrame;
 	executeCommands.push_back(cmd);
 }
-void CommandBuffer::Signal(ID3D12Fence* computeFence, UINT currentFrame)
+void CommandBuffer::WaitForGraphics(ID3D12Fence* computeFence, UINT currentFrame)
 {
 	ChangeExecuteState(NOT_EXECUTING);
 	InnerCommand cmd;
-	cmd.type = InnerCommand::CommandType_Signal;
+	cmd.type = InnerCommand::CommandType_WaitGraphics;
+	cmd.waitFence.fence = computeFence;
+	cmd.waitFence.frameIndex = currentFrame;
+	executeCommands.push_back(cmd);
+}
+void CommandBuffer::SignalToCompute(ID3D12Fence* computeFence, UINT currentFrame)
+{
+	ChangeExecuteState(NOT_EXECUTING);
+	InnerCommand cmd;
+	cmd.type = InnerCommand::CommandType_SignalCompute;
+	cmd.signalFence.fence = computeFence;
+	cmd.signalFence.frameIndex = currentFrame;
+	executeCommands.push_back(cmd);
+}
+void CommandBuffer::SignalToGraphics(ID3D12Fence* computeFence, UINT currentFrame)
+{
+	ChangeExecuteState(NOT_EXECUTING);
+	InnerCommand cmd;
+	cmd.type = InnerCommand::CommandType_SignalGraphics;
 	cmd.signalFence.fence = computeFence;
 	cmd.signalFence.frameIndex = currentFrame;
 	executeCommands.push_back(cmd);

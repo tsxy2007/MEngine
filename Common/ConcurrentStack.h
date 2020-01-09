@@ -10,6 +10,22 @@ private:
 	std::atomic<int64> length;
 	size_t mCapacity;
 	std::mutex mtx;
+	void Resize(int64 index)
+	{
+		if (index >= (int)mCapacity)
+		{
+			std::lock_guard<std::mutex> lck(mtx);
+			if (index >= mCapacity)
+			{
+				unsigned int newCapacity = mCapacity * 2;
+				T* newDatas = (T*)malloc(sizeof(T) * newCapacity);
+				memcpy(newDatas, datas, sizeof(T) * mCapacity);
+				free(datas);
+				datas = newDatas;
+				mCapacity = newCapacity;
+			}
+		}
+	}
 public:
 	ConcurrentStack(size_t capacity) :
 		mCapacity(capacity),
@@ -25,29 +41,10 @@ public:
 		do
 		{
 			index = length++;
-			if (index >= (int)mCapacity)
-			{
-				mtx.lock();
-				if (index >= mCapacity)
-				{
-					unsigned int newCapacity = mCapacity * 2;
-					T* newDatas = (T*)malloc(sizeof(T) * newCapacity);
-					memcpy(newDatas, datas, sizeof(T) * mCapacity);
-					free(datas);
-					datas = newDatas;
-					mCapacity = newCapacity;
-				}
-				mtx.unlock();
-			}
 		} while (index < 0);
+		Resize(index);
 		datas[index] = value;
 		return (unsigned int)index;
-	}
-	void Set(unsigned int index, const T& value)
-	{
-		mtx.lock();
-		datas[index] = value;
-		mtx.unlock();
 	}
 
 	T Get(unsigned int index)

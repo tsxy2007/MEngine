@@ -93,17 +93,13 @@ Texture::Texture(
 		texDesc.SampleDesc.Count = 1;
 		texDesc.SampleDesc.Quality = 0;
 		texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-		D3D12_CLEAR_VALUE colorClear;
-		colorClear.Format = mFormat;
-		float colors[4] = { 0,0,0,0 };
-		memcpy(colorClear.Color, colors, sizeof(float) * 4);
+		texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 		ThrowIfFailed(device->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
 			&texDesc,
 			D3D12_RESOURCE_STATE_RENDER_TARGET,
-			&colorClear,
+			nullptr,
 			IID_PPV_ARGS(&Resource)));
 		std::vector<char> dataResults;
 		ReadData(filePath, data, dataResults);

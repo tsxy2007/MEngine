@@ -41,13 +41,22 @@ bool TemporalRTCommand::operator=(const TemporalRTCommand& other) const
 	}
 }
 
+void PipelineComponent::CreateFence(ID3D12Device* device)
+{
+	if (fence == nullptr && GetCommandListType() != CommandListType_None)
+	{
+		ThrowIfFailed(device->CreateFence(0, D3D12_FENCE_FLAG_SHARED,
+			IID_PPV_ARGS(&fence)));
+	}
+}
+
 void PipelineComponent::ClearHandles()
 {
 	jobHandles.clear();
 }
 void PipelineComponent::MarkHandles()
 {
-	for (auto ite = dependedComponents.begin(); ite != dependedComponents.end(); ++ite)
+	for (auto ite = cpuDepending.begin(); ite != cpuDepending.end(); ++ite)
 	{
 		auto& vec = (*ite)->jobHandles;
 		for (auto selfIte = jobHandles.begin(); selfIte != jobHandles.end(); ++selfIte)
@@ -65,5 +74,6 @@ PipelineComponent::PipelineComponent()
 	requiredRTs.reserve(10);
 	unLoadRTCommands.reserve(10);
 	jobHandles.reserve(10);
-	dependedComponents.reserve(10);
+	gpuDepending.reserve(10);
+	cpuDepending.reserve(10);
 }

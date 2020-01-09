@@ -10,6 +10,7 @@
 #include "../JobSystem/JobSystem.h"
 #include "../PipelineComponent/IPerCameraResource.h"
 #include <mutex>
+class CommandBuffer;
 class Camera;
 class PipelineComponent;
 struct Vertex
@@ -75,14 +76,15 @@ public:
 	static CBufferPool cameraCBufferPool;
 	static std::vector<std::unique_ptr<FrameResource>> mFrameResources;
 	static FrameResource* mCurrFrameResource;
+	std::unique_ptr<CommandBuffer> commandBuffer = nullptr;
     FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount);
     FrameResource(const FrameResource& rhs) = delete;
     FrameResource& operator=(const FrameResource& rhs) = delete;
     ~FrameResource();
-	void UpdateBeforeFrame(ID3D12Fence* mFence);
+	void UpdateBeforeFrame(ID3D12Fence** mFence, UINT fenceCount);
 	static void ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources, FrameResource* resource);
-	void UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* commandQueue, ID3D12Fence* mFence);
-	ThreadCommand* GetNewThreadCommand(Camera* cam, ID3D12Device* device);
+	void UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue** commandQueue, ID3D12Fence** mFence, UINT commandQueueCount);
+	ThreadCommand* GetNewThreadCommand(Camera* cam, ID3D12Device* device, D3D12_COMMAND_LIST_TYPE cmdListType);
 	void ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd);
 	void OnLoadCamera(Camera* targetCamera, ID3D12Device* device);
 	void OnUnloadCamera(Camera* targetCamera);

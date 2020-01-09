@@ -104,8 +104,6 @@ void GBufferComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 	};
 	//Schedule MultiThread Job
 	ScheduleJob(runnable);
-	//Execute CommandList in CommandQueue
-	data.commandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 }
 #include "PrepareComponent.h"
 void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
@@ -158,7 +156,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	}
 	gbufferContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, colorFormats.size(), colorFormats.data());
 	depthPrepassContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, 0, nullptr);
-	SetDepending<PrepareComponent>();
+	SetCPUDepending<PrepareComponent>();
 	
 }
 
