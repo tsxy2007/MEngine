@@ -33,6 +33,10 @@ struct PassConstants
 	DirectX::XMFLOAT4X4 InvProj = MathHelper::Identity4x4();
 	DirectX::XMFLOAT4X4 ViewProj = MathHelper::Identity4x4();
 	DirectX::XMFLOAT4X4 InvViewProj = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 nonJitterVP = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 nonJitterInverseVP = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 lastVP = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 lastInverseVP = MathHelper::Identity4x4();
 	DirectX::XMFLOAT3 worldSpaceCameraPos;
 	float NearZ = 0.0f;
 	float FarZ = 0.0f;
@@ -76,8 +80,7 @@ public:
     FrameResource& operator=(const FrameResource& rhs) = delete;
     ~FrameResource();
 	void UpdateBeforeFrame(ID3D12Fence* mFence);
-	static void ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources);
-	static void ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>&& resources);
+	static void ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources, FrameResource* resource);
 	void UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue* commandQueue, ID3D12Fence* mFence);
 	ThreadCommand* GetNewThreadCommand(Camera* cam, ID3D12Device* device);
 	void ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd);

@@ -55,7 +55,7 @@ void GetPostProcessShader(ID3D12Device* device)
 	Pass& p = allPasses[0];
 	p.fragment = "frag";
 	p.vertex = "vert";
-	p.filePath = L"Shaders\\PostProcess";
+	p.filePath = L"Shaders\\PostProcess.hlsl";
 	p.name = "PostProcess";
 	p.rasterizeState = cullDesc;
 	p.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -101,7 +101,7 @@ void GetOpaqueStandardShader(ID3D12Device* device)
 	Pass& p = allPasses[0];
 	p.fragment = "PS";
 	p.vertex = "VS";
-	p.filePath = L"Shaders\\Default";
+	p.filePath = L"Shaders\\Default.hlsl";
 	p.name = "OpaqueStandard";
 	p.rasterizeState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	p.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -111,7 +111,7 @@ void GetOpaqueStandardShader(ID3D12Device* device)
 	Pass& dp = allPasses[1];
 	dp.fragment = "PS_Depth";
 	dp.vertex = "VS_Depth";
-	dp.filePath = L"Shaders\\Default";
+	dp.filePath = L"Shaders\\Default.hlsl";
 	dp.name = "OpaqueStandard_Depth";
 	dp.rasterizeState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	dp.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -157,7 +157,7 @@ void GetSkyboxShader(ID3D12Device* device)
 	Pass& p = allPasses[0];
 	p.fragment = "frag";
 	p.vertex = "vert";
-	p.filePath = L"Shaders\\Skybox";
+	p.filePath = L"Shaders\\Skybox.hlsl";
 	p.name = "Skybox";
 	p.rasterizeState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	p.blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -167,7 +167,7 @@ void GetSkyboxShader(ID3D12Device* device)
 	const UINT SHADER_VAR_COUNT = 2;
 	ShaderVariable var[SHADER_VAR_COUNT];
 	var[0].type = ShaderVariable::Type::ConstantBuffer;
-	var[0].name = "Per_Camera_Buffer";
+	var[0].name = "SkyboxBuffer";
 	var[0].registerPos = 0;
 	var[0].space = 0;
 
@@ -212,8 +212,44 @@ void GetCullingShader(ID3D12Device* device)
 	vars[4].type = ComputeShaderVariable::StructuredBuffer;
 	vars[4].registerPos = 1;
 	vars[4].space = 0;
-	ComputeShader* cs = new ComputeShader(L"Shaders\\Cull", kernelNames, KERNEL_COUNT, vars, SHADER_VAR_COUNT, device, false);
+	ComputeShader* cs = new ComputeShader(L"Shaders\\Cull.compute", kernelNames, KERNEL_COUNT, vars, SHADER_VAR_COUNT, device, false);
 	ShaderCompiler::AddComputeShader("Cull", cs);
+}
+
+void GetTextureCopyShader(ID3D12Device* device)
+{
+	const UINT KERNEL_COUNT = 2;
+	std::string kernelNames[KERNEL_COUNT];
+	kernelNames[0] = "CopyToRGBA32";
+	kernelNames[1] = "CopyToRGBA64";
+	const UINT SHADER_VAR_COUNT = 5;
+	ComputeShaderVariable vars[SHADER_VAR_COUNT];
+	vars[0].name = "CopyData";
+	vars[0].type = ComputeShaderVariable::ConstantBuffer;
+	vars[0].registerPos = 0;
+	vars[0].space = 0;
+
+	vars[1].name = "_RGBA32InputBuffer";
+	vars[1].type = ComputeShaderVariable::StructuredBuffer;
+	vars[1].registerPos = 0;
+	vars[1].space = 0;
+
+	vars[2].name = "_RGBA64InputBuffer";
+	vars[2].type = ComputeShaderVariable::StructuredBuffer;
+	vars[2].registerPos = 1;
+	vars[2].space = 0;
+
+	vars[3].name = "_RGBAFloatInputBuffer";
+	vars[3].type = ComputeShaderVariable::StructuredBuffer;
+	vars[3].registerPos = 2;
+	vars[3].space = 0;
+
+	vars[4].name = "_MainTex";
+	vars[4].type = ComputeShaderVariable::UAVDescriptorHeap;
+	vars[4].registerPos = 0;
+	vars[4].space = 0;
+	ComputeShader* cs = new ComputeShader(L"Shaders\\TextureCopy.compute", kernelNames, KERNEL_COUNT, vars, SHADER_VAR_COUNT, device, false);
+	ShaderCompiler::AddComputeShader("TextureCopy", cs);
 }
 
 void ShaderCompiler::Init(ID3D12Device* device)
@@ -223,6 +259,7 @@ void ShaderCompiler::Init(ID3D12Device* device)
 	GetOpaqueStandardShader(device);
 	GetSkyboxShader(device);
 	GetCullingShader(device);
+	GetTextureCopyShader(device);
 	GetPostProcessShader(device);
 }
 

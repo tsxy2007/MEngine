@@ -2,6 +2,7 @@
 
 #include "../Common/d3dUtil.h"
 #include "../Common/MObject.h"
+class FrameResource;
 class UploadBuffer : public MObject
 {
 public:
@@ -21,6 +22,7 @@ public:
 	{
 		return mUploadBuffer.Get();
 	}
+	void ReleaseAfterFlush(FrameResource* res);
 private:
 	struct UploadCommand
 	{

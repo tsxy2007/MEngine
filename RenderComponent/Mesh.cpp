@@ -46,7 +46,8 @@ Mesh::Mesh(
 	ID3D12GraphicsCommandList* commandList,
 	DXGI_FORMAT indexFormat,
 	UINT indexCount,
-	void* indexArrayPtr
+	void* indexArrayPtr,
+	FrameResource* res
 ) : MObject(), dataPtr(nullptr), mVertexCount(vertexCount),
 indexFormat(indexFormat),
 indexCount(indexCount),
@@ -165,7 +166,7 @@ indexArrayPtr(indexArrayPtr)
 	char* indexBufferStart = dataPtr + VertexBufferByteSize;
 	memcpy(indexBufferStart, indexArrayPtr, indexCount * ((indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4));
 	dataBuffer = d3dUtil::CreateDefaultBuffer(device, commandList, dataPtr, indexSize + VertexBufferByteSize, uploadBuffer);
-	FrameResource::mCurrFrameResource->ReleaseResourceAfterFlush(uploadBuffer);
+	FrameResource::mCurrFrameResource->ReleaseResourceAfterFlush(uploadBuffer, res);
 }
 
 

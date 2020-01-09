@@ -2,7 +2,6 @@
 #include "../Common/Camera.h"
 #include "../RenderComponent/UploadBuffer.h"
 #include "CameraData/CameraTransformData.h"
-#include "../Common/Random.h"
 #include "../Singleton/MathLib.h"
 using namespace DirectX;
 UINT sampleIndex = 0;
@@ -90,7 +89,7 @@ void ConfigureJitteredProjectionMatrix(Camera* camera, UINT height, UINT width, 
 		camera->GetFovY(),
 		camera->GetAspect(),
 		jitterOffset,
-		width, height, 
+		width, height,
 		jitteredMat,
 		jitterVec
 	);
@@ -111,12 +110,18 @@ struct PrepareRunnable
 		{
 			return new CameraTransformData;
 		});
+		camera->UpdateProjectionMatrix();
 		ConfigureJitteredProjectionMatrix(
 			camera,
 			width, height,
 			1, transData
 		);
 		camera->UploadCameraBuffer(ths->passConstants);
+		XMMATRIX nonJitterVP = XMMatrixMultiply(camera->GetView(), transData->nonJitteredMatrix);;
+		ths->passConstants.nonJitterVP = *(XMFLOAT4X4*)&nonJitterVP;
+		ths->passConstants.nonJitterInverseVP = *(XMFLOAT4X4*)&XMMatrixInverse(&XMMatrixDeterminant(nonJitterVP), nonJitterVP);
+		memcpy(&ths->passConstants.lastVP, &transData->lastVP, sizeof(XMFLOAT4X4));
+		ths->passConstants.lastInverseVP = *(XMFLOAT4X4*)&XMMatrixInverse(&XMMatrixDeterminant(transData->lastVP), transData->lastVP);
 		ConstBufferElement ele = resource->cameraCBs[camera->GetInstanceID()];
 		ele.buffer->CopyData(ele.element, &ths->passConstants);
 	}

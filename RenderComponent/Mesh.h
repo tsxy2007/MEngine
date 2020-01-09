@@ -1,6 +1,7 @@
 #pragma once
 #include "../Common/d3dUtil.h"
 #include "../Common/MObject.h"
+class FrameResource;
 class Mesh : public MObject
 {
 	Microsoft::WRL::ComPtr<ID3D12Resource> dataBuffer = nullptr;
@@ -40,6 +41,7 @@ public:
 		ID3D12GraphicsCommandList* commandList,
 		DXGI_FORMAT indexFormat,
 		UINT indexCount,
-		void* indexArrayPtr
+		void* indexArrayPtr,
+		FrameResource* res
 	);
 };

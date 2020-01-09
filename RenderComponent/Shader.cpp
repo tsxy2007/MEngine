@@ -82,9 +82,9 @@ Shader::Shader(
 	{
 		Pass& p = passes[i];
 		if (p.vsShader == nullptr)
-			p.vsShader = CompileShader(p.filePath, p.vertex, "vs_5_1", nullptr, useShaderCache);// d3dUtil::CompileShader(p.filePath, nullptr, p.vertex, "vs_5_1");
+			p.vsShader = d3dUtil::CompileShader(p.filePath, nullptr, p.vertex, "vs_5_1");//CompileShader(p.filePath, p.vertex, "vs_5_1", nullptr, useShaderCache);
 		if (p.psShader == nullptr)
-			p.psShader = CompileShader(p.filePath, p.fragment, "ps_5_1", nullptr, useShaderCache);// d3dUtil::CompileShader(p.filePath, nullptr, p.fragment, "ps_5_1");
+			p.psShader = d3dUtil::CompileShader(p.filePath, nullptr, p.fragment, "ps_5_1");// CompileShader(p.filePath, p.fragment, "ps_5_1", nullptr, useShaderCache);
 		allPasses.push_back(std::move(p));
 	}
 	mVariablesDict.reserve(shaderVarCount + 2);

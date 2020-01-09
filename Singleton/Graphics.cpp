@@ -1,4 +1,5 @@
 #include "Graphics.h"
+#include "../Singleton/FrameResource.h"
 #include "../RenderComponent/Shader.h"
 #include "MeshLayout.h"
 #include "../RenderComponent/Mesh.h"
@@ -17,7 +18,7 @@ void Graphics::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* comma
 	uv[1] = { 1, 1 };
 	uv[2] = { 1, -1 };
 	std::array<INT16, 3> indices = { 0, 1, 2 };
-	fullScreenMesh = std::make_unique<Mesh>(
+	fullScreenMesh = std::unique_ptr<Mesh>(new Mesh(
 		3,
 		vertex.data(),
 		nullptr,
@@ -31,8 +32,8 @@ void Graphics::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* comma
 		commandList,
 		DXGI_FORMAT_R16_UINT,
 		3,
-		indices.data()
-		);
+		indices.data(), nullptr
+		));
 
 }
 

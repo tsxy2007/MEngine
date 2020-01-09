@@ -160,12 +160,8 @@ void Camera::SetLens(float fovY, float aspect, float zn, float zf)
 	mAspect = aspect;
 	mNearZ = zn;
 	mFarZ = zf;
-
-	mNearWindowHeight = 2.0f * mNearZ * tanf( 0.5f*mFovY );
-	mFarWindowHeight  = 2.0f * mFarZ * tanf( 0.5f*mFovY );
-
-	XMMATRIX P = XMMatrixPerspectiveFovLH(mFovY, mAspect, mFarZ, mNearZ);
-	XMStoreFloat4x4(&mProj, P);
+	mNearWindowHeight = 2.0f * mNearZ * tanf(0.5f*mFovY);
+	mFarWindowHeight = 2.0f * mFarZ * tanf(0.5f*mFovY);
 }
 
 void Camera::LookAt(FXMVECTOR pos, FXMVECTOR target, FXMVECTOR worldUp)
@@ -277,6 +273,12 @@ void Camera::RotateY(float angle)
 	XMStoreFloat3(&mLook, XMVector3TransformNormal(XMLoadFloat3(&mLook), R));
 
 	mViewDirty = true;
+}
+
+void Camera::UpdateProjectionMatrix()
+{
+	XMMATRIX P = XMMatrixPerspectiveFovLH(mFovY, mAspect, mFarZ, mNearZ);
+	XMStoreFloat4x4(&mProj, P);
 }
 
 void Camera::UpdateViewMatrix()

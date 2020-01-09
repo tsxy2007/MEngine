@@ -139,7 +139,7 @@ ComputeShader::ComputeShader(
 	UINT kernelSize = kernelCount;
 	for (int i = 0; i < kernelSize; ++i)
 	{
-		csShaders[i] = Compile(compilePath, kernelName[i], nullptr, useCache);//d3dUtil::CompileShader(compilePath + L".compute", nullptr, kernelName[i], "cs_5_1");
+		csShaders[i] = d3dUtil::CompileShader(compilePath, nullptr, kernelName[i], "cs_5_1");//Compile(compilePath, kernelName[i], nullptr, useCache);
 		D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
 		psoDesc.pRootSignature = mRootSignature.Get();
 		psoDesc.CS =

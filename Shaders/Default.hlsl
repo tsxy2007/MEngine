@@ -29,6 +29,10 @@ cbuffer Per_Camera_Buffer : register(b1)
     float4x4 gInvProj;
     float4x4 gViewProj;
     float4x4 gInvViewProj;
+    float4x4 nonJitterVP;
+    float4x4 nonJitterInverseVP;
+    float4x4 lastVP;
+    float4x4 inverseLastVP;
     float3 worldSpaceCameraPos;
     float gNearZ;
     float gFarZ;

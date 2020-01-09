@@ -12,6 +12,7 @@ private:
 	ObjectPtr<Texture> skyboxTex;
 	ObjectPtr<Material> skyboxMat;
 	ObjectPtr<DescriptorHeap> texDescHeap;
+	UINT SkyboxCBufferID;
 public:
 	virtual ~Skybox();
 	Skybox(

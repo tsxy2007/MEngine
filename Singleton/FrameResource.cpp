@@ -62,17 +62,12 @@ void FrameResource::OnUnloadCamera(Camera* targetCamera)
 	perCameraDataMemPool.Delete(data);
 }
 
-void FrameResource::ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>&& resources)
+void FrameResource::ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources, FrameResource* resource)
 {
-	if (mCurrFrameResource == nullptr)
+	if (resource == nullptr)
 		needClearResourcesAfterFlush.push_back(resources);
 	else
-		mCurrFrameResource->needClearResources.push_back(resources);
-}
-
-void FrameResource::ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources)
-{
-	ReleaseResourceAfterFlush(std::move(resources));
+		resource->needClearResources.push_back(resources);
 }
 
 
@@ -100,5 +95,9 @@ FrameResource::~FrameResource()
 {
 	if (mCurrFrameResource == this)
 		mCurrFrameResource = nullptr;
+	for (auto ite = perFrameResource.begin(); ite != perFrameResource.end(); ++ite)
+	{
+		delete ite->second;
+	}
 	delete commmonThreadCommand;
 }

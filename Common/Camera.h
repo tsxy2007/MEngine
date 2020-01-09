@@ -83,6 +83,7 @@ public:
 
 	// After modifying camera position/orientation, call to rebuild the view matrix.
 	void UpdateViewMatrix();
+	void UpdateProjectionMatrix();
 	void UploadCameraBuffer(PassConstants& mMainPassCB);
 	CameraRenderPath GetRenderingPath() const { return renderType; }
 	template <typename Func>

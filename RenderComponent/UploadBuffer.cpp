@@ -25,7 +25,7 @@ void UploadBuffer::Create(ID3D12Device* device, UINT elementCount, bool isConsta
 		&CD3DX12_RESOURCE_DESC::Buffer(mElementByteSize*elementCount),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
-		IID_PPV_ARGS(mUploadBuffer.GetAddressOf())));
+		IID_PPV_ARGS(&mUploadBuffer)));
 	ThrowIfFailed(mUploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mMappedData)));
 
 	// We do not need to unmap until we are done with the resource.  However, we must not write to
@@ -78,4 +78,9 @@ void UploadBuffer::CopyFrom(UploadBuffer* otherBuffer, UINT selfStartIndex, UINT
 	otherPtr += otherBuffer->GetAlignedStride() * otherBufferStartIndex;
 	currPtr += GetAlignedStride() * selfStartIndex;
 	memcpy(currPtr, otherPtr, elementCount * GetAlignedStride());
+}
+
+void  UploadBuffer::ReleaseAfterFlush(FrameResource* res)
+{
+	FrameResource::ReleaseResourceAfterFlush(mUploadBuffer, res);
 }

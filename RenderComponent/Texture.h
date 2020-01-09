@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 #include "../Common/MObject.h"
-#include "../RenderComponent/DescriptorHeap.h"
+class FrameResource;
+class DescriptorHeap;
 class Texture : public MObject
 {
 public:
@@ -16,6 +17,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
 	TextureType mType;
+	DXGI_FORMAT mFormat;
+	UINT16 mipLevels;
 	void GetResourceViewDescriptor(D3D12_SHADER_RESOURCE_VIEW_DESC& desc);
 public:
 
@@ -26,16 +29,13 @@ public:
 	{
 		return Resource.Get();
 	}
-	
-	void MakeNoLongerReadable()
-	{
-		UploadHeap = nullptr;
-	}
 	Texture(
 		ID3D12GraphicsCommandList* commandList,
 		ID3D12Device* device,
+		FrameResource* res,
 		std::string name,
 		std::wstring filePath,
+		bool isDDS,
 		TextureType type = Tex2D
 	);
 	void BindColorBufferToSRVHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);

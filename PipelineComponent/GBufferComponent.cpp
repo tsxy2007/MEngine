@@ -11,6 +11,7 @@
 #include "RenderPipeline.h"
 #include "../LogicComponent/Transform.h"
 #include "../Common/GeometryGenerator.h"
+#include "../RenderComponent/GPU Driven/GRP_Renderer.h"
 using namespace DirectX;
 PSOContainer* gbufferContainer(nullptr);
 PSOContainer* depthPrepassContainer(nullptr);
