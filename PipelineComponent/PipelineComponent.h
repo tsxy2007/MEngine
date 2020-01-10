@@ -49,6 +49,7 @@ private:
 	std::vector<PipelineComponent*> gpuDepending;
 	std::vector<std::pair<UINT, UINT>> requiredRTs;
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
+	UINT dependingComponentCount = 0;
 	void CreateFence(ID3D12Device* device);
 	void ExecuteTempRTCommand(ID3D12Device* device, TempRTAllocator* allocator);
 	template <typename ... T>

@@ -68,7 +68,9 @@ class CrateApp : public D3DApp
 {
 public:
 	Microsoft::WRL::ComPtr<ID3D12Fence> mComputeFence;
+	Microsoft::WRL::ComPtr<ID3D12Fence> mAsyncFence;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mComputeCommandQueue;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mAsyncCommandQueue;
 	typedef std::aligned_storage_t<sizeof(World), alignof(World)> WorldStorage;
 	CrateApp(HINSTANCE hInstance);
 	CrateApp(const CrateApp& rhs) = delete;
@@ -169,6 +171,10 @@ CrateApp::~CrateApp()
 	pipelineJobSys = nullptr;
 	RenderPipeline::DestroyInstance();
 	((World*)&worldPtr)->~World();
+	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
+	{
+		FrameResource::mFrameResources[i] = nullptr;
+	}
 }
 
 bool CrateApp::Initialize()
@@ -181,6 +187,7 @@ bool CrateApp::Initialize()
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
 	ThrowIfFailed(md3dDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mComputeCommandQueue)));
+	ThrowIfFailed(md3dDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mAsyncCommandQueue)));
 	directThreadCommand = std::unique_ptr<ThreadCommand>(new ThreadCommand(md3dDevice.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT));
 	directThreadCommand->ResetCommand();
 	// Reset the command list to prep for initialization commands.
@@ -209,6 +216,9 @@ bool CrateApp::Initialize()
 
 	ThrowIfFailed(md3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE,
 		IID_PPV_ARGS(&mComputeFence)));
+
+	ThrowIfFailed(md3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE,
+		IID_PPV_ARGS(&mAsyncFence)));
 	return true;
 }
 
@@ -231,8 +241,7 @@ void CrateApp::Update(const GameTimer& gt)
 
 	// Has the GPU finished processing the commands of the current frame resource?
 	// If not, wait until the GPU has completed commands up to this fence point.
-	ID3D12Fence* fences[2] = { mFence.Get(), mComputeFence.Get() };
-	FrameResource::mCurrFrameResource->UpdateBeforeFrame(fences, 2);
+
 	UpdateMaterialCBs(gt);
 	mainCamera->SetLens(0.333333 * MathHelper::Pi, AspectRatio(), 1.5, 100);
 	((World*)&worldPtr)->Update(FrameResource::mCurrFrameResource);
@@ -326,7 +335,7 @@ void CrateApp::Draw(const GameTimer& gt)
 	mCommandQueue->ExecuteCommandLists(1, (ID3D12CommandList**)mCommandList.GetAddressOf());*/
 	cam[0] = mainCamera.operator->();
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
-	ID3D12Fence* fences[2] = { mFence.Get(), mComputeFence.Get() };
+	ID3D12Fence* fences[3] = { mFence.Get(), mComputeFence.Get(), mAsyncFence.Get() };
 	RenderPipelineData data;
 	data.device = md3dDevice.Get();
 	data.backBufferHandle = CurrentBackBufferView();
@@ -335,12 +344,14 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.resource = FrameResource::mCurrFrameResource;
 	data.allCameras = &cam;
 	data.fence = fences;
+	data.fenceCount = _countof(fences);
 	data.fenceIndex = &mCurrentFence;
 	data.executeLastFrame = lastFrameExecute;
 	data.swap = mSwapChain.Get();
 	data.world = (World*)&worldPtr;
 	data.world->windowWidth = mClientWidth;
 	data.world->windowHeight = mClientHeight;
+	
 	rp->RenderCamera(data, pipelineJobSys.get());
 
 	lastFrameExecute = true;
@@ -531,7 +542,7 @@ void CrateApp::BuildFrameResources()
 	{
 		FrameResource* res = new FrameResource(md3dDevice.Get(), 1, 1);
 		FrameResource::mFrameResources.emplace_back(res);
-		res->commandBuffer = std::unique_ptr<CommandBuffer>(new CommandBuffer(mCommandQueue.Get(), mComputeCommandQueue.Get()));
+		res->commandBuffer = std::unique_ptr<CommandBuffer>(new CommandBuffer(mCommandQueue.Get(), mComputeCommandQueue.Get(), mAsyncCommandQueue.Get()));
 	}
 }
 

@@ -21,6 +21,7 @@ bool RenderCommand::ExecuteCommand(
 		v = queue.TryPop(&cmd);
 	}
 	if (!v) return false;
+	RenderCommand* ptr = cmd.operator->();
 	(*cmd)(device, commandList, resource);
 	return true;
 }

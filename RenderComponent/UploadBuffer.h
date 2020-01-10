@@ -15,6 +15,7 @@ public:
 	void CopyDataInside(UINT from, UINT to);
 	void CopyDatas(UINT startElementIndex, UINT elementCount, const void* data);
 	void CopyFrom(UploadBuffer* otherBuffer, UINT selfStartIndex, UINT otherBufferStartIndex, UINT elementCount);
+	D3D12_GPU_VIRTUAL_ADDRESS GetAddress(UINT elementCount);
 	void* GetMappedDataPtr(UINT element);
 	size_t GetStride() const { return mStride; }
 	size_t GetAlignedStride() const { return mElementByteSize; }

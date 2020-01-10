@@ -43,8 +43,8 @@ void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue** 
 	// Add an instruction to the command queue to set a new fence point. 
 	// Because we are on the GPU timeline, the new fence point won't be 
 	// set until the GPU finishes processing all the commands prior to this Signal().
-	for(UINT i= 0; i < commandQueueCount; ++i)
-		commandQueue[i]->Signal(mFence[i], currentFence);
+	for (UINT i = 0; i < commandQueueCount; ++i)
+		commandQueue[i]->Signal(mFence[i], Fence);
 }
 
 void FrameResource::OnLoadCamera(Camera* targetCamera, ID3D12Device* device)

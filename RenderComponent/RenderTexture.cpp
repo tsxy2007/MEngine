@@ -314,24 +314,19 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 		}
 		break;
 	}
-	DXGI_FORMAT resourceFormat;
 	switch (depthByte)
 	{
 	case RenderTextureDepthSettings_Depth32:
 		mDepthFormat = DXGI_FORMAT_D32_FLOAT;
-		resourceFormat = DXGI_FORMAT_R32_TYPELESS;
 		break;
 	case RenderTextureDepthSettings_Depth16:
 		mDepthFormat = DXGI_FORMAT_D16_UNORM;
-		resourceFormat = DXGI_FORMAT_R16_TYPELESS;
 		break;
 	case RenderTextureDepthSettings_DepthStencil:
 		mDepthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		resourceFormat = DXGI_FORMAT_R24G8_TYPELESS;
 		break;
 	default:
 		mDepthFormat = DXGI_FORMAT_UNKNOWN;
-		resourceFormat = DXGI_FORMAT_UNKNOWN;
 		break;
 	}
 
@@ -345,7 +340,7 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 		depthStencilDesc.Height = height;
 		depthStencilDesc.DepthOrArraySize = arraySize;
 		depthStencilDesc.MipLevels = 1;  
-		depthStencilDesc.Format = resourceFormat;
+		depthStencilDesc.Format = mDepthFormat;
 		depthStencilDesc.SampleDesc.Count = 1;
 		depthStencilDesc.SampleDesc.Quality = 0;
 		depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;

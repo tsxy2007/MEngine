@@ -41,11 +41,15 @@ void CommandBuffer::ChangeExecuteState(ExecuteType state)
 	}
 	executeChoose = state;
 }
-
+void CommandBuffer::ExecuteAsyncComputeCommandList(ID3D12GraphicsCommandList* commandList)
+{
+	asyncCmdLists.push_back(commandList);
+}
 void CommandBuffer::Clear()
 {
 	executeCommands.clear();
 	graphicsCmdLists.clear();
+	asyncCmdLists.clear();
 	executeCount = 0;
 	executeChoose = NOT_EXECUTING;
 }
@@ -53,6 +57,10 @@ void CommandBuffer::Submit()
 {
 	ChangeExecuteState(NOT_EXECUTING);
 	UINT graphicsIndex = 0;
+	if (!asyncCmdLists.empty())
+	{
+		asyncQueue->ExecuteCommandLists(asyncCmdLists.size(), (ID3D12CommandList**)asyncCmdLists.data());
+	}
 	for (auto ite = executeCommands.begin(); ite != executeCommands.end(); ++ite)
 	{
 		switch (ite->type)
@@ -132,9 +140,12 @@ void CommandBuffer::ExecuteComputeCommandList(ID3D12GraphicsCommandList* command
 
 CommandBuffer::CommandBuffer(
 	ID3D12CommandQueue* graphicsCommandQueue,
-	ID3D12CommandQueue* computeCommandQueue
+	ID3D12CommandQueue* computeCommandQueue,
+	ID3D12CommandQueue* asyncQueue
 ) : graphicsCommandQueue(graphicsCommandQueue),
-computeCommandQueue(computeCommandQueue)
+computeCommandQueue(computeCommandQueue),
+asyncQueue(asyncQueue)
 {
-
+	asyncCmdLists.reserve(20);
+	graphicsCmdLists.reserve(20);
 }

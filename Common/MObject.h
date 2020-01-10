@@ -11,7 +11,7 @@ private:
 	static std::mutex mtx;
 	std::vector<PtrLink*> allPtrs;
 	void AddPtr(PtrLink* ptr);
-	void RemovePtr(PtrLink* ptr);
+	void RemovePtr(PtrLink* ptr, std::unique_lock<std::mutex>&);
 	static std::atomic<unsigned int> CurrentID;
 	unsigned int instanceID;
 public:

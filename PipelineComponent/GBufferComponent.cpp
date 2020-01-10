@@ -20,6 +20,12 @@ PSOContainer* depthPrepassContainer(nullptr);
 #define NORMAL_RT  (component->GetTempRT(2))
 #define EMISSION_RT  (component->GetTempRT(3))
 #define MOTION_VECTOR_RT (component->GetTempRT(4))
+
+ObjectPtr<Material> mat;
+ObjectPtr<Mesh> mesh;
+ObjectPtr<MeshRenderer> meshRenderer;
+ObjectPtr<Transform> trans;
+
 class GBufferFrameResource : public IPipelineResource
 {
 public:
@@ -76,9 +82,23 @@ public:
 		//Depth Prepass
 		//TODO
 		commandList->OMSetRenderTargets(0, nullptr, true, &EMISSION_RT->GetDepthDescriptor(0));
+		meshRenderer->Draw(
+			1, commandList,
+			device,
+			&resource->cameraCBs[cam->GetInstanceID()],
+			&frameRes->ub,
+			1, depthPrepassContainer
+		);
 		//GBuffer Pass
 		//TODO
 		commandList->OMSetRenderTargets(5, handles, true, &EMISSION_RT->GetDepthDescriptor(0));
+		meshRenderer->Draw(
+			0, commandList,
+			device,
+			&resource->cameraCBs[cam->GetInstanceID()],
+			&frameRes->ub,
+			1, depthPrepassContainer
+		);
 		tcmd->CloseCommand();
 	}
 };
@@ -105,6 +125,7 @@ void GBufferComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 	//Schedule MultiThread Job
 	ScheduleJob(runnable);
 }
+void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh, ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, FrameResource* res);
 #include "PrepareComponent.h"
 void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
@@ -157,11 +178,54 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	gbufferContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, colorFormats.size(), colorFormats.data());
 	depthPrepassContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, 0, nullptr);
 	SetCPUDepending<PrepareComponent>();
-	
+	ObjectPtr<UploadBuffer> materialPropertyBuffer = new UploadBuffer();
+	materialPropertyBuffer->Create(device, 1, true, sizeof(MaterialConstants));
+	ObjectPtr<DescriptorHeap> heap;
+	mat = new Material(ShaderCompiler::GetShader("OpaqueStandard"), materialPropertyBuffer, 0, heap);
+	GeometryGenerator geoGen;
+	BuildShapeGeometry(geoGen.CreateBox(1, 1, 1, 1), mesh, device, commandList, nullptr);
+	trans = new Transform(nullptr);
+	meshRenderer = new MeshRenderer(trans.operator->(), device, mesh, mat);
 }
 
 void GBufferComponent::Dispose()
 {
+
+	//meshRenderer->Destroy();
+	trans->Destroy();
 	delete gbufferContainer;
 	delete depthPrepassContainer;
+}
+
+void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh, ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, FrameResource* res)
+{
+	std::vector<XMFLOAT3> positions(box.Vertices.size());
+	std::vector<XMFLOAT3> normals(box.Vertices.size());
+	std::vector<XMFLOAT2> uvs(box.Vertices.size());
+	for (size_t i = 0; i < box.Vertices.size(); ++i)
+	{
+		positions[i] = box.Vertices[i].Position;
+		normals[i] = box.Vertices[i].Normal;
+		uvs[i] = box.Vertices[i].TexC;
+	}
+
+	std::vector<std::uint16_t> indices = box.GetIndices16();
+	bMesh = new Mesh(
+		box.Vertices.size(),
+		positions.data(),
+		normals.data(),
+		nullptr,
+		nullptr,
+		uvs.data(),
+		nullptr,
+		nullptr,
+		nullptr,
+		device,
+		cmdList,
+		DXGI_FORMAT_R16_UINT,
+		indices.size(),
+		indices.data(),
+		res
+	);
+	
 }

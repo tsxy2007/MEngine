@@ -218,10 +218,11 @@ void GetCullingShader(ID3D12Device* device)
 
 void GetTextureCopyShader(ID3D12Device* device)
 {
-	const UINT KERNEL_COUNT = 2;
+	const UINT KERNEL_COUNT = 3;
 	std::string kernelNames[KERNEL_COUNT];
 	kernelNames[0] = "CopyToRGBA32";
 	kernelNames[1] = "CopyToRGBA64";
+	kernelNames[2] = "CopyToRGBAFloat";
 	const UINT SHADER_VAR_COUNT = 5;
 	ComputeShaderVariable vars[SHADER_VAR_COUNT];
 	vars[0].name = "CopyData";

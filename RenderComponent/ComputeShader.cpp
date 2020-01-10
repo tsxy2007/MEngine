@@ -180,19 +180,26 @@ void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id,
 	UINT rootSigPos = ite->second;
 	ComputeShaderVariable& var = mVariablesVector[rootSigPos];
 	UploadBuffer* uploadBufferPtr;
+	ID3D12DescriptorHeap* heap;
 	switch (var.type)
 	{
 	case ComputeShaderVariable::Type::SRVDescriptorHeap:
+		heap = ((DescriptorHeap*)targetObj)->Get().Get();
+		commandList->SetDescriptorHeaps(1, &heap);
 		commandList->SetComputeRootDescriptorTable(
 			rootSigPos,
 			((DescriptorHeap*)targetObj)->hGPU(indexOffset)
 		);
+		
 		break;
 	case ComputeShaderVariable::Type::UAVDescriptorHeap:
+		heap = ((DescriptorHeap*)targetObj)->Get().Get();
+		commandList->SetDescriptorHeaps(1, &heap);
 		commandList->SetComputeRootDescriptorTable(
 			rootSigPos,
 			((DescriptorHeap*)targetObj)->hGPU(indexOffset)
 		);
+		
 		break;
 	case ComputeShaderVariable::Type::ConstantBuffer:
 		uploadBufferPtr = ((UploadBuffer*)targetObj);

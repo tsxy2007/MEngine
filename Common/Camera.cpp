@@ -11,17 +11,19 @@ Camera::Camera(ID3D12Device* device, CameraRenderPath renderType) : MObject(), r
 {
 	perCameraResource.reserve(20);
 	SetLens(0.25f*MathHelper::Pi, 1.0f, 1.0f, 1000.0f);
-	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
+	for (auto ite = FrameResource::mFrameResources.begin(); ite != FrameResource::mFrameResources.end(); ++ite)
 	{
-		FrameResource::mFrameResources[i]->OnLoadCamera(this, device);
+		if (*ite != nullptr)
+			(*ite)->OnLoadCamera(this, device);
 	}
 }
 
 Camera::~Camera()
 {
-	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
+	for (auto ite = FrameResource::mFrameResources.begin(); ite != FrameResource::mFrameResources.end(); ++ite)
 	{
-		FrameResource::mFrameResources[i]->OnUnloadCamera(this);
+		if (*ite != nullptr)
+			(*ite)->OnUnloadCamera(this);
 	}
 	for (auto ite = perCameraResource.begin(); ite != perCameraResource.end(); ++ite)
 	{
@@ -256,7 +258,7 @@ void Camera::Pitch(float angle)
 
 	XMMATRIX R = XMMatrixRotationAxis(XMLoadFloat3(&mRight), angle);
 
-	XMStoreFloat3(&mUp,   XMVector3TransformNormal(XMLoadFloat3(&mUp), R));
+	XMStoreFloat3(&mUp, XMVector3TransformNormal(XMLoadFloat3(&mUp), R));
 	XMStoreFloat3(&mLook, XMVector3TransformNormal(XMLoadFloat3(&mLook), R));
 
 	mViewDirty = true;
@@ -268,7 +270,7 @@ void Camera::RotateY(float angle)
 
 	XMMATRIX R = XMMatrixRotationY(angle);
 
-	XMStoreFloat3(&mRight,   XMVector3TransformNormal(XMLoadFloat3(&mRight), R));
+	XMStoreFloat3(&mRight, XMVector3TransformNormal(XMLoadFloat3(&mRight), R));
 	XMStoreFloat3(&mUp, XMVector3TransformNormal(XMLoadFloat3(&mUp), R));
 	XMStoreFloat3(&mLook, XMVector3TransformNormal(XMLoadFloat3(&mLook), R));
 
@@ -283,7 +285,7 @@ void Camera::UpdateProjectionMatrix()
 
 void Camera::UpdateViewMatrix()
 {
-	if(mViewDirty)
+	if (mViewDirty)
 	{
 		XMVECTOR R = XMLoadFloat3(&mRight);
 		XMVECTOR U = XMLoadFloat3(&mUp);

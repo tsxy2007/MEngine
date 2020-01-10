@@ -48,6 +48,7 @@ void PipelineComponent::CreateFence(ID3D12Device* device)
 		ThrowIfFailed(device->CreateFence(0, D3D12_FENCE_FLAG_SHARED,
 			IID_PPV_ARGS(&fence)));
 	}
+	dependingComponentCount++;
 }
 
 void PipelineComponent::ClearHandles()

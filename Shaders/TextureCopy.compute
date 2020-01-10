@@ -39,3 +39,12 @@ void CopyToRGBA64(uint2 id : SV_DISPATCHTHREADID)
     float r = (float)(value.x & 65535) / 65535.0;
     _MainTex[pos] = float4(r,g,b,a);
 }
+
+[numthreads(8,8,1)]
+void CopyToRGBAFloat(uint2 id : SV_DISPATCHTHREADID)
+{
+    if(id.x >= _Count.x || id.y >= _Count.y)
+        return;
+    uint2 pos = id + _StartPos; 
+    _MainTex[pos] = _RGBAFloatInputBuffer[id.y * _Count.x + id.x];
+}

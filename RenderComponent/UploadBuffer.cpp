@@ -75,12 +75,17 @@ void UploadBuffer::CopyFrom(UploadBuffer* otherBuffer, UINT selfStartIndex, UINT
 {
 	char* otherPtr = (char*)otherBuffer->mMappedData;
 	char* currPtr = (char*)mMappedData;
-	otherPtr += otherBuffer->GetAlignedStride() * otherBufferStartIndex;
-	currPtr += GetAlignedStride() * selfStartIndex;
-	memcpy(currPtr, otherPtr, elementCount * GetAlignedStride());
+	otherPtr += otherBuffer->mElementByteSize * otherBufferStartIndex;
+	currPtr += mElementByteSize * selfStartIndex;
+	memcpy(currPtr, otherPtr, elementCount * mElementByteSize);
 }
 
 void  UploadBuffer::ReleaseAfterFlush(FrameResource* res)
 {
 	FrameResource::ReleaseResourceAfterFlush(mUploadBuffer, res);
+}
+
+D3D12_GPU_VIRTUAL_ADDRESS UploadBuffer::GetAddress(UINT elementCount)
+{
+	return mUploadBuffer->GetGPUVirtualAddress() + elementCount * mElementByteSize;
 }

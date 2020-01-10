@@ -17,7 +17,6 @@ public:
 		postSRVHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
 	}
 };
-ObjectPtr<Texture> tex;
 class PostRunnable
 {
 public:
@@ -99,5 +98,4 @@ void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCom
 void PostProcessingComponent::Dispose()
 {
 	postContainer = nullptr;
-	tex->Destroy();
 }

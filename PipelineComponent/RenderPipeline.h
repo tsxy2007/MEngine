@@ -18,6 +18,7 @@ struct RenderPipelineData
 	FrameResource* resource;
 	std::vector<Camera*>* allCameras;
 	ID3D12Fence** fence;
+	UINT fenceCount;
 	UINT64* fenceIndex;
 	bool executeLastFrame;
 	IDXGISwapChain* swap;

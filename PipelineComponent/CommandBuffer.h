@@ -9,7 +9,9 @@ class CommandBuffer
 private:
 	ID3D12CommandQueue* graphicsCommandQueue;
 	ID3D12CommandQueue* computeCommandQueue;
+	ID3D12CommandQueue* asyncQueue;
 	std::vector<ID3D12GraphicsCommandList*> graphicsCmdLists;
+	std::vector<ID3D12GraphicsCommandList*> asyncCmdLists;
 	struct Fence
 	{
 		ID3D12Fence* fence;
@@ -56,16 +58,21 @@ public:
 	ID3D12CommandQueue* GetComputeQueue() const {
 		return computeCommandQueue;
 	}
+	ID3D12CommandQueue* GetAsyncQueue() const {
+		return asyncQueue;
+	}
 	void WaitForCompute(ID3D12Fence* computeFence, UINT currentFrame);
 	void WaitForGraphics(ID3D12Fence* graphicsFence, UINT currentFrame);
 	void SignalToCompute(ID3D12Fence* computeFence, UINT currentFrame);
 	void SignalToGraphics(ID3D12Fence* graphicsFence, UINT currentFrame);
 	void ExecuteGraphicsCommandList(ID3D12GraphicsCommandList* commandList);
 	void ExecuteComputeCommandList(ID3D12GraphicsCommandList* commandList);
+	void ExecuteAsyncComputeCommandList(ID3D12GraphicsCommandList* commandList);
 	void Submit();
 	void Clear();
 	CommandBuffer(
 		ID3D12CommandQueue* graphicsCommandQueue,
-		ID3D12CommandQueue* computeCommandQueue
+		ID3D12CommandQueue* computeCommandQueue,
+		ID3D12CommandQueue* asyncQueue
 	);
 };

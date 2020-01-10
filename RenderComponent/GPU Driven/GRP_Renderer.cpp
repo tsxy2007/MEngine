@@ -108,16 +108,18 @@ public:
 			c = allCommands[i];
 			mtx.unlock();
 			ConstBufferElement& cEle = allocatedObjects[c.index];
-			auto&& ite = allocatedObjects.end() - 1;
+			std::vector<ConstBufferElement>::iterator ite;// = allocatedObjects.end() - 1;
 			UINT last = count - 1;
+			ObjectConstants objConst;
 			switch (c.type)
 			{
 			case Command::CommandType_Add:
 				Resize(count + 1, device);
 				ConstBufferElement obj = objectPool.Get(device);
-				c.cmd.objectCBufferAddress = obj.buffer->Resource()->GetGPUVirtualAddress() +
-					obj.element * obj.buffer->GetAlignedStride();
+				c.cmd.objectCBufferAddress = obj.buffer->GetAddress(obj.element);
 				allocatedObjects.push_back(obj);
+				objConst.objectToWorld = c.objData.localToWorld;
+				allocatedObjects[allocatedObjects.size() - 1].buffer->CopyData(allocatedObjects[allocatedObjects.size() - 1].element, &objConst);
 				objectPosBuffer->CopyData(count, &c.objData);
 				cmdDrawBuffers->CopyData(count, &c.cmd);
 				count++;
@@ -129,16 +131,18 @@ public:
 					cmdDrawBuffers->CopyDataInside(last, c.index);
 				}
 				objectPool.Return(cEle);
+				ite = allocatedObjects.end() - 1;
 				cEle = *ite;
 				allocatedObjects.erase(ite);
 				count--;
 				break;
 			case Command::CommandType::CommandType_TransformPos:
+				objConst.objectToWorld = c.objData.localToWorld;
+				allocatedObjects[c.index].buffer->CopyData(allocatedObjects[c.index].element, &objConst);
 				objectPosBuffer->CopyData(c.index, &c.objData);
 				break;
 			case Command::CommandType::CommandType_Renderer:
-				c.cmd.objectCBufferAddress = cEle.buffer->Resource()->GetGPUVirtualAddress() +
-					cEle.element * cEle.buffer->GetAlignedStride();
+				c.cmd.objectCBufferAddress = cEle.buffer->GetAddress(cEle.element); 
 				cmdDrawBuffers->CopyData(c.index, &c.cmd);
 				break;
 			}
