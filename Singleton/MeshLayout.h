@@ -23,7 +23,8 @@ private:
 		bool uv0,
 		bool uv2,
 		bool uv3,
-		bool uv4
+		bool uv4,
+		bool bone
 	);
 public:
 	static std::vector<D3D12_INPUT_ELEMENT_DESC>* GetMeshLayoutValue(UINT index);
@@ -34,6 +35,7 @@ public:
 		bool uv0,
 		bool uv2,
 		bool uv3,
-		bool uv4
+		bool uv4,
+		bool bone
 	);
 };

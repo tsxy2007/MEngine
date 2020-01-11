@@ -107,43 +107,6 @@ PtrLink& PtrLink::operator= (const PtrLink& link)
 	return *this;
 }
 
-PtrLink::PtrLink(const PtrLink&& link) :
-	mPtr(link.mPtr)
-{
-	if (mPtr != nullptr)
-	{
-		std::lock_guard<std::mutex> lck(MObject::mtx);
-		mPtr->AddPtr(this);
-	}
-}
-
-PtrLink& PtrLink::operator= (const PtrLink&& link)
-{
-	if (link.mPtr == mPtr) return *this;
-	Dispose();
-	mPtr = link.mPtr;
-	if (mPtr != nullptr)
-	{
-		std::lock_guard<std::mutex> lck(MObject::mtx);
-		mPtr->AddPtr(this);
-	}
-
-	return *this;
-}
-
-PtrLink& PtrLink::operator=(MObject* ptr)
-{
-	if (ptr == mPtr) return *this;
-	Dispose();
-	mPtr = ptr;
-	if (mPtr != nullptr)
-	{
-		std::lock_guard<std::mutex> lck(MObject::mtx);
-		mPtr->AddPtr(this);
-	}
-	return *this;
-}
-
 void PtrLink::Dispose()
 {
 	if (mPtr != nullptr)

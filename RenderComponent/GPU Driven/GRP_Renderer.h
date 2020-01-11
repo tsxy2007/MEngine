@@ -17,9 +17,9 @@ public:
 	struct CullData
 	{
 		DirectX::XMFLOAT4 planes[6];
-		DirectX::XMFLOAT3 _FrustumMinPoint;
+		DirectX::XMFLOAT4 _FrustumMinPoint;
+		DirectX::XMFLOAT4 _FrustumMaxPoint;
 		UINT _Count;
-		DirectX::XMFLOAT3 _FrustumMaxPoint;
 	};
 	struct RenderElement
 	{

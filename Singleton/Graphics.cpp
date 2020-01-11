@@ -29,10 +29,9 @@ void Graphics::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* comma
 		nullptr,
 		nullptr,
 		device,
-		commandList,
 		DXGI_FORMAT_R16_UINT,
 		3,
-		indices.data(), nullptr
+		indices.data()
 		));
 
 }

@@ -15,7 +15,8 @@ void MeshLayout::GenerateDesc(
 	bool uv0,
 	bool uv2,
 	bool uv3,
-	bool uv4
+	bool uv4,
+	bool bone
 )
 {
 	UINT offset = 12;
@@ -72,6 +73,16 @@ void MeshLayout::GenerateDesc(
 		);
 		offset += 8;
 	}
+	if (bone)
+	{
+		target.push_back(
+			{ "BONEINDEX", 0, DXGI_FORMAT_R32G32B32A32_SINT, 0, offset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		);
+		target.push_back(
+			{ "BONEWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, offset + 16, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+		);
+		offset += 32;
+	}
 }
 #include <mutex>
 std::mutex mtx;
@@ -82,7 +93,8 @@ UINT MeshLayout::GetMeshLayoutIndex(
 	bool uv0,
 	bool uv2,
 	bool uv3,
-	bool uv4
+	bool uv4,
+	bool bone
 )
 {
 	USHORT value = 0;
@@ -93,18 +105,17 @@ UINT MeshLayout::GetMeshLayoutIndex(
 	if (uv2) value |= 0b10000;
 	if (uv3) value |= 0b100000;
 	if (uv4) value |= 0b1000000;
-	mtx.lock();
+	if (bone) value |= 0b10000000;
+	std::lock_guard<std::mutex> lck(mtx);
 	auto&& ite = layoutDict.find(value);
 	if (ite == layoutDict.end())
 	{
 		std::vector<D3D12_INPUT_ELEMENT_DESC>* desc = new std::vector<D3D12_INPUT_ELEMENT_DESC>();
-		GenerateDesc(*desc, normal, tangent, color, uv0, uv2, uv3, uv4);
+		GenerateDesc(*desc, normal, tangent, color, uv0, uv2, uv3, uv4, bone);
 		layoutDict[value] = layoutValues.size();
 		UINT value = (UINT)layoutValues.size();
 		layoutValues.push_back(desc);
-		mtx.unlock();
 		return value;
 	}
-	mtx.unlock();
 	return ite->second;
 }

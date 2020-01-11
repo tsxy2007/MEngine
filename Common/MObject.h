@@ -30,17 +30,11 @@ public:
 	int value;
 	PtrLink(MObject* ptr);
 
-	PtrLink& operator=(const PtrLink&& link);
-
 	PtrLink& operator= (const PtrLink& link);
 
 	PtrLink(const PtrLink& link);
 
-	PtrLink(const PtrLink&& link);
-
 	~PtrLink();
-
-	PtrLink& operator=(MObject* ptr);
 };
 
 
@@ -63,10 +57,14 @@ public:
 
 	}
 
-	ObjectPtr(const ObjectPtr<T>&& ptr) :
-		link(std::move(ptr.link))
+	operator bool() const
 	{
+		return link.mPtr == nullptr;
+	}
 
+	operator MObject*() const
+	{
+		return link.mPtr;
 	}
 
 	ObjectPtr(const PtrLink& ptr) : link(ptr)
@@ -74,7 +72,7 @@ public:
 
 	}
 	template<typename F>
-	ObjectPtr<F> Cast()
+	ObjectPtr<F> Cast() const
 	{
 		ObjectPtr<F> mobj = link;
 		return mobj;
@@ -83,18 +81,6 @@ public:
 	ObjectPtr<T>& operator=(const ObjectPtr<T>& other)
 	{
 		link = other.link;
-		return *this;
-	}
-
-	ObjectPtr<T>& operator=(const ObjectPtr<T>&& other)
-	{
-		link = other.link;
-		return *this;
-	}
-
-	ObjectPtr<T> & operator=(T* ptr)
-	{
-		link = ptr;
 		return *this;
 	}
 

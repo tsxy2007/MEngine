@@ -1,6 +1,10 @@
 #include "Mesh.h"
 #include "../Singleton/FrameResource.h"
 #include "../Singleton/MeshLayout.h"
+#include "../Singleton/Graphics.h"
+#include "../RenderComponent/RenderCommand.h"
+using namespace DirectX;
+using Microsoft::WRL::ComPtr;
 //CPP
 D3D12_VERTEX_BUFFER_VIEW Mesh::VertexBufferView() const
 {
@@ -24,13 +28,73 @@ D3D12_INDEX_BUFFER_VIEW Mesh::IndexBufferView()
 
 Mesh::~Mesh()
 {
-	dataBuffer = nullptr;
-	if (dataPtr != nullptr)
-	{
-		delete dataPtr;
-		dataPtr = nullptr;
-	}
 }
+
+ComPtr<ID3D12Resource> CreateDefaultBuffer(
+	ID3D12Device* device,
+	UINT64 byteSize,
+	ComPtr<ID3D12Resource>& uploadBuffer)
+{
+	ComPtr<ID3D12Resource> defaultBuffer;
+
+	// Create the actual default buffer resource.
+	ThrowIfFailed(device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(byteSize),
+		D3D12_RESOURCE_STATE_COMMON,
+		nullptr,
+		IID_PPV_ARGS(&defaultBuffer)));
+
+	// In order to copy CPU memory data into our default buffer, we need to create
+	// an intermediate upload heap. 
+	ThrowIfFailed(device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(byteSize),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&uploadBuffer)));
+
+
+	return defaultBuffer;
+}
+
+void CopyToBuffer(
+	UINT64 byteSize,
+	ID3D12GraphicsCommandList* cmdList,
+	ComPtr<ID3D12Resource>& uploadBuffer,
+	ComPtr<ID3D12Resource>& defaultBuffer)
+{
+	Graphics::ResourceStateTransform< D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST>(cmdList, defaultBuffer.Get());
+	cmdList->CopyBufferRegion(defaultBuffer.Get(), 0, uploadBuffer.Get(), 0, byteSize);
+	Graphics::ResourceStateTransform<D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ>(cmdList, defaultBuffer.Get());
+
+}
+
+class MeshLoadCommand : public RenderCommand
+{
+public:
+	ComPtr<ID3D12Resource> uploadResource;
+	ComPtr<ID3D12Resource> defaultResource;
+	UINT64 byteSize;
+	MeshLoadCommand(
+		ComPtr<ID3D12Resource>& uploadResource,
+		ComPtr<ID3D12Resource>& defaultResource,
+		UINT64 byteSize
+	) : byteSize(byteSize), uploadResource(uploadResource), defaultResource(defaultResource)
+	{}
+
+	virtual void operator()(
+		ID3D12Device* device,
+		ID3D12GraphicsCommandList* commandList,
+		FrameResource* resource)
+	{
+		FrameResource::ReleaseResourceAfterFlush(uploadResource, resource);
+		FrameResource::ReleaseResourceAfterFlush(defaultResource, resource);
+		CopyToBuffer(byteSize, commandList, uploadResource, defaultResource);
+	}
+};
 
 Mesh::Mesh(
 	int vertexCount,
@@ -43,12 +107,10 @@ Mesh::Mesh(
 	DirectX::XMFLOAT2* uv2,
 	DirectX::XMFLOAT2* uv3,
 	ID3D12Device* device,
-	ID3D12GraphicsCommandList* commandList,
 	DXGI_FORMAT indexFormat,
 	UINT indexCount,
-	void* indexArrayPtr,
-	FrameResource* res
-) : MObject(), dataPtr(nullptr), mVertexCount(vertexCount),
+	void* indexArrayPtr
+) : MObject(), mVertexCount(vertexCount),
 indexFormat(indexFormat),
 indexCount(indexCount),
 indexArrayPtr(indexArrayPtr)
@@ -62,7 +124,8 @@ indexArrayPtr(indexArrayPtr)
 		uv != nullptr,
 		uv1 != nullptr,
 		uv2 != nullptr,
-		uv3 != nullptr
+		uv3 != nullptr,
+		false
 	);
 	std::vector<D3D12_INPUT_ELEMENT_DESC>* meshLayouts = MeshLayout::GetMeshLayoutValue(meshLayoutIndex);
 	UINT stride = 0;
@@ -82,8 +145,8 @@ indexArrayPtr(indexArrayPtr)
 	VertexBufferByteSize = stride * vertexCount;
 	//IndexBufferByteSize = (IndexFormat == DXGI_FORMAT_R16_UINT ? 2 : 4) * indexCount;
 	size_t indexSize = indexCount * ((indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4);
-	dataPtr = reinterpret_cast<char*>(malloc(VertexBufferByteSize + indexSize));
-
+	char* dataPtr = reinterpret_cast<char*>(malloc(VertexBufferByteSize + indexSize));
+	std::unique_ptr<char> dataPtrGuard(dataPtr);
 	auto vertBufferCopy = [&](char* buffer, char* ptr, UINT size, int& offset, std::array<int, 8>& offstArray, int arrayLen) -> void
 	{
 		if (ptr == nullptr)
@@ -165,204 +228,170 @@ indexArrayPtr(indexArrayPtr)
 	);
 	char* indexBufferStart = dataPtr + VertexBufferByteSize;
 	memcpy(indexBufferStart, indexArrayPtr, indexCount * ((indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4));
-	dataBuffer = d3dUtil::CreateDefaultBuffer(device, commandList, dataPtr, indexSize + VertexBufferByteSize, uploadBuffer);
-	FrameResource::mCurrFrameResource->ReleaseResourceAfterFlush(uploadBuffer, res);
+	ComPtr<ID3D12Resource> uploadBuffer;
+	dataBuffer = CreateDefaultBuffer(device, indexSize + VertexBufferByteSize, uploadBuffer);
+	void* mappedPtr = nullptr;
+	ThrowIfFailed(uploadBuffer->Map(0, nullptr, &mappedPtr));
+	memcpy(mappedPtr, dataPtr, indexSize + VertexBufferByteSize);
+	uploadBuffer->Unmap(0, nullptr);
+	MeshLoadCommand* meshLoadCommand = new MeshLoadCommand(
+		uploadBuffer,
+		dataBuffer,
+		indexSize + VertexBufferByteSize
+	);
+	RenderCommand::AddCommand(meshLoadCommand);
 }
 
-
-struct CharPart
+struct IndexSettings
 {
-	char* ptr;
-	size_t start;
-	size_t size;
-	bool operator==(std::string& str)
+	enum IndexFormat
 	{
-		if (str.size() != size) return false;
-		for (size_t i = 0; i < size; ++i)
-		{
-			if (str[i] != ptr[start + i]) return false;
-		}
-		return true;
-	}
-	bool operator!= (std::string& str)
+		IndexFormat_16Bit = 0,
+		IndexFormat_32Bit = 1
+	};
+	IndexFormat indexFormat;
+	UINT indexCount;
+};
+struct MeshHeader
+{
+	enum MeshDataType
 	{
-		return !operator==(str);
-	}
-	bool operator==(std::string&& str)
+		MeshDataType_Vertex = 0,
+		MeshDataType_Index = 1,
+		MeshDataType_Normal = 2,
+		MeshDataType_Tangent = 3,
+		MeshDataType_UV = 4,
+		MeshDataType_UV2 = 5,
+		MeshDataType_UV3 = 6,
+		MeshDataType_UV4 = 7,
+		MeshDataType_Color = 8,
+		MeshDataType_BoneIndex = 9,
+		MeshDataType_BoneWeight = 10,
+		MeshDataType_BoundingBox = 11,
+		MeshDataType_Num = 12
+	};
+	MeshDataType type;
+	union
 	{
-		if (str.size() != size) return false;
-		for (size_t i = 0; i < size; ++i)
-		{
-			if (str[i] != ptr[start + i]) return false;
-		}
-		return true;
-	}
-	bool operator!= (std::string&& str)
-	{
-		return !operator==(std::move(str));
-	}
-
-	bool CheckPartialEqual(std::string& str, size_t startPos, size_t endPos)
-	{
-		for (size_t i = startPos; i < endPos; ++i)
-		{
-			if (ptr[i + start] != str[i]) return false;
-		}
-		return true;
-	}
-	bool CheckPartialEqual(std::string&& str, size_t startPos, size_t endPos)
-	{
-		for (size_t i = startPos; i < endPos; ++i)
-		{
-			if (ptr[i + start] != str[i]) return false;
-		}
-		return true;
-	}
-	UINT ToUInt()
-	{
-		UINT times = 1;
-		UINT value = 0;
-		int v = start;
-		for (int end = start + size - 1; end >= v; --end)
-		{
-			value += ((UINT)ptr[end] - 48) * times;
-			times *= 10;
-		}
-		return value;
-	}
-	UINT ToUInt(int start, int end)
-	{
-		UINT times = 1;
-		UINT value = 0;
-		for (int i = end - 1; i >= start; --i)
-		{
-			value += ((UINT)ptr[i] - 48) * times;
-			times *= 10;
-		}
-		return value;
-	}
+		IndexSettings indexSettings;
+		UINT vertexCount;
+		UINT normalCount;
+		UINT tangentCount;
+		UINT uvCount;
+		UINT colorCount;
+		UINT boneCount;
+	};
 };
 
-void SplitString(char* targetString, size_t size, std::vector<CharPart>& vec, const char splitFlag = ' ')
+struct MeshData
 {
-	vec.clear();
-	size_t startPos = 0;
-	for (size_t i = 0; i < size; ++i)
+	DXGI_FORMAT indexFormat = DXGI_FORMAT_R16_UINT;
+	std::vector<XMFLOAT3> vertex;
+	std::vector<XMFLOAT3> normal;
+	std::vector<XMFLOAT4> tangent;
+	std::vector<XMFLOAT2> uv;
+	std::vector<XMFLOAT2> uv2;
+	std::vector<XMFLOAT2> uv3;
+	std::vector<XMFLOAT2> uv4;
+	std::vector<XMFLOAT4> color;
+	std::vector<XMUINT4> boneIndex;
+	std::vector<XMFLOAT4> boneWeight;
+	std::vector<char> indexData;
+	XMFLOAT3 boundingCenter;
+	XMFLOAT3 boundingExtent;
+};
+
+bool DecodeMesh(
+	const std::wstring& filePath,
+	MeshData& meshData)
+{
+	std::ifstream ifs(filePath, std::ios::binary);
+	if (!ifs)
 	{
-		char c = targetString[i];
-		size_t splitSize = i - startPos;
-		if (c == splitFlag && splitSize > 0)
+		return false;//File Read Error!
+	}
+	UINT chunkCount = 0;
+	ifs.read((char*)&chunkCount, sizeof(UINT));
+	if (chunkCount >= MeshHeader::MeshDataType_Num) return false;	//Too many types
+	for (UINT i = 0; i < chunkCount; ++i)
+	{
+		MeshHeader header;
+		ifs.read((char*)&header, sizeof(MeshHeader));
+		if (header.type >= MeshHeader::MeshDataType_Num) return false;	//Illegal Data Type
+		size_t indexSize;
+		switch (header.type)
 		{
-			vec.emplace_back<CharPart>({ targetString, startPos, splitSize });
-			startPos = i + 1;
+		case MeshHeader::MeshDataType_Vertex:
+			meshData.vertex.resize(header.vertexCount);
+			ifs.read((char*)meshData.vertex.data(), sizeof(XMFLOAT3) * header.vertexCount);
+			break;
+		case MeshHeader::MeshDataType_Normal:
+			meshData.normal.resize(header.normalCount);
+			ifs.read((char*)meshData.normal.data(), sizeof(XMFLOAT3) * header.normalCount);
+			break;
+		case MeshHeader::MeshDataType_Tangent:
+			meshData.tangent.resize(header.tangentCount);
+			ifs.read((char*)meshData.tangent.data(), sizeof(XMFLOAT4) * header.tangentCount);
+			break;
+		case MeshHeader::MeshDataType_UV:
+			meshData.uv.resize(header.uvCount);
+			ifs.read((char*)meshData.uv.data(), sizeof(XMFLOAT2) * header.uvCount);
+			break;
+		case MeshHeader::MeshDataType_UV2:
+			meshData.uv2.resize(header.uvCount);
+			ifs.read((char*)meshData.uv2.data(), sizeof(XMFLOAT2) * header.uvCount);
+			break;
+		case MeshHeader::MeshDataType_UV3:
+			meshData.uv3.resize(header.uvCount);
+			ifs.read((char*)meshData.uv3.data(), sizeof(XMFLOAT2) * header.uvCount);
+			break;
+		case MeshHeader::MeshDataType_UV4:
+			meshData.uv4.resize(header.uvCount);
+			ifs.read((char*)meshData.uv4.data(), sizeof(XMFLOAT2) * header.uvCount);
+			break;
+		case MeshHeader::MeshDataType_BoneIndex:
+			meshData.boneIndex.resize(header.boneCount);
+			ifs.read((char*)meshData.boneIndex.data(), sizeof(XMUINT4) * header.boneCount);
+			break;
+		case MeshHeader::MeshDataType_BoneWeight:
+			meshData.boneWeight.resize(header.boneCount);
+			ifs.read((char*)meshData.boneWeight.data(), sizeof(XMFLOAT4) * header.boneCount);
+			break;
+		case MeshHeader::MeshDataType_Index:
+			indexSize = header.indexSettings.indexFormat == IndexSettings::IndexFormat_16Bit ? 2 : 4;
+			meshData.indexFormat = indexSize == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+			meshData.indexData.resize(indexSize * header.indexSettings.indexCount);
+			ifs.read(meshData.indexData.data(), meshData.indexData.size());
+			break;
+		case MeshHeader::MeshDataType_BoundingBox:
+			ifs.read((char*)&meshData.boundingCenter, sizeof(XMFLOAT3) * 2);
+			break;
 		}
 	}
-	size_t splitSize = size - startPos;
-	if (splitSize > 0)
-	{
-		vec.emplace_back<CharPart>({ targetString, startPos, splitSize });
-	}
+	return true;
 }
-using namespace DirectX;
-UINT DecodeMesh(
-	std::string& meshPath,
-	DirectX::XMFLOAT3*& positions,
-	DirectX::XMFLOAT3*& normals,
-	DirectX::XMFLOAT4*& tangents,
-	DirectX::XMFLOAT4*& colors,
-	DirectX::XMFLOAT2*& uv,
-	DirectX::XMFLOAT2*& uv2,
-	DirectX::XMFLOAT2*& uv3,
-	DirectX::XMFLOAT2*& uv4,
-	std::vector<std::vector<UINT>>& subMeshes)
+
+ObjectPtr<Mesh> Mesh::LoadMeshFromFile(const std::wstring& str, ID3D12Device* device, ID3D12GraphicsCommandList* commandList, FrameResource* res)
 {
-	std::ifstream input(meshPath);
-	char sign[32];
-	std::vector<CharPart> commandParts(5);
-	UINT index = 0;
-	positions = nullptr;
-	normals = nullptr;
-	tangents = nullptr;
-	uv = nullptr;
-	uv2 = nullptr;
-	uv3 = nullptr;
-	uv4 = nullptr;
-	colors = nullptr;
-
-	while (true)
-	{
-		input.getline((char*)sign, 32);
-		UINT commandLength = strlen((char*)sign);
-		if (commandLength == 0)
-			return index;
-		SplitString(sign, commandLength, commandParts);
-		CharPart pt = commandParts[0];
-		CharPart sizeCount = commandParts[1];
-		UINT dataSize = sizeCount.ToUInt();
-		UINT size = sizeCount.size;
-		if (pt.CheckPartialEqual("sub", 0, 3))
-		{
-			UINT subMeshIndex = pt.ToUInt(3, pt.size);
-			if ((1 + subMeshIndex) > subMeshes.size())
-				subMeshes.resize(subMeshIndex + 1);
-			std::vector<UINT>& vec = subMeshes[subMeshIndex];
-			UINT triCount = dataSize / sizeof(int);
-			vec.resize(triCount);
-			input.read((char*)vec.data(), dataSize);
-		}
-		else if (pt == "v")
-		{
-			UINT vertCount = dataSize / sizeof(DirectX::XMFLOAT3);
-			index = vertCount;
-			positions = new DirectX::XMFLOAT3[vertCount];
-			input.read((char*)positions, dataSize);
-		}
-		else if (pt == "n")
-		{
-			//Normal
-			UINT normalCount = dataSize / sizeof(DirectX::XMFLOAT3);
-			normals = new DirectX::XMFLOAT3[normalCount];
-			input.read((char*)normals, dataSize);
-		}
-		else if (pt == "t")
-		{
-			//Tangent
-			UINT tangentCount = dataSize / sizeof(DirectX::XMFLOAT4);
-
-			tangents = new DirectX::XMFLOAT4[tangentCount];
-			input.read((char*)tangents, dataSize);
-		}
-		else if (pt == "uv1")
-		{
-			UINT uvCount = dataSize / sizeof(DirectX::XMFLOAT2);
-			uv = new DirectX::XMFLOAT2[uvCount];
-			input.read((char*)uv, dataSize);
-		}
-		else if (pt == "uv2")
-		{
-			UINT uvCount = dataSize / sizeof(DirectX::XMFLOAT2);
-			uv2 = new DirectX::XMFLOAT2[uvCount];
-			input.read((char*)uv2, dataSize);
-		}
-		else if (pt == "uv3")
-		{
-			UINT uvCount = dataSize / sizeof(DirectX::XMFLOAT2);
-			uv3 = new DirectX::XMFLOAT2[uvCount];
-			input.read((char*)uv3, dataSize);
-		}
-		else if (pt == "uv4")
-		{
-			UINT uvCount = dataSize / sizeof(DirectX::XMFLOAT2);
-			uv4 = new DirectX::XMFLOAT2[uvCount];
-			input.read((char*)uv4, dataSize);
-		}
-		else if (pt == "color")
-		{
-			UINT colorCount = dataSize / sizeof(DirectX::XMFLOAT4);
-			colors = new DirectX::XMFLOAT4[colorCount];
-			input.read((char*)colors, dataSize);
-		}
-		input.get();// \n
-	}
-	return index;
+	ObjectPtr<Mesh> result;
+	MeshData meshData;
+	if (!DecodeMesh(str, meshData)) return result;
+	/*result = new Mesh(
+		meshData.vertex.size(),
+		meshData.vertex.data(),
+		meshData.normal.data(),
+		meshData.tangent.data(),
+		meshData.color.data(),
+		meshData.uv.data(),
+		meshData.uv2.data(),
+		meshData.uv3.data(),
+		meshData.uv4.data(),
+		device,
+		commandList,
+		meshData.indexFormat,
+		meshData.indexData.size() / ((meshData.indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4),
+		meshData.indexData.data(),
+		res
+	);*/
+	return result;
 }

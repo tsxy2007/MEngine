@@ -71,10 +71,9 @@ skyboxTex(tex)
 			nullptr,
 			nullptr,
 			device,
-			commandList,
 			DXGI_FORMAT_R16_UINT,
 			3,
-			indices.data(), nullptr
+			indices.data()
 			));
 	}
 }

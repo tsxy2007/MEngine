@@ -392,8 +392,8 @@ void  GRP_Renderer::DrawCommand(
 	CullData cullD;
 	cullD._Count = elements.size();
 	memcpy(cullD.planes, frustumPlanes, sizeof(DirectX::XMFLOAT4) * 6);
-	cullD._FrustumMaxPoint = frustumMaxPoint;
-	cullD._FrustumMinPoint = frustumMinPoint;
+	memcpy(&cullD._FrustumMaxPoint, &frustumMaxPoint, sizeof(DirectX::XMFLOAT3));
+	memcpy(&cullD._FrustumMinPoint, &frustumMinPoint, sizeof(DirectX::XMFLOAT3));
 	cullDataBuffer.buffer->CopyData(cullDataBuffer.element, &cullD);
 	cullShader->SetResource(commandList, _InputBuffer, perFrameData->cmdDrawBuffers.get(), 0);
 	cullShader->SetResource(commandList, _InputDataBuffer, perFrameData->objectPosBuffer.get(), 0);

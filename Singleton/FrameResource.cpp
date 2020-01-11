@@ -14,7 +14,7 @@ FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCo
 	objectCBs.reserve(50);
 	needClearResources.reserve(10);
 	needClearResourcesAfterFlush.reserve(10);
-	commmonThreadCommand = new ThreadCommand(device, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+	commmonThreadCommand = new ThreadCommand(device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 }
 
 void FrameResource::UpdateBeforeFrame(ID3D12Fence** mFence, UINT fenceCount)

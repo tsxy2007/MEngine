@@ -78,7 +78,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 		}
 		commandList->CloseCommand();
 	});
-	currentCommandBuffer->ExecuteAsyncComputeCommandList(commandList->GetCmdList());
+	currentCommandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 	for (UINT camIndex = 0; camIndex < renderData.allCameras->size(); ++camIndex)
 	{
 		JobBucket& bucket = bucketArray[camIndex];

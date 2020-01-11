@@ -227,6 +227,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 			true,
 			false,
 			false,
+			false,
 			false
 		),
 		256,
@@ -274,11 +275,9 @@ void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh
 		nullptr,
 		nullptr,
 		device,
-		cmdList,
 		DXGI_FORMAT_R16_UINT,
 		indices.size(),
-		indices.data(),
-		res
+		indices.data()
 	);
 	
 }

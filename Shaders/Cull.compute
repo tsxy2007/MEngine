@@ -1,9 +1,9 @@
 cbuffer CBuffer : register(b0)
 {
     float4 planes[6];
-    float3 _FrustumMinPoint;
+    float4 _FrustumMinPoint;
+    float4 _FrustumMaxPoint;
     uint _Count;
-    float3 _FrustumMaxPoint;
 };
 struct MultiDrawCommand
 {
@@ -44,7 +44,7 @@ float PlaneTest(float3 localPosition, float3 extent, float4x4 localToWorld){
         worldMin = min(worldMin, currPos);
         worldMax = max(worldMax, currPos);
     }
-    float outOfRange = dot(_FrustumMinPoint > worldMax, 1) + dot(_FrustumMaxPoint < worldMin, 1);
+    float outOfRange = dot(_FrustumMinPoint.xyz > worldMax, 1) + dot(_FrustumMaxPoint.xyz < worldMin, 1);
     if(outOfRange > 0.5) return 0;
     [unroll]
     for(i = 0; i < 6; ++i)
