@@ -67,7 +67,7 @@ XMFLOAT3 Camera::GetPosition3f()const
 	return mPosition;
 }
 
-void Camera::SetPosition(float x, float y, float z)
+void Camera::SetPosition(double x, double y, double z)
 {
 	mPosition = XMFLOAT3(x, y, z);
 	mViewDirty = true;
@@ -109,61 +109,61 @@ XMFLOAT3 Camera::GetLook3f()const
 	return mLook;
 }
 
-float Camera::GetNearZ()const
+double Camera::GetNearZ()const
 {
 	return mNearZ;
 }
 
-float Camera::GetFarZ()const
+double Camera::GetFarZ()const
 {
 	return mFarZ;
 }
 
-float Camera::GetAspect()const
+double Camera::GetAspect()const
 {
 	return mAspect;
 }
 
-float Camera::GetFovY()const
+double Camera::GetFovY()const
 {
 	return mFovY;
 }
 
-float Camera::GetFovX()const
+double Camera::GetFovX()const
 {
-	float halfWidth = 0.5f*GetNearWindowWidth();
+	double halfWidth = 0.5f*GetNearWindowWidth();
 	return 2.0f*atan(halfWidth / mNearZ);
 }
 
-float Camera::GetNearWindowWidth()const
+double Camera::GetNearWindowWidth()const
 {
 	return mAspect * mNearWindowHeight;
 }
 
-float Camera::GetNearWindowHeight()const
+double Camera::GetNearWindowHeight()const
 {
 	return mNearWindowHeight;
 }
 
-float Camera::GetFarWindowWidth()const
+double Camera::GetFarWindowWidth()const
 {
 	return mAspect * mFarWindowHeight;
 }
 
-float Camera::GetFarWindowHeight()const
+double Camera::GetFarWindowHeight()const
 {
 	return mFarWindowHeight;
 }
 
-void Camera::SetLens(float fovY, float aspect, float zn, float zf)
+void Camera::SetLens(double fovY, double aspect, double zn, double zf)
 {
 	// cache properties
 	mFovY = fovY;
 	mAspect = aspect;
 	mNearZ = zn;
 	mFarZ = zf;
-	mNearWindowHeight = 2.0f * mNearZ * tanf(0.5f*mFovY);
-	mFarWindowHeight = 2.0f * mFarZ * tanf(0.5f*mFovY);
+	mNearWindowHeight = 2.0 * (double)mNearZ * tan(0.5 * mFovY);
+	mFarWindowHeight = 2.0 * (double)mFarZ * tan(0.5 * mFovY);
 }
 
 void Camera::LookAt(FXMVECTOR pos, FXMVECTOR target, FXMVECTOR worldUp)
@@ -230,7 +230,7 @@ XMFLOAT4X4 Camera::GetProj4x4f()const
 	return mProj;
 }
 
-void Camera::Strafe(float d)
+void Camera::Strafe(double d)
 {
 	// mPosition += d*mRight
 	XMVECTOR s = XMVectorReplicate(d);
@@ -241,7 +241,7 @@ void Camera::Strafe(float d)
 	mViewDirty = true;
 }
 
-void Camera::Walk(float d)
+void Camera::Walk(double d)
 {
 	// mPosition += d*mLook
 	XMVECTOR s = XMVectorReplicate(d);
@@ -252,7 +252,7 @@ void Camera::Walk(float d)
 	mViewDirty = true;
 }
 
-void Camera::Pitch(float angle)
+void Camera::Pitch(double angle)
 {
 	// Rotate up and look vector about the right vector.
 
@@ -264,7 +264,7 @@ void Camera::Pitch(float angle)
 	mViewDirty = true;
 }
 
-void Camera::RotateY(float angle)
+void Camera::RotateY(double angle)
 {
 	// Rotate the basis vectors about the world y-axis.
 
@@ -300,9 +300,9 @@ void Camera::UpdateViewMatrix()
 		R = XMVector3Cross(U, L);
 
 		// Fill in the view matrix entries.
-		float x = -XMVectorGetX(XMVector3Dot(P, R));
-		float y = -XMVectorGetX(XMVector3Dot(P, U));
-		float z = -XMVectorGetX(XMVector3Dot(P, L));
+		double x = -XMVectorGetX(XMVector3Dot(P, R));
+		double y = -XMVectorGetX(XMVector3Dot(P, U));
+		double z = -XMVectorGetX(XMVector3Dot(P, L));
 
 		XMStoreFloat3(&mRight, R);
 		XMStoreFloat3(&mUp, U);

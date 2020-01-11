@@ -205,14 +205,14 @@ void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id,
 		uploadBufferPtr = ((UploadBuffer*)targetObj);
 		commandList->SetComputeRootConstantBufferView(
 			rootSigPos,
-			uploadBufferPtr->Resource()->GetGPUVirtualAddress() + indexOffset * uploadBufferPtr->GetAlignedStride()
+			uploadBufferPtr->GetAddress(indexOffset)
 		);
 		break;
 	case ComputeShaderVariable::Type::StructuredBuffer:
 		uploadBufferPtr = ((UploadBuffer*)targetObj);
 		commandList->SetComputeRootShaderResourceView(
 			rootSigPos,
-			uploadBufferPtr->Resource()->GetGPUVirtualAddress() + indexOffset * uploadBufferPtr->GetStride());
+			uploadBufferPtr->GetAddress(indexOffset));
 		break;
 	}
 }

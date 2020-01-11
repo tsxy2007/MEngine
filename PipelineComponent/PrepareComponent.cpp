@@ -117,13 +117,33 @@ struct PrepareRunnable
 			1, transData
 		);
 		camera->UploadCameraBuffer(ths->passConstants);
-		XMMATRIX nonJitterVP = XMMatrixMultiply(camera->GetView(), transData->nonJitteredMatrix);;
+		//Calculate Jitter Matrix
+		XMMATRIX nonJitterVP = XMMatrixMultiply(camera->GetView(), transData->nonJitteredMatrix);
 		ths->passConstants.nonJitterVP = *(XMFLOAT4X4*)&nonJitterVP;
 		ths->passConstants.nonJitterInverseVP = *(XMFLOAT4X4*)&XMMatrixInverse(&XMMatrixDeterminant(nonJitterVP), nonJitterVP);
 		memcpy(&ths->passConstants.lastVP, &transData->lastVP, sizeof(XMFLOAT4X4));
 		ths->passConstants.lastInverseVP = *(XMFLOAT4X4*)&XMMatrixInverse(&XMMatrixDeterminant(transData->lastVP), transData->lastVP);
 		ConstBufferElement ele = resource->cameraCBs[camera->GetInstanceID()];
 		ele.buffer->CopyData(ele.element, &ths->passConstants);
+		//Calculate Frustum Planes
+		XMMATRIX localToWorldMatrix;
+		localToWorldMatrix.r[0] = camera->GetRight();
+		localToWorldMatrix.r[1] = camera->GetUp();
+		localToWorldMatrix.r[2] = camera->GetLook();
+		XMFLOAT3 position = camera->GetPosition3f();
+		localToWorldMatrix.r[3] = { position.x, position.y, position.z, 1 };
+		MathLib::GetPerspFrustumPlanes(localToWorldMatrix, camera->GetFovY(), camera->GetAspect(), camera->GetNearZ(), camera->GetFarZ(), ths->frustumPlanes);
+		//Calculate Frustum Bounding
+		MathLib::GetFrustumBoundingBox(
+			localToWorldMatrix,
+			camera->GetNearWindowHeight(),
+			camera->GetFarWindowHeight(),
+			camera->GetAspect(),
+			camera->GetNearZ(),
+			camera->GetFarZ(),
+			&ths->frustumMinPos,
+			&ths->frustumMaxPos
+		);
 	}
 };
 

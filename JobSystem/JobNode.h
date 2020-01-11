@@ -43,7 +43,7 @@ private:
 	};
 	struct FuncStorage
 	{
-		alignas(__m128) char arr[sizeof(__m128) * 16];
+		__m128 arr[16];
 	};
 	static std::mutex threadMtx;
 	static VectorPool vectorPool;
@@ -54,14 +54,16 @@ private:
 	void(*destructorFunc)(void*) = nullptr;
 	void(*executeFunc)(void*);
 	template <typename Func>
-	void Create(Func&& func)
+	void Create(Func& func)
 	{
 		dependingEvent = vectorPool.New();
 			using Storage = std::aligned_storage_t<sizeof(Func), alignof(Func)>;
 		if (sizeof(Storage) >= sizeof(FuncStorage))	//Create in heap
 		{
 			assert(false);
-			ptr = new Func(std::forward<Func>(func));
+			ptr = new Func{
+				std::move(func)
+			};
 			destructorFunc = [](void* currPtr)->void
 			{
 				Func* fc = (Func*)currPtr;
@@ -71,7 +73,9 @@ private:
 		else
 		{
 			ptr = &stackArr;
-			new (ptr)Func(std::forward<Func>(func));
+			new (ptr)Func{
+				std::move(func)
+			};
 			destructorFunc = [](void* currPtr)->void
 			{
 				Func* fc = (Func*)currPtr;

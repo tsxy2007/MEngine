@@ -14,6 +14,13 @@ class StructuredBuffer;
 class GRP_Renderer : public MObject
 {
 public:
+	struct CullData
+	{
+		DirectX::XMFLOAT4 planes[6];
+		DirectX::XMFLOAT3 _FrustumMinPoint;
+		UINT _Count;
+		DirectX::XMFLOAT3 _FrustumMaxPoint;
+	};
 	struct RenderElement
 	{
 		ConstBufferElement propertyBuffer;
@@ -72,6 +79,7 @@ public:
 	void UpdateRenderer(Transform* targetTrans, Mesh* mesh, ID3D12Device* device);
 	CommandSignature* GetCmdSignature() { return &cmdSig; }
 	DescriptorHeap* GetTextureHeap();
+	void UpdateFrame(FrameResource*, ID3D12Device*);//Should be called Per frame
 	void UpdateTransform(Transform* targetTrans, ID3D12Device* device);
 	void DrawCommand(
 		ID3D12GraphicsCommandList* commandList,

@@ -1,2 +1,3 @@
-﻿  MObject.cpp
+﻿cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  GBufferComponent.cpp
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Debug\Crate.exe

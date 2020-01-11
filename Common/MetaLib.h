@@ -61,6 +61,25 @@ struct LoopClass<F, 0>
 };
 
 template <typename F, unsigned int count>
+struct LoopClassEarlyBreak
+{
+	static bool Do(F&& f)
+	{
+		if (!LoopClassEarlyBreak<F, count - 1>::Do(std::move(f))) return false;
+		return f(count);
+	}
+};
+
+template <typename F>
+struct LoopClassEarlyBreak<F, 0>
+{
+	static bool Do(F&& f)
+	{
+		return f(0);
+	}
+};
+
+template <typename F, unsigned int count>
 void InnerLoop(F& function)
 {
 	LoopClass<F, count - 1>::Do(std::move(function));
@@ -70,6 +89,17 @@ template <typename F, unsigned int count>
 void InnerLoop(F&& function)
 {
 	LoopClass<F, count - 1>::Do(std::move(function));
+}
+template <typename F, unsigned int count>
+bool InnerLoopEarlyBreak(F& function)
+{
+	return LoopClassEarlyBreak<F, count - 1>::Do(std::move(function));
+}
+
+template <typename F, unsigned int count>
+bool InnerLoopEarlyBreak(F&& function)
+{
+	return LoopClassEarlyBreak<F, count - 1>::Do(std::move(function));
 }
 template <typename K, typename V>
 class Dictionary

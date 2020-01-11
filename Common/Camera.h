@@ -32,7 +32,7 @@ public:
 	// Get/Set world camera position.
 	DirectX::XMVECTOR GetPosition()const;
 	DirectX::XMFLOAT3 GetPosition3f()const;
-	void SetPosition(float x, float y, float z);
+	void SetPosition(double x, double y, double z);
 	void SetPosition(const DirectX::XMFLOAT3& v);
 
 	// Get camera basis vectors.
@@ -44,20 +44,20 @@ public:
 	DirectX::XMFLOAT3 GetLook3f()const;
 
 	// Get frustum properties.
-	float GetNearZ()const;
-	float GetFarZ()const;
-	float GetAspect()const;
-	float GetFovY()const;
-	float GetFovX()const;
+	double GetNearZ()const;
+	double GetFarZ()const;
+	double GetAspect()const;
+	double GetFovY()const;
+	double GetFovX()const;
 
 	// Get near and far plane dimensions in view space coordinates.
-	float GetNearWindowWidth()const;
-	float GetNearWindowHeight()const;
-	float GetFarWindowWidth()const;
-	float GetFarWindowHeight()const;
+	double GetNearWindowWidth()const;
+	double GetNearWindowHeight()const;
+	double GetFarWindowWidth()const;
+	double GetFarWindowHeight()const;
 
 	// Set frustum.
-	void SetLens(float fovY, float aspect, float zn, float zf);
+	void SetLens(double fovY, double aspect, double zn, double zf);
 
 	// Define camera space via LookAt parameters.
 	void LookAt(DirectX::FXMVECTOR pos, DirectX::FXMVECTOR target, DirectX::FXMVECTOR worldUp);
@@ -74,12 +74,12 @@ public:
 	void SetView(const DirectX::XMFLOAT4X4& data);
 	void SetView(const DirectX::XMMATRIX& data);
 	// Strafe/Walk the camera a distance d.
-	void Strafe(float d);
-	void Walk(float d);
+	void Strafe(double d);
+	void Walk(double d);
 
 	// Rotate the camera.
-	void Pitch(float angle);
-	void RotateY(float angle);
+	void Pitch(double angle);
+	void RotateY(double angle);
 
 	// After modifying camera position/orientation, call to rebuild the view matrix.
 	void UpdateViewMatrix();
@@ -115,12 +115,12 @@ private:
 	DirectX::XMFLOAT3 mLook = { 0.0f, 0.0f, 1.0f };
 
 	// Cache frustum properties.
-	float mNearZ = 0.0f;
-	float mFarZ = 0.0f;
-	float mAspect = 0.0f;
-	float mFovY = 0.0f;
-	float mNearWindowHeight = 0.0f;
-	float mFarWindowHeight = 0.0f;
+	double mNearZ = 0.0f;
+	double mFarZ = 0.0f;
+	double mAspect = 0.0f;
+	double mFovY = 0.0f;
+	double mNearWindowHeight = 0.0f;
+	double mFarWindowHeight = 0.0f;
 
 
 	bool mViewDirty = true;

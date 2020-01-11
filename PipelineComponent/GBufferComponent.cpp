@@ -12,6 +12,8 @@
 #include "../LogicComponent/Transform.h"
 #include "../Common/GeometryGenerator.h"
 #include "../RenderComponent/GPU Driven/GRP_Renderer.h"
+#include "../Singleton/MeshLayout.h"
+#include "PrepareComponent.h"
 using namespace DirectX;
 PSOContainer* gbufferContainer(nullptr);
 PSOContainer* depthPrepassContainer(nullptr);
@@ -25,14 +27,17 @@ ObjectPtr<Material> mat;
 ObjectPtr<Mesh> mesh;
 ObjectPtr<MeshRenderer> meshRenderer;
 ObjectPtr<Transform> trans;
-
+ObjectPtr<GRP_Renderer> grpRenderer;
+PrepareComponent* prepareComp = nullptr;
 class GBufferFrameResource : public IPipelineResource
 {
 public:
 	DescriptorHeap renderTargetHeap;
 	UploadBuffer ub;
+	UploadBuffer cullBuffer;
 	GBufferFrameResource(ID3D12Device* device)
 	{
+		cullBuffer.Create(device, 1, true, sizeof(GRP_Renderer::CullData));
 		ub.Create(device, 2, true, sizeof(ObjectConstants));
 		renderTargetHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 5, false);
 		XMFLOAT4X4 mat = MathHelper::Identity4x4();
@@ -60,6 +65,7 @@ public:
 		{
 			return new GBufferFrameResource(device);
 		});
+		grpRenderer->UpdateFrame(resource, device);
 		//Bind To RTV Heap
 		ALBEDO_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 0, 0);
 		SPECULAR_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 1, 0);
@@ -82,22 +88,47 @@ public:
 		//Depth Prepass
 		//TODO
 		commandList->OMSetRenderTargets(0, nullptr, true, &EMISSION_RT->GetDepthDescriptor(0));
-		meshRenderer->Draw(
+		/*meshRenderer->Draw(
 			1, commandList,
 			device,
 			&resource->cameraCBs[cam->GetInstanceID()],
 			&frameRes->ub,
 			1, depthPrepassContainer
+		);*/
+		ConstBufferElement cullEle;
+		cullEle.buffer = &frameRes->cullBuffer;
+		cullEle.element = 0;
+		grpRenderer->DrawCommand(
+			commandList,
+			device,
+			1, resource,
+			resource->cameraCBs[cam->GetInstanceID()],
+			cullEle,
+			prepareComp->frustumPlanes,
+			*(XMFLOAT3*)&prepareComp->frustumMinPos,
+			*(XMFLOAT3*)&prepareComp->frustumMaxPos,
+			depthPrepassContainer
 		);
 		//GBuffer Pass
 		//TODO
 		commandList->OMSetRenderTargets(5, handles, true, &EMISSION_RT->GetDepthDescriptor(0));
-		meshRenderer->Draw(
+		/*meshRenderer->Draw(
 			0, commandList,
 			device,
 			&resource->cameraCBs[cam->GetInstanceID()],
 			&frameRes->ub,
 			1, depthPrepassContainer
+		);*/
+		grpRenderer->DrawCommand(
+			commandList,
+			device,
+			0, resource,
+			resource->cameraCBs[cam->GetInstanceID()],
+			cullEle,
+			prepareComp->frustumPlanes,
+			*(XMFLOAT3*)&prepareComp->frustumMinPos,
+			*(XMFLOAT3*)&prepareComp->frustumMaxPos,
+			gbufferContainer
 		);
 		tcmd->CloseCommand();
 	}
@@ -125,8 +156,9 @@ void GBufferComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 	//Schedule MultiThread Job
 	ScheduleJob(runnable);
 }
+
 void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh, ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, FrameResource* res);
-#include "PrepareComponent.h"
+
 void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	tempRTRequire.resize(5);
@@ -186,6 +218,27 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	BuildShapeGeometry(geoGen.CreateBox(1, 1, 1, 1), mesh, device, commandList, nullptr);
 	trans = new Transform(nullptr);
 	meshRenderer = new MeshRenderer(trans.operator->(), device, mesh, mat);
+	grpRenderer = new GRP_Renderer(
+		sizeof(MaterialConstants),
+		MeshLayout::GetMeshLayoutIndex(
+			true,
+			false,
+			false,
+			true,
+			false,
+			false,
+			false
+		),
+		256,
+		10000,
+		ShaderCompiler::GetShader("OpaqueStandard"),
+		2,
+		device
+	);
+	grpRenderer->AddRenderElement(
+		trans, mesh, device
+	);
+	prepareComp = RenderPipeline::GetComponent<PrepareComponent>();
 }
 
 void GBufferComponent::Dispose()

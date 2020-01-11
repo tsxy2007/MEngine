@@ -21,18 +21,28 @@ public:
 		DirectX::XMVECTOR localExtent);
 	static void GetCameraNearPlanePoints(
 		DirectX::XMMATRIX& localToWorldMatrix,
-		float fov,
-		float aspect,
-		float distance,
+		double fov,
+		double aspect,
+		double distance,
 		DirectX::XMVECTOR* corners
 	);
 
 	static void GetPerspFrustumPlanes(
 		DirectX::XMMATRIX& localToWorldMatrix,
-		float fov,
-		float aspect,
-		float nearPlane,
-		float farPlane,
+		double fov,
+		double aspect,
+		double nearPlane,
+		double farPlane,
 		DirectX::XMFLOAT4* frustumPlanes
+	);
+	static void GetFrustumBoundingBox(
+		DirectX::XMMATRIX& localToWorldMatrix,
+		double nearWindowHeight,
+		double farWindowHeight,
+		double aspect,
+		double nearZ,
+		double farZ, 
+		DirectX::XMVECTOR* minValue,
+		DirectX::XMVECTOR* maxValue
 	);
 };

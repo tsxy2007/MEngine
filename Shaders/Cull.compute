@@ -1,8 +1,8 @@
 cbuffer CBuffer : register(b0)
 {
-    uint _Count;
     float4 planes[6];
     float3 _FrustumMinPoint;
+    uint _Count;
     float3 _FrustumMaxPoint;
 };
 struct MultiDrawCommand

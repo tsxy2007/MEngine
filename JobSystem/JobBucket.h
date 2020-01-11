@@ -19,7 +19,7 @@ public:
 	{
 		JobNode* node = jobNodePool.New();
 		jobNodesVec.emplace_back(node);
-		node->Create<Func>(std::forward<Func>(func));
+		node->Create(func);
 		JobHandle retValue(node);
 		return retValue;
 	}
@@ -28,7 +28,7 @@ public:
 	{
 		JobNode* node = jobNodePool.New();
 		jobNodesVec.emplace_back(node);
-		node->Create<Func>(std::forward<Func>(func));
+		node->Create<Func>(func);
 		JobHandle retValue(node);
 		return retValue;
 	}

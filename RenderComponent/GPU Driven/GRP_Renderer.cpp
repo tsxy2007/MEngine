@@ -17,13 +17,7 @@ struct ObjectData
 	DirectX::XMFLOAT3 boundingCenter;
 	DirectX::XMFLOAT3 boundingExtent;
 };
-struct CullData
-{
-	UINT _Count;
-	DirectX::XMFLOAT4 planes[6];
-	DirectX::XMFLOAT3 _FrustumMinPoint;
-	DirectX::XMFLOAT3 _FrustumMaxPoint;
-};
+
 struct Command
 {
 	enum CommandType
@@ -107,7 +101,7 @@ public:
 			}
 			c = allCommands[i];
 			mtx.unlock();
-			ConstBufferElement& cEle = allocatedObjects[c.index];
+			ConstBufferElement cEle;// = allocatedObjects[c.index];
 			std::vector<ConstBufferElement>::iterator ite;// = allocatedObjects.end() - 1;
 			UINT last = count - 1;
 			ObjectConstants objConst;
@@ -130,6 +124,7 @@ public:
 					objectPosBuffer->CopyDataInside(last, c.index);
 					cmdDrawBuffers->CopyDataInside(last, c.index);
 				}
+				cEle = allocatedObjects[c.index];
 				objectPool.Return(cEle);
 				ite = allocatedObjects.end() - 1;
 				cEle = *ite;
@@ -142,6 +137,7 @@ public:
 				objectPosBuffer->CopyData(c.index, &c.objData);
 				break;
 			case Command::CommandType::CommandType_Renderer:
+				cEle = allocatedObjects[c.index];
 				c.cmd.objectCBufferAddress = cEle.buffer->GetAddress(cEle.element); 
 				cmdDrawBuffers->CopyData(c.index, &c.cmd);
 				break;
@@ -327,6 +323,15 @@ void GRP_Renderer::RemoveElement(Transform* trans, ID3D12Device* device)
 
 }
 
+void GRP_Renderer::UpdateFrame(FrameResource* resource, ID3D12Device* device)
+{
+	GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)resource->GetResource(this, [=]()->GpuDrivenRenderer*
+	{
+		return new GpuDrivenRenderer(device, capacity);
+	});
+	perFrameData->UpdateFrame(device);
+}
+
 void GRP_Renderer::UpdateTransform(Transform* targetTrans, ID3D12Device* device)
 {
 	auto&& ite = dicts.find(targetTrans);
@@ -395,7 +400,7 @@ void  GRP_Renderer::DrawCommand(
 	cullShader->SetStructuredBufferByAddress(commandList, _OutputBuffer, cullResultBuffer->GetAddress(0, 0));
 	cullShader->SetStructuredBufferByAddress(commandList, _CountBuffer, cullResultBuffer->GetAddress(1, 0));
 	cullShader->SetResource(commandList, CBuffer, cullDataBuffer.buffer, cullDataBuffer.element);
-	cullShader->Dispatch(commandList, 1, dispatchCount, 1, 1);
+	cullShader->Dispatch(commandList, 1, 1, 1, 1);
 	cullShader->Dispatch(commandList, 0, dispatchCount, 1, 1);
 	PSODescriptor desc;
 	desc.meshLayoutIndex = meshLayoutIndex;

@@ -1,4 +1,5 @@
 #include "MathLib.h"
+#include "../Common/MetaLib.h"
 using namespace DirectX;
 #define GetVec(name, v) XMVECTOR name = XMLoadFloat3(&##v);
 #define StoreVec(ptr, v) XMStoreFloat3(ptr, v);
@@ -32,7 +33,7 @@ bool MathLib::BoxIntersect(DirectX::XMMATRIX& localToWorldMatrix, DirectX::XMVEC
 {
 	XMMATRIX matrixTranspose = XMMatrixTranspose(localToWorldMatrix);
 	XMVECTOR pos = XMVector3TransformCoord(position, matrixTranspose);
-	for (UINT i = 0; i < 6; ++i)
+	auto func = [&](UINT i)->bool
 	{
 		XMVECTOR plane = planes[i];
 		XMVECTOR absNormal = XMVectorAbs(XMVector3TransformNormal(plane, matrixTranspose));
@@ -41,20 +42,21 @@ bool MathLib::BoxIntersect(DirectX::XMMATRIX& localToWorldMatrix, DirectX::XMVEC
 		XMStoreFloat(&dist, result);
 		XMStoreFloat4(&planeF, plane);
 		if (dist > -planeF.w) return false;
-	}
+	};
+	InnerLoopEarlyBreak<decltype(func), 6>(func);
 	return true;
 }
 
 void MathLib::GetCameraNearPlanePoints(
 	XMMATRIX& localToWorldMatrix,
-	float fov,
-	float aspect,
-	float distance,
+	double fov,
+	double aspect,
+	double distance,
 	XMVECTOR* corners
 )
 {
-	float upLength = distance * tan(fov * 0.5f);
-	float rightLength = upLength * aspect;
+	double upLength = distance * tan(fov * 0.5);
+	double rightLength = upLength * aspect;
 	XMVECTOR farPoint = localToWorldMatrix.r[3] + distance * localToWorldMatrix.r[2];
 	XMVECTOR upVec = upLength * localToWorldMatrix.r[1];
 	XMVECTOR rightVec = rightLength * localToWorldMatrix.r[0];
@@ -66,10 +68,10 @@ void MathLib::GetCameraNearPlanePoints(
 
 void MathLib::GetPerspFrustumPlanes(
 	XMMATRIX& localToWorldMatrix,
-	float fov,
-	float aspect,
-	float nearPlane,
-	float farPlane,
+	double fov,
+	double aspect,
+	double nearPlane,
+	double farPlane,
 	XMFLOAT4* frustumPlanes
 )
 {
@@ -81,4 +83,41 @@ void MathLib::GetPerspFrustumPlanes(
 	*(XMVECTOR*)(frustumPlanes + 3) = GetPlane(nearCorners[2], nearCorners[3], localToWorldMatrix.r[3]);
 	*(XMVECTOR*)(frustumPlanes + 4) = GetPlane(nearCorners[0], nearCorners[2], localToWorldMatrix.r[3]);
 	*(XMVECTOR*)(frustumPlanes + 5) = GetPlane(nearCorners[3], nearCorners[1], localToWorldMatrix.r[3]);
+}
+
+void MathLib::GetFrustumBoundingBox(
+	DirectX::XMMATRIX& localToWorldMatrix,
+	double nearWindowHeight,
+	double farWindowHeight,
+	double aspect,
+	double nearZ,
+	double farZ,
+	XMVECTOR* minValue,
+	XMVECTOR* maxValue)
+{
+	double halfNearYHeight = nearWindowHeight * 0.5;
+	double halfFarYHeight = farWindowHeight * 0.5;
+	double halfNearXWidth = halfNearYHeight * aspect;
+	double halfFarXWidth = halfFarYHeight * aspect;
+	XMVECTOR poses[8];
+	XMVECTOR pos = localToWorldMatrix.r[3];
+	XMVECTOR right = localToWorldMatrix.r[0];
+	XMVECTOR up = localToWorldMatrix.r[1];
+	XMVECTOR forward = localToWorldMatrix.r[2];
+	poses[0] = pos + forward * nearZ - right * halfNearXWidth - up * halfNearYHeight;
+	poses[1] = pos + forward * nearZ - right * halfNearXWidth + up * halfNearYHeight;
+	poses[2] = pos + forward * nearZ + right * halfNearXWidth - up * halfNearYHeight;
+	poses[3] = pos + forward * nearZ + right * halfNearXWidth + up * halfNearYHeight;
+	poses[4] = pos + forward * farZ - right * halfFarXWidth - up * halfFarYHeight;
+	poses[5] = pos + forward * farZ - right * halfFarXWidth + up * halfFarYHeight;
+	poses[6] = pos + forward * farZ + right * halfFarXWidth - up * halfFarYHeight;
+	poses[7] = pos + forward * farZ + right * halfFarXWidth + up * halfFarYHeight;
+	*minValue = poses[7];
+	*maxValue = poses[7];
+	auto func = [&](UINT i)->void
+	{
+		*minValue = XMVectorMin(poses[i], *minValue);
+		*maxValue = XMVectorMax(poses[i], *maxValue);
+	};
+	InnerLoop<decltype(func), 7>(func);
 }

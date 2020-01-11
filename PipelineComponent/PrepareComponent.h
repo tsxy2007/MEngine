@@ -10,6 +10,8 @@ class PrepareComponent : public PipelineComponent
 public:
 	PassConstants passConstants;
 	DirectX::XMFLOAT4 frustumPlanes[6];
+	DirectX::XMVECTOR frustumMinPos;
+	DirectX::XMVECTOR frustumMaxPos;
 protected:
 	std::vector<TemporalRTCommand> useless;
 	virtual CommandListType GetCommandListType() {
