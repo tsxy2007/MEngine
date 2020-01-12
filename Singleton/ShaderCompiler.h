@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <string>
-
+class JobSystem;
 class Shader;
 class ComputeShader;
 class ID3D12Device;
@@ -15,5 +15,5 @@ public:
 	static ComputeShader* GetComputeShader(std::string name);
 	static void AddShader(std::string str, Shader* shad);
 	static void AddComputeShader(std::string str, ComputeShader* shad);
-	static void Init(ID3D12Device* device);
+	static void Init(ID3D12Device* device, JobSystem* jobSys);
 };

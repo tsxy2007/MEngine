@@ -1,5 +1,6 @@
 #include "JobHandle.h"
-
+#include "JobNode.h"
+JobHandle::JobHandle(JobNode* otherNode) : node(otherNode) {};
 JobHandle::JobHandle() : node(nullptr)
 {
 

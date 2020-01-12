@@ -68,20 +68,20 @@ void RenderTexture::GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc)
 	srvDesc.Format = mDepthResource->GetDesc().Format;
 	switch (mType)
 	{
-	case RenderTextureType::Cubemap:
+	case RenderTextureType::RenderTextureType_Cubemap:
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 		srvDesc.TextureCube.MostDetailedMip = 0;
 		srvDesc.TextureCube.MipLevels = mDepthResource->GetDesc().MipLevels;
 		srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
 		break;
-	case RenderTextureType::Tex2D:
+	case RenderTextureType::RenderTextureType_Tex2D:
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 		srvDesc.Texture2D.MipLevels = mDepthResource->GetDesc().MipLevels;
 		srvDesc.Texture2D.PlaneSlice = 0;
 		srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 		break;
-	case RenderTextureType::Tex2DArray:
+	case RenderTextureType::RenderTextureType_Tex2DArray:
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
 		srvDesc.Texture2DArray.MostDetailedMip = 0;
 		srvDesc.Texture2DArray.MipLevels = mDepthResource->GetDesc().MipLevels;
@@ -90,7 +90,7 @@ void RenderTexture::GetDepthViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc)
 		srvDesc.Texture2DArray.ArraySize = depthSlice;
 		srvDesc.Texture2DArray.FirstArraySlice = 0;
 		break;
-	case RenderTextureType::Tex3D:
+	case RenderTextureType::RenderTextureType_Tex3D:
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
 		srvDesc.Texture3D.MipLevels = mDepthResource->GetDesc().MipLevels;
 		srvDesc.Texture3D.MostDetailedMip = 0;
@@ -113,12 +113,12 @@ void RenderTexture::GetColorUAVDesc(D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, U
 	uavDesc.Format = mColorResource->GetDesc().Format;
 	switch (mType)
 	{
-	case RenderTextureType::Tex2D:
+	case RenderTextureType::RenderTextureType_Tex2D:
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 		uavDesc.Texture2D.MipSlice = targetMipLevel;
 		uavDesc.Texture2D.PlaneSlice = 0;
 		break;
-	case RenderTextureType::Tex3D:
+	case RenderTextureType::RenderTextureType_Tex3D:
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
 		uavDesc.Texture3D.FirstWSlice = 0;
 		uavDesc.Texture3D.MipSlice = targetMipLevel;
@@ -140,20 +140,20 @@ void RenderTexture::GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc)
 	srvDesc.Format = mColorResource->GetDesc().Format;
 	switch (mType)
 	{
-	case RenderTextureType::Cubemap:
+	case RenderTextureType::RenderTextureType_Cubemap:
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 		srvDesc.TextureCube.MostDetailedMip = 0;
 		srvDesc.TextureCube.MipLevels = mColorResource->GetDesc().MipLevels;
 		srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
 		break;
-	case RenderTextureType::Tex2D:
+	case RenderTextureType::RenderTextureType_Tex2D:
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 		srvDesc.Texture2D.MipLevels = mColorResource->GetDesc().MipLevels;
 		srvDesc.Texture2D.PlaneSlice = 0;
 		srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 		break;
-	case RenderTextureType::Tex2DArray:
+	case RenderTextureType::RenderTextureType_Tex2DArray:
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
 		srvDesc.Texture2DArray.MostDetailedMip = 0;
 		srvDesc.Texture2DArray.MipLevels = mColorResource->GetDesc().MipLevels;
@@ -162,7 +162,7 @@ void RenderTexture::GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc)
 		srvDesc.Texture2DArray.ArraySize = depthSlice;
 		srvDesc.Texture2DArray.FirstArraySlice = 0;
 		break;
-	case RenderTextureType::Tex3D:
+	case RenderTextureType::RenderTextureType_Tex3D:
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
 		srvDesc.Texture3D.MipLevels = mColorResource->GetDesc().MipLevels;
 		srvDesc.Texture3D.MostDetailedMip = 0;
@@ -201,12 +201,12 @@ void RenderTexture::BindRTVToHeap(ID3D12Device* device, DescriptorHeap* targetHe
 	slice = min(slice, maxDepth);
 	switch (mType)
 	{
-	case RenderTextureType::Tex2D:
+	case RenderTextureType::RenderTextureType_Tex2D:
 
 		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, targetHeap->hCPU(targetHeapIndex));
 		break;
 
-	case RenderTextureType::Tex3D:
+	case RenderTextureType::RenderTextureType_Tex3D:
 		rtvDesc.Texture3D.FirstWSlice = slice;
 		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, targetHeap->hCPU(targetHeapIndex));
 		break;
@@ -236,21 +236,21 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 	UINT arraySize;
 	switch (type)
 	{
-	case RenderTextureType::Cubemap:
+	case RenderTextureType::RenderTextureType_Cubemap:
 		arraySize = 6;
 		break;
-	case RenderTextureType::Tex2D:
+	case RenderTextureType::RenderTextureType_Tex2D:
 		arraySize = 1;
 		break;
 	default:
-		arraySize = depthCount;
+		arraySize = max(1, depthCount);
 		break;
 	}
 	mipCount = max(1, mipCount);
 	depthSlice = arraySize;
 	D3D12_RESOURCE_DESC texDesc;
 	ZeroMemory(&texDesc, sizeof(D3D12_RESOURCE_DESC));
-	texDesc.Dimension = (type == RenderTextureType::Tex3D) ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	texDesc.Dimension = (type == RenderTextureType::RenderTextureType_Tex3D) ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	texDesc.Alignment = 0;
 	texDesc.Width = mWidth;
 	texDesc.Height = mHeight;
@@ -261,21 +261,17 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 	texDesc.SampleDesc.Quality = 0;
 	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-	D3D12_CLEAR_VALUE colorClear;
-	colorClear.Format = mFormat;
-	float colors[4] = { 0,0,0,0 };
-	memcpy(colorClear.Color, colors, sizeof(float) * 4);
 	ThrowIfFailed(device->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 		D3D12_HEAP_FLAG_NONE,
 		&texDesc,
 		D3D12_RESOURCE_STATE_RENDER_TARGET,
-		&colorClear,
+		nullptr,
 		IID_PPV_ARGS(&mColorResource)));
 
 	switch (type)
 	{
-	case RenderTextureType::Tex2D:
+	case RenderTextureType::RenderTextureType_Tex2D:
 		rtvHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, arraySize, false);
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 		rtvDesc.Format = mFormat;
@@ -284,7 +280,7 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, rtvHeap.hCPU(0));
 		break;
 
-	case RenderTextureType::Tex3D:
+	case RenderTextureType::RenderTextureType_Tex3D:
 		rtvHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, arraySize, false);
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE3D;
 		rtvDesc.Format = mFormat;
@@ -314,18 +310,23 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 		}
 		break;
 	}
+	DXGI_FORMAT mResourceFormat;
 	switch (depthByte)
 	{
 	case RenderTextureDepthSettings_Depth32:
+		mResourceFormat = DXGI_FORMAT_R32_FLOAT;
 		mDepthFormat = DXGI_FORMAT_D32_FLOAT;
 		break;
 	case RenderTextureDepthSettings_Depth16:
+		mResourceFormat = DXGI_FORMAT_R16_UNORM;
 		mDepthFormat = DXGI_FORMAT_D16_UNORM;
 		break;
 	case RenderTextureDepthSettings_DepthStencil:
+		mResourceFormat = DXGI_FORMAT_R24G8_TYPELESS;
 		mDepthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		break;
 	default:
+		mResourceFormat = DXGI_FORMAT_UNKNOWN;
 		mDepthFormat = DXGI_FORMAT_UNKNOWN;
 		break;
 	}
@@ -334,32 +335,28 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 	{
 		dsvHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, arraySize, false);
 		D3D12_RESOURCE_DESC depthStencilDesc;
-		depthStencilDesc.Dimension = (type == RenderTextureType::Tex3D) ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		depthStencilDesc.Dimension = (type == RenderTextureType::RenderTextureType_Tex3D) ? D3D12_RESOURCE_DIMENSION_TEXTURE3D : D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		depthStencilDesc.Alignment = 0;
 		depthStencilDesc.Width = width;
 		depthStencilDesc.Height = height;
 		depthStencilDesc.DepthOrArraySize = arraySize;
 		depthStencilDesc.MipLevels = 1;  
-		depthStencilDesc.Format = mDepthFormat;
+		depthStencilDesc.Format = mResourceFormat;
 		depthStencilDesc.SampleDesc.Count = 1;
 		depthStencilDesc.SampleDesc.Quality = 0;
 		depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 		depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-		D3D12_CLEAR_VALUE optClear;
-		optClear.Format = mDepthFormat;
-		optClear.DepthStencil.Depth = 0;
-		optClear.DepthStencil.Stencil = 0;
 		ThrowIfFailed(device->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
 			&depthStencilDesc,
 			D3D12_RESOURCE_STATE_DEPTH_WRITE,
-			&optClear,
+			nullptr,
 			IID_PPV_ARGS(mDepthResource.GetAddressOf())));
 		D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
 		switch (type)
 		{
-		case RenderTextureType::Tex2D:
+		case RenderTextureType::RenderTextureType_Tex2D:
 			dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 			dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 			dsvDesc.Format = mDepthFormat;
@@ -369,6 +366,7 @@ mScissorRect({ 0, 0, (int)width, (int)height })
 		default:
 			dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 			dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
+
 			dsvDesc.Texture2DArray.ArraySize = 1;
 			dsvDesc.Texture2DArray.MipSlice = 0;
 			for (int i = 0; i < arraySize; ++i)

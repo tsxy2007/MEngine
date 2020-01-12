@@ -4,6 +4,7 @@
 #include "../RenderComponent/DescriptorHeap.h"
 #include "UploadBuffer.h"
 #include <fstream>
+#include "../JobSystem/JobInclude.h"
 using namespace std;
 using Microsoft::WRL::ComPtr;
 Shader::~Shader()
@@ -35,45 +36,11 @@ void Shader::GetPassPSODesc(UINT pass, D3D12_GRAPHICS_PIPELINE_STATE_DESC* targe
 	targetPSO->DepthStencilState = p.depthStencilState;
 }
 
-ComPtr<ID3DBlob> CompileShader(std::wstring& path, std::string& functionName, std::string&& standard, D3D_SHADER_MACRO* macros, bool useCache)
-{
-	//std::fstream fs;
-	std::wstring filePath = path + L".hlsl";
-	/*std::wstring wstr(functionName.size() + 1, L' ');
-	wstr[0] = L'_';
-	for (int i = 0; i < functionName.size(); ++i)
-	{
-		wstr[i + 1] = functionName[i];
-	}
-	std::wstring cachePath = path + wstr + L".shaderCache";
-	fs.open(cachePath, ios::in);*/
-	ComPtr<ID3DBlob> result;
-	if(!useCache /*|| !fs*/)
-	{ 
-	//	fs.close();
-	//	fs.open(cachePath, ios::out);
-		result = d3dUtil::CompileShader(filePath, macros, functionName, standard);
-	//	fs.write((char*)result->GetBufferPointer(), result->GetBufferSize());
-	//	fs.close();
-	}
-	else
-	{
-	/*	fs.seekg(0, fs.end);
-		size_t shaderSize = fs.tellg();
-		fs.seekg(0, 0);
-		ThrowIfFailed(D3DCreateBlob(shaderSize, result.GetAddressOf()));
-		fs.read((char*)result->GetBufferPointer(), shaderSize);
-		size_t flag = fs.tellg();
-		fs.close();*/
-	}
-	return result;
-}
-
 Shader::Shader(
 	Pass* passes, UINT passCount,
 	ShaderVariable* shaderVariables, UINT shaderVarCount,
 	ID3D12Device* device,
-	bool useShaderCache
+	JobBucket* compileJob
 )
 {
 	//Create Pass
@@ -81,12 +48,28 @@ Shader::Shader(
 	for (int i = 0; i < passCount; ++i)
 	{
 		Pass& p = passes[i];
-		if (p.vsShader == nullptr)
-			p.vsShader = d3dUtil::CompileShader(p.filePath, nullptr, p.vertex, "vs_5_1");//CompileShader(p.filePath, p.vertex, "vs_5_1", nullptr, useShaderCache);
-		if (p.psShader == nullptr)
-			p.psShader = d3dUtil::CompileShader(p.filePath, nullptr, p.fragment, "ps_5_1");// CompileShader(p.filePath, p.fragment, "ps_5_1", nullptr, useShaderCache);
 		allPasses.push_back(std::move(p));
 	}
+	std::vector<Pass>* allPassesPtr = &allPasses;
+	auto func = [passCount, allPassesPtr]()->void
+	{
+		for (int i = 0; i < passCount; ++i)
+		{
+			Pass& p = (*allPassesPtr)[i];
+			if (p.vsShader == nullptr)
+				p.vsShader = d3dUtil::CompileShader(p.filePath, nullptr, p.vertex, "vs_5_1");//CompileShader(p.filePath, p.vertex, "vs_5_1", nullptr, useShaderCache);
+			if (p.psShader == nullptr)
+				p.psShader = d3dUtil::CompileShader(p.filePath, nullptr, p.fragment, "ps_5_1");// CompileShader(p.filePath, p.fragment, "ps_5_1", nullptr, useShaderCache);
+		}
+	};
+	if (compileJob)
+	{
+		compileJob->GetTask(func);
+	}
+	else {
+		func();
+	}
+	
 	mVariablesDict.reserve(shaderVarCount + 2);
 	mVariablesVector.reserve(shaderVarCount);
 	for (int i = 0; i < shaderVarCount; ++i)
@@ -102,7 +85,7 @@ Shader::Shader(
 	allParameter.reserve(VariableLength());
 	std::vector< CD3DX12_DESCRIPTOR_RANGE> allTexTable;
 	IterateVariables([&](ShaderVariable& var) -> void {
-		if (var.type == ShaderVariable::Type::DescriptorHeap)
+		if (var.type == ShaderVariableType_DescriptorHeap)
 		{
 			CD3DX12_DESCRIPTOR_RANGE texTable;
 			texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, var.tableSize, var.registerPos, var.space);
@@ -115,14 +98,14 @@ Shader::Shader(
 		CD3DX12_ROOT_PARAMETER slotRootParameter;
 		switch (var.type)
 		{
-		case ShaderVariable::Type::DescriptorHeap:
+		case ShaderVariableType_DescriptorHeap:
 			slotRootParameter.InitAsDescriptorTable(1, allTexTable.data() + offset);
 			offset++;
 			break;
-		case ShaderVariable::Type::ConstantBuffer:
+		case ShaderVariableType_ConstantBuffer:
 			slotRootParameter.InitAsConstantBufferView(var.registerPos, var.space);
 			break;
-		case ShaderVariable::Type::StructuredBuffer:
+		case ShaderVariableType_StructuredBuffer:
 			slotRootParameter.InitAsShaderResourceView(var.registerPos, var.space);
 			break;
 		default:
@@ -169,7 +152,7 @@ void Shader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObjec
 	ID3D12DescriptorHeap* heap = nullptr;
 	switch (var.type)
 	{
-	case ShaderVariable::Type::DescriptorHeap:
+	case ShaderVariableType_DescriptorHeap:
 		heap = ((DescriptorHeap*)targetObj)->Get().Get();
 		commandList->SetDescriptorHeaps(1, &heap);
 		commandList->SetGraphicsRootDescriptorTable(
@@ -177,14 +160,14 @@ void Shader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObjec
 			((DescriptorHeap*)targetObj)->hGPU(indexOffset)
 		);
 		break;
-	case ShaderVariable::Type::ConstantBuffer:
+	case ShaderVariableType_ConstantBuffer:
 		uploadBufferPtr = ((UploadBuffer*)targetObj);
 		commandList->SetGraphicsRootConstantBufferView(
 			rootSigPos,
 			uploadBufferPtr->Resource()->GetGPUVirtualAddress() + indexOffset * uploadBufferPtr->GetAlignedStride()
 		);
 		break;
-	case ShaderVariable::Type::StructuredBuffer:
+	case ShaderVariableType_StructuredBuffer:
 		uploadBufferPtr = ((UploadBuffer*)targetObj);
 		commandList->SetGraphicsRootShaderResourceView(
 			rootSigPos,

@@ -15,19 +15,19 @@ ThreadCommand* InitThreadCommand(ID3D12Device* device, Camera* cam, FrameResourc
 {
 	switch (comp->GetCommandListType())
 	{
-	case PipelineComponent::CommandListType_Graphics:
+	case CommandListType_Graphics:
 		return resource->GetNewThreadCommand(cam, device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 		break;
-	case PipelineComponent::CommandListType_Compute:
+	case CommandListType_Compute:
 		return resource->GetNewThreadCommand(cam, device, D3D12_COMMAND_LIST_TYPE_COMPUTE);
 	default:
 		return nullptr;
 	}
 }
-void ExecuteThreadCommand(Camera* cam, ThreadCommand* command)
+void ExecuteThreadCommand(Camera* cam, ThreadCommand* command, FrameResource* resource)
 {
 	if (command != nullptr) {
-		FrameResource::mCurrFrameResource->ReleaseThreadCommand(cam, command);
+		resource->ReleaseThreadCommand(cam, command);
 	}
 }
 
@@ -62,12 +62,16 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	std::vector <JobBucket>& bucketArray = buckets[bucketsFlag];
 	bucketsFlag = !bucketsFlag;
 	bucketArray.resize(max(renderData.allCameras->size(), 1));
+	for (auto ite = bucketArray.begin(); ite != bucketArray.end(); ++ite)
+	{
+		ite->SetJobSystem(jobSys);
+	}
 	PipelineComponent::EventData data;
 	data.device = renderData.device;
 	data.resource = renderData.resource;
 	data.world = renderData.world;
 	UINT frameNum = *renderData.fenceIndex + 2;
-	FrameResource::mCurrFrameResource->UpdateBeforeFrame(renderData.fence, renderData.fenceCount);
+	renderData.resource->UpdateBeforeFrame(renderData.fence, renderData.fenceCount);
 	ThreadCommand* commandList = renderData.resource->commmonThreadCommand;
 	bucketArray[0].GetTask([=]()->void
 	{
@@ -155,7 +159,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 			component->RenderEvent(data, component->threadCommand);
 			switch (component->GetCommandListType())
 			{
-			case PipelineComponent::CommandListType_Graphics:
+			case CommandListType_Graphics:
 				for (auto ite = component->gpuDepending.begin(); ite != component->gpuDepending.end(); ++ite)
 				{
 					currentCommandBuffer->WaitForGraphics((*ite)->fence.Get(), frameNum);
@@ -166,7 +170,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 					currentCommandBuffer->SignalToGraphics(component->fence.Get(), frameNum);
 				}
 				break;
-			case PipelineComponent::CommandListType_Compute:
+			case CommandListType_Compute:
 				for (auto ite = component->gpuDepending.begin(); ite != component->gpuDepending.end(); ++ite)
 				{
 					currentCommandBuffer->WaitForCompute((*ite)->fence.Get(), frameNum);
@@ -184,7 +188,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 		{
 			PipelineComponent* component = waitingComponents[i];
 			component->MarkHandles();
-			ExecuteThreadCommand(cam, component->threadCommand);
+			ExecuteThreadCommand(cam, component->threadCommand, renderData.resource);
 		}
 	}
 

@@ -43,7 +43,7 @@ void Material::BindShaderResource(ID3D12GraphicsCommandList* commandList)
 
 }
 
-bool Material::SetProperty(UINT id, ObjectPtr<MObject> obj, ShaderVariable::Type type, UINT offsetIndex)
+bool Material::SetProperty(UINT id, ObjectPtr<MObject> obj, ShaderVariableType type, UINT offsetIndex)
 {
 	ShaderVariable var;
 	if (mShader->TryGetShaderVariable(id, var) && var.type == type)
@@ -63,7 +63,7 @@ bool Material::SetProperty(UINT id, ObjectPtr<MObject> obj, ShaderVariable::Type
 
 bool Material::SetBindlessResource(UINT id, UINT offsetIndex)
 {
-	return SetProperty(id, shaderResourceHeap.operator->(), ShaderVariable::Type::DescriptorHeap, offsetIndex);
+	return SetProperty(id, shaderResourceHeap.operator->(), ShaderVariableType_DescriptorHeap, offsetIndex);
 }
 
 void Material::RemoveProperty(UINT key)

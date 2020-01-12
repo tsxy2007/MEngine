@@ -2,22 +2,22 @@
 #include "../Common/MObject.h"
 #include "../Common/d3dUtil.h"
 #include "../RenderComponent/DescriptorHeap.h"
-enum class CubeMapFace : int
+enum CubeMapFace
 {
-	PositiveX = 0,
-	NegativeX = 1,
-	PositiveY = 2,
-	NegativeY = 3,
-	PositiveZ = 4,
-	NegativeZ = 5
+	CubeMapFace_PositiveX = 0,
+	CubeMapFace_NegativeX = 1,
+	CubeMapFace_PositiveY = 2,
+	CubeMapFace_NegativeY = 3,
+	CubeMapFace_PositiveZ = 4,
+	CubeMapFace_NegativeZ = 5
 };
 
-enum class RenderTextureType : int
+enum RenderTextureType
 {
-	Tex2D = 0,
-	Tex2DArray = 1,
-	Tex3D = 2,
-	Cubemap = 3
+	RenderTextureType_Tex2D = 0,
+	RenderTextureType_Tex2DArray = 1,
+	RenderTextureType_Tex3D = 2,
+	RenderTextureType_Cubemap = 3
 };
 enum RenderTextureDepthSettings
 {

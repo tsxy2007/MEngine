@@ -1,4 +1,6 @@
 #include "PipelineComponent.h"
+#include "../RenderComponent/RenderTexture.h"
+#include "../PipelineComponent/IPerCameraResource.h"
 #include "../Singleton/FrameResource.h"
 #include "TempRTAllocator.h"
 std::mutex PipelineComponent::mtx;

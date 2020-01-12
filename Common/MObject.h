@@ -59,7 +59,7 @@ public:
 
 	operator bool() const
 	{
-		return link.mPtr == nullptr;
+		return link.mPtr != nullptr;
 	}
 
 	operator MObject*() const

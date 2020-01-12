@@ -3,20 +3,11 @@
 #include "ConcurrentQueue.h"
 #include <condition_variable>
 #include <atomic>
-ConcurrentQueue<JobNode*> executingNode(100);
-std::vector<std::thread*> allThreads;
-std::atomic<int> bucketMissionCount;
-int currentBucketPos;
-std::vector<JobBucket*> buckets;
-std::condition_variable cv;
-bool JobSystemInitialized(false);
-
-std::mutex mainThreadWaitMutex;
-std::condition_variable mainThreadWaitCV;
-bool mainThreadFinished(true);
-
+#include "JobBucket.h"
+#include "JobNode.h"
 void JobSystem::UpdateNewBucket()
 {
+	START:
 	if (currentBucketPos >= buckets.size())
 	{
 		mainThreadFinished = true;
@@ -28,6 +19,11 @@ void JobSystem::UpdateNewBucket()
 	}
 
 	JobBucket* bucket = buckets[currentBucketPos];
+	if (bucket->jobNodesVec.empty() || bucket->sys != this)
+	{
+		currentBucketPos++;
+		goto START;
+	}
 	bucketMissionCount = bucket->jobNodesVec.size();
 	executingNode.ResizeAndClear(bucket->jobNodesVec.size());
 	for (int i = 0; i < bucket->jobNodesVec.size(); ++i)
@@ -44,13 +40,13 @@ void JobSystem::UpdateNewBucket()
 	UINT size = executingNode.GetSize();
 	if (executingNode.GetSize() < mThreadCount) {
 		for (int64_t i = 0; i < executingNode.GetSize(); ++i) {
-			std::lock_guard<std::mutex> lck(JobNode::threadMtx);
+			std::lock_guard<std::mutex> lck(threadMtx);
 			cv.notify_one();
 		}
 	}
 	else
 	{
-		std::lock_guard<std::mutex> lck(JobNode::threadMtx);
+		std::lock_guard<std::mutex> lck(threadMtx);
 		cv.notify_all();
 	}
 }
@@ -59,22 +55,26 @@ class JobThreadRunnable
 {
 public:
 	JobSystem* sys;
+	/*bool* JobSystemInitialized;
+	std::condition_variable* cv;
+	ConcurrentQueue<JobNode*>* executingNode;
+	std::atomic<int>* bucketMissionCount;*/
 	void operator()()
 	{
 		int value = (int)-1;
-		while (JobSystemInitialized)
+		while (sys->JobSystemInitialized)
 		{
 			{
-				std::unique_lock<std::mutex> lck(JobNode::threadMtx);
-				cv.wait(lck);
+				std::unique_lock<std::mutex> lck(sys->threadMtx);
+				sys->cv.wait(lck);
 			}
 			JobNode* node = nullptr;
-			while (executingNode.TryPop(&node))
+			while (sys->executingNode.TryPop(&node))
 			{
 			START_LOOP:
-				JobNode* nextNode = node->Execute(executingNode, cv);
-				JobBucket::jobNodePool.Delete(node);
-				value = bucketMissionCount.fetch_add(-1) - 1;
+				JobNode* nextNode = node->Execute(sys->executingNode, sys->cv);
+				sys->jobNodePool.Delete(node);
+				value = sys->bucketMissionCount.fetch_add(-1) - 1;
 				if (nextNode != nullptr)
 				{
 					node = nextNode;
@@ -90,7 +90,12 @@ public:
 	}
 };
 
-JobSystem::JobSystem(int threadCount)
+JobSystem::JobSystem(int threadCount) : 
+	executingNode(100),
+	JobSystemInitialized(false),
+	mainThreadFinished(true),
+	jobNodePool(100),
+	vectorPool(100)
 {
 	if (JobSystemInitialized) return;
 	mThreadCount = threadCount;
@@ -110,7 +115,7 @@ JobSystem::~JobSystem()
 	if (!JobSystemInitialized) return;
 	JobSystemInitialized = false;
 	{
-		std::lock_guard<std::mutex> lck(JobNode::threadMtx);
+		std::lock_guard<std::mutex> lck(threadMtx);
 		cv.notify_all();
 	}
 	for (int i = 0; i < allThreads.size(); ++i)
@@ -123,8 +128,8 @@ JobSystem::~JobSystem()
 void JobSystem::ExecuteBucket(JobBucket** bucket, int bucketCount)
 {
 	Wait();
-	JobBucket::jobNodePool.UpdateSwitcher();
-	JobNode::vectorPool.UpdateSwitcher();
+	jobNodePool.UpdateSwitcher();
+	vectorPool.UpdateSwitcher();
 	currentBucketPos = 0;
 	buckets.resize(bucketCount);
 	memcpy(buckets.data(), bucket, sizeof(JobBucket*) * bucketCount);
@@ -135,8 +140,8 @@ void JobSystem::ExecuteBucket(JobBucket** bucket, int bucketCount)
 void JobSystem::ExecuteBucket(JobBucket* bucket, int bucketCount)
 {
 	Wait();
-	JobBucket::jobNodePool.UpdateSwitcher();
-	JobNode::vectorPool.UpdateSwitcher();
+	jobNodePool.UpdateSwitcher();
+	vectorPool.UpdateSwitcher();
 	currentBucketPos = 0;
 	buckets.resize(bucketCount);
 	for (int i = 0; i < bucketCount; ++i)
@@ -155,3 +160,86 @@ void JobSystem::Wait()
 		mainThreadWaitCV.wait(lck);
 }
 
+
+
+void VectorPool::UpdateSwitcher()
+{
+	if (unusedObjects[objectSwitcher].count < 0) unusedObjects[objectSwitcher].count = 0;
+	objectSwitcher = !objectSwitcher;
+}
+
+void VectorPool::Delete(std::vector<JobNode*>* targetPtr)
+{
+	Array* arr = unusedObjects + !objectSwitcher;
+	int64_t currentCount = arr->count++;
+	if (currentCount >= arr->capacity)
+	{
+		std::lock_guard<std::mutex> lck(mtx);
+		//			lock
+		if (currentCount >= arr->capacity)
+		{
+			int64_t newCapacity = arr->capacity * 2;
+			std::vector<JobNode*>** newArray = new std::vector<JobNode*>*[newCapacity];
+			memcpy(newArray, arr->objs, sizeof(std::vector<JobNode*>*) * arr->capacity);
+			delete arr->objs;
+			arr->objs = newArray;
+			arr->capacity = newCapacity;
+		}
+	}
+	arr->objs[currentCount] = targetPtr;
+}
+
+std::vector<JobNode*>* VectorPool::New()
+{
+	Array* arr = unusedObjects + objectSwitcher;
+	int64_t currentCount = --arr->count;
+	std::vector<JobNode*>* t;
+	if (currentCount >= 0)
+	{
+		t = (std::vector<JobNode*>*)arr->objs[currentCount];
+
+	}
+	else
+	{
+		t = new std::vector<JobNode*>;
+		t->reserve(20);
+	}
+
+	return t;
+}
+
+VectorPool::VectorPool(unsigned int initCapacity)
+{
+	if (initCapacity < 3) initCapacity = 3;
+	unusedObjects[0].objs = new std::vector<JobNode*>*[initCapacity];
+	unusedObjects[0].capacity = initCapacity;
+	unusedObjects[0].count = initCapacity / 2;
+	for (unsigned int i = 0; i < unusedObjects[0].count; ++i)
+	{
+		unusedObjects[0].objs[i] = new std::vector<JobNode*>;// (StorageT*)malloc(sizeof(StorageT));
+		unusedObjects[0].objs[i]->reserve(20);
+	}
+	unusedObjects[1].objs = new std::vector<JobNode*>*[initCapacity];
+	unusedObjects[1].capacity = initCapacity;
+	unusedObjects[1].count = initCapacity / 2;
+	for (unsigned int i = 0; i < unusedObjects[1].count; ++i)
+	{
+		unusedObjects[1].objs[i] = new std::vector<JobNode*>;
+		unusedObjects[1].objs[i]->reserve(20);
+	}
+}
+VectorPool::~VectorPool()
+{
+	for (int64_t i = 0; i < unusedObjects[0].count; ++i)
+	{
+		delete unusedObjects[0].objs[i];
+
+	}
+	delete unusedObjects[0].objs;
+	for (int64_t i = 0; i < unusedObjects[1].count; ++i)
+	{
+		delete unusedObjects[1].objs[i];
+
+	}
+	delete unusedObjects[1].objs;
+}

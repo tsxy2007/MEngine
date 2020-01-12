@@ -80,14 +80,14 @@ VertexOut VS(VertexIn vin)
     return vout;
 }
 
-void PS(VertexOut pin, out float4 albedo : SV_TARGET0, out float4 specular : SV_TARGET1, out float4 normal : SV_TARGET2, out float4 emission : SV_TARGET3, out float2 mv : SV_TARGET4)
+void PS(VertexOut i, out float4 albedo : SV_TARGET0, out float4 specular : SV_TARGET1, out float4 normal : SV_TARGET2, out float4 emission : SV_TARGET3, out float2 mv : SV_TARGET4)
 {
    // float2 bindlessChooser = floor(saturate(pin.TexC) * 3);
  //   uint sampleCount = (uint)(bindlessChooser.x * 3 + bindlessChooser.y);
     albedo = 0;
     specular = 0;
     normal = 0;
-    emission = 0.5;
+    emission = float4(i.NormalW * 0.5 + 0.5, 1);
     mv = 0;
 }
 

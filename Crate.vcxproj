@@ -36,9 +36,12 @@
     <ClInclude Include="Common\Random.h" />
     <ClInclude Include="Common\RandomVector.h" />
     <ClInclude Include="Common\RingQueue.h" />
+    <ClInclude Include="JobSystem\JobInclude.h" />
+    <ClInclude Include="JobSystem\VectorPool.h" />
     <ClInclude Include="PipelineComponent\CameraData\CameraTransformData.h" />
     <ClInclude Include="PipelineComponent\CommandBuffer.h" />
     <ClInclude Include="PipelineComponent\PostProcessingComponent.h" />
+    <ClInclude Include="PipelineComponent\TemporalAA.h" />
     <ClInclude Include="RenderComponent\GPU Driven\GRP_Renderer.h" />
     <ClInclude Include="JobSystem\ConcurrentQueue.h" />
     <ClInclude Include="JobSystem\JobBucket.h" />
@@ -218,7 +221,7 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level1</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -250,7 +253,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level1</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>

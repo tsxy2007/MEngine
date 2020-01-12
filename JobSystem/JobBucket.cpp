@@ -1,2 +1,10 @@
 #include "JobBucket.h"
-ConcurrentPool<JobNode> JobBucket::jobNodePool(100);
+#include "JobNode.h"
+JobBucket::JobBucket()
+{
+	jobNodesVec.reserve(20);
+}
+void JobBucket::SetJobSystem(JobSystem* sys)
+{
+	this->sys = sys;
+}

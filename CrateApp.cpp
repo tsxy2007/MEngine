@@ -161,7 +161,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 CrateApp::CrateApp(HINSTANCE hInstance)
 	: D3DApp(hInstance)
 {
-	pipelineJobSys = std::unique_ptr<JobSystem>(new JobSystem(10));
 }
 
 CrateApp::~CrateApp()
@@ -183,6 +182,7 @@ bool CrateApp::Initialize()
 	if (!D3DApp::Initialize())
 		return false;
 	ShaderID::Init();
+	pipelineJobSys = std::unique_ptr<JobSystem>(new JobSystem(10));
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
@@ -191,7 +191,7 @@ bool CrateApp::Initialize()
 	directThreadCommand = std::unique_ptr<ThreadCommand>(new ThreadCommand(md3dDevice.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT));
 	directThreadCommand->ResetCommand();
 	// Reset the command list to prep for initialization commands.
-	ShaderCompiler::Init(md3dDevice.Get());
+	ShaderCompiler::Init(md3dDevice.Get(), pipelineJobSys.get());
 	LoadTextures();
 	BuildDescriptorHeaps();
 	GeometryGenerator geoGen;

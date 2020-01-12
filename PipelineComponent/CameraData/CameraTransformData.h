@@ -6,8 +6,8 @@ struct CameraTransformData : public IPipelineResource
 {
 	DirectX::XMFLOAT2 jitter;
 	DirectX::XMFLOAT2 lastFrameJitter;
-	DirectX::XMMATRIX nonJitteredMatrix;
+	DirectX::XMMATRIX nonJitteredVPMatrix;
+	DirectX::XMMATRIX nonJitteredProjMatrix;
 	DirectX::XMMATRIX lastVP;
 	DirectX::XMMATRIX lastNonJitterVP;
-	RenderTexture* rt = nullptr;
 };

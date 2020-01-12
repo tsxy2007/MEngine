@@ -5,61 +5,40 @@
 #include "../Common/d3dUtil.h"
 #include <fstream>
 #include "StructuredBuffer.h"
+#include "../JobSystem/JobInclude.h"
 
 using Microsoft::WRL::ComPtr;
-ComPtr<ID3DBlob> Compile(std::wstring& path, std::string& kernelName, D3D_SHADER_MACRO* m, bool useCache)
-{
-	//std::fstream fs;
-	std::wstring filePath = path + L".compute";
-/*	std::wstring kernelLFilePath(kernelName.size() + 1, L'_');
-	kernelLFilePath[0] = L'_';
-	for (int i = 0; i < kernelName.size(); ++i)
-	{
-		kernelLFilePath[1 + i] = kernelName[i];
-	}
-	std::wstring cachePath = path + kernelLFilePath + L".computeCache";*/
-	//fs.open(cachePath, std::ios::in | std::ios::binary);
-	ComPtr<ID3DBlob> blob = nullptr;
-	//useCache = false;
-	if (!useCache/* || !fs*/)
-	{
-		//fs.close();
-	//	fs.open(cachePath, std::ios::out | std::ios::binary);
-	//	fs.clear();
-	//	fs.seekg(0, std::ios::beg);
-		blob = d3dUtil::CompileShader(filePath, m, kernelName, "cs_5_1");
-		//fs.write((char*)blob->GetBufferPointer(), blob->GetBufferSize());
-	//	fs.close();
-	}
-	else
-	{
-		/*
-		fs.seekg(0, fs.end);
-		size_t sz = fs.tellg();
-		fs.clear();
-		fs.seekg(0, std::ios::beg);
-		ThrowIfFailed(D3DCreateBlob(sz, blob.GetAddressOf()));
-		fs.read((char*)blob->GetBufferPointer(), sz);
-		ComPtr<ID3DBlob> testOne = d3dUtil::CompileShader(filePath, m, kernelName, "cs_5_1");
-		size_t value = false;
-		
-		for (size_t i = 0; i < testOne->GetBufferSize(); ++i)
-		{
-			char* c = (char*)blob->GetBufferPointer() + i;
-			char* cc = (char*)testOne->GetBufferPointer() + i;
-			if (*c != *cc) 
-				value = true;
-		}*/
-	}
-	return blob;
-}
 using namespace std;
+struct ComputeShaderCompiler
+{
+	ComputeShader* shader;
+	UINT kernelSize;
+	std::string kernelName;
+	ID3D12Device* device;
+	std::wstring compilePath;
+	UINT i;
+	void operator()()
+	{
+
+		shader->csShaders[i] = d3dUtil::CompileShader(compilePath, nullptr, kernelName, "cs_5_1");//Compile(compilePath, kernelName[i], nullptr, useCache);
+		D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
+		psoDesc.pRootSignature = shader->mRootSignature.Get();
+		psoDesc.CS =
+		{
+			reinterpret_cast<BYTE*>(shader->csShaders[i]->GetBufferPointer()),
+			shader->csShaders[i]->GetBufferSize()
+		};
+		psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+		ThrowIfFailed(device->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&shader->pso[i])));
+
+	}
+};
 ComputeShader::ComputeShader(
 	wstring compilePath,
 	std::string* kernelName, UINT kernelCount,
 	ComputeShaderVariable* allShaderVariables, UINT varSize,
 	ID3D12Device* device,
-	bool useCache) : csShaders(kernelCount), pso(kernelCount)
+	JobBucket* compileJob) : csShaders(kernelCount), pso(kernelCount)
 {
 	mVariablesDict.reserve(varSize + 2);
 	mVariablesVector.reserve(varSize);
@@ -137,20 +116,37 @@ ComputeShader::ComputeShader(
 		serializedRootSig->GetBufferSize(),
 		IID_PPV_ARGS(mRootSignature.GetAddressOf())));
 	UINT kernelSize = kernelCount;
-	for (int i = 0; i < kernelSize; ++i)
+	if (compileJob != nullptr)
 	{
-		csShaders[i] = d3dUtil::CompileShader(compilePath, nullptr, kernelName[i], "cs_5_1");//Compile(compilePath, kernelName[i], nullptr, useCache);
-		D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
-		psoDesc.pRootSignature = mRootSignature.Get();
-		psoDesc.CS =
+		for (UINT i = 0; i < kernelSize; ++i)
 		{
-			reinterpret_cast<BYTE*>(csShaders[i]->GetBufferPointer()),
-			csShaders[i]->GetBufferSize()
-		};
-		psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
-		ThrowIfFailed(device->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&pso[i])));
+			compileJob->GetTask<ComputeShaderCompiler>(
+				{
+					this,
+					kernelSize,
+					kernelName[i],
+					device,
+					compilePath,
+					i
+				});
+		}
 	}
-
+	else
+	{
+		for (int i = 0; i < kernelSize; ++i)
+		{
+			csShaders[i] = d3dUtil::CompileShader(compilePath, nullptr, kernelName[i], "cs_5_1");//Compile(compilePath, kernelName[i], nullptr, useCache);
+			D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
+			psoDesc.pRootSignature = mRootSignature.Get();
+			psoDesc.CS =
+			{
+				reinterpret_cast<BYTE*>(csShaders[i]->GetBufferPointer()),
+				csShaders[i]->GetBufferSize()
+			};
+			psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+			ThrowIfFailed(device->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&pso[i])));
+		}
+	}
 	D3D12_COMMAND_SIGNATURE_DESC desc = {};
 	D3D12_INDIRECT_ARGUMENT_DESC indDesc;
 	ZeroMemory(&indDesc, sizeof(D3D12_INDIRECT_ARGUMENT_DESC));
@@ -168,7 +164,7 @@ ComputeShader::ComputeShader(
 void ComputeShader::BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* heap)
 {
 	commandList->SetComputeRootSignature(mRootSignature.Get());
-	if(heap != nullptr)
+	if (heap != nullptr)
 		commandList->SetDescriptorHeaps(1, heap->Get().GetAddressOf());
 }
 
@@ -190,7 +186,7 @@ void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id,
 			rootSigPos,
 			((DescriptorHeap*)targetObj)->hGPU(indexOffset)
 		);
-		
+
 		break;
 	case ComputeShaderVariable::Type::UAVDescriptorHeap:
 		heap = ((DescriptorHeap*)targetObj)->Get().Get();
@@ -199,7 +195,7 @@ void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id,
 			rootSigPos,
 			((DescriptorHeap*)targetObj)->hGPU(indexOffset)
 		);
-		
+
 		break;
 	case ComputeShaderVariable::Type::ConstantBuffer:
 		uploadBufferPtr = ((UploadBuffer*)targetObj);

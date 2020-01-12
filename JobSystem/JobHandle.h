@@ -1,12 +1,12 @@
 #pragma once
-#include "JobNode.h"
+class JobNode;
 class JobBucket;
 class JobHandle
 {
 	friend class JobBucket;
 private:
 	JobNode* node;
-	JobHandle(JobNode* otherNode) : node(otherNode) {};
+	JobHandle(JobNode* otherNode);
 public:
 	JobHandle();
 	JobHandle(const JobHandle& other);

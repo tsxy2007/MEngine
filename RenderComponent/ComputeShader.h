@@ -1,7 +1,7 @@
 #pragma once
 #include "../Common/d3dUtil.h"
 #include "Shader.h"
-
+class JobBucket;
 struct ComputeShaderVariable
 {
 	enum Type
@@ -18,8 +18,10 @@ struct ComputeShaderVariable
 
 class DescriptorHeap;
 class StructuredBuffer;
+class ComputeShaderCompiler;
 class ComputeShader
 {
+	friend class ComputeShaderCompiler;
 private:
 	std::vector<Pass> allPasses;
 	
@@ -35,7 +37,7 @@ public:
 		std::string* kernelName, UINT kernelCount,
 		ComputeShaderVariable* allShaderVariables, UINT varSize,
 		ID3D12Device* device,
-		bool useCache);
+		JobBucket* compileJob);
 	size_t VariableLength() const { return mVariablesVector.size(); }
 	void BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* heap);
 	void SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset);

@@ -228,6 +228,15 @@
     <ClInclude Include="Common\ConstantBufferStruct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PipelineComponent\TemporalAA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JobSystem\VectorPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JobSystem\JobInclude.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">

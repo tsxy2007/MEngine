@@ -100,9 +100,8 @@ public:
     // check if these frame resources are still in use by the GPU.
 	UINT64 Fence = 0;
 	//Rendering Events
-
 	template <typename Func>
-	inline IPipelineResource* GetResource(void* targetComponent, Camera* cam, const Func&& func)
+	inline IPipelineResource* GetPerCameraResource(void* targetComponent, Camera* cam, const Func& func)
 	{
 		std::lock_guard<std::mutex> lck(mtx);
 		FrameResCamera* ptr = perCameraDatas[cam];
@@ -116,12 +115,7 @@ public:
 		return ite->second;
 	}
 	template <typename Func>
-	inline IPipelineResource* GetResource(void* targetComponent, Camera* cam, const Func& func)
-	{
-		return GetResource(targetComponent, cam, std::move(func));
-	}
-	template <typename Func>
-	inline IPipelineResource* GetResource(void* targetComponent, const Func&& func)
+	inline IPipelineResource* GetResource(void* targetComponent, const Func& func)
 	{
 		std::lock_guard<std::mutex> lck(mtx);
 		auto&& ite = perFrameResource.find(targetComponent);
@@ -132,11 +126,6 @@ public:
 			return newComp;
 		}
 		return ite->second;
-	}
-	template <typename Func>
-	inline IPipelineResource* GetResource(void* targetComponent, const Func& func)
-	{
-		return GetResource(targetComponent, std::move(func));
 	}
 
 	void DisposeResource(void* targetComponent)

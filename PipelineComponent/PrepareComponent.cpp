@@ -79,8 +79,8 @@ void GetJitteredProjectionMatrix(
 }
 void ConfigureJitteredProjectionMatrix(Camera* camera, UINT height, UINT width, double jitterOffset, CameraTransformData* data)
 {
-	data->nonJitteredMatrix = camera->GetProj();
-	XMMATRIX jitteredMat = data->nonJitteredMatrix;
+	data->nonJitteredProjMatrix = camera->GetProj();
+	XMMATRIX jitteredMat = data->nonJitteredProjMatrix;
 	data->lastFrameJitter = data->jitter;
 	XMVECTOR jitterVec = XMLoadFloat2(&data->jitter);
 	GetJitteredProjectionMatrix(
@@ -95,6 +95,7 @@ void ConfigureJitteredProjectionMatrix(Camera* camera, UINT height, UINT width, 
 	);
 	memcpy(&data->jitter, &jitterVec, sizeof(XMFLOAT2));
 	camera->SetProj(jitteredMat);
+	data->nonJitteredVPMatrix = XMMatrixMultiply(camera->GetView(), data->nonJitteredProjMatrix);
 }
 
 struct PrepareRunnable
@@ -118,7 +119,7 @@ struct PrepareRunnable
 		);
 		camera->UploadCameraBuffer(ths->passConstants);
 		//Calculate Jitter Matrix
-		XMMATRIX nonJitterVP = XMMatrixMultiply(camera->GetView(), transData->nonJitteredMatrix);
+		XMMATRIX nonJitterVP = transData->nonJitteredVPMatrix;
 		ths->passConstants.nonJitterVP = *(XMFLOAT4X4*)&nonJitterVP;
 		ths->passConstants.nonJitterInverseVP = *(XMFLOAT4X4*)&XMMatrixInverse(&XMMatrixDeterminant(nonJitterVP), nonJitterVP);
 		memcpy(&ths->passConstants.lastVP, &transData->lastVP, sizeof(XMFLOAT4X4));

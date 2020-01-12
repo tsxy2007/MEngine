@@ -12,7 +12,7 @@ private:
 	struct MatProperty
 	{
 		UINT id;
-		ShaderVariable::Type type;
+		ShaderVariableType type;
 		ObjectPtr<MObject> obj = nullptr;
 		UINT indexOffset;
 	};
@@ -23,7 +23,7 @@ private:
 	std::vector<MatProperty> propertiesValue;
 	ObjectPtr<DescriptorHeap> shaderResourceHeap = nullptr;
 
-	bool SetProperty(UINT id, ObjectPtr<MObject> obj, ShaderVariable::Type type, UINT offsetIndex);
+	bool SetProperty(UINT id, ObjectPtr<MObject> obj, ShaderVariableType type, UINT offsetIndex);
 public:
 	Material(
 		Shader* shader,

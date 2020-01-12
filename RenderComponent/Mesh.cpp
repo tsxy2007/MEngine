@@ -371,12 +371,12 @@ bool DecodeMesh(
 	return true;
 }
 
-ObjectPtr<Mesh> Mesh::LoadMeshFromFile(const std::wstring& str, ID3D12Device* device, ID3D12GraphicsCommandList* commandList, FrameResource* res)
+ObjectPtr<Mesh> Mesh::LoadMeshFromFile(const std::wstring& str, ID3D12Device* device)
 {
 	ObjectPtr<Mesh> result;
 	MeshData meshData;
 	if (!DecodeMesh(str, meshData)) return result;
-	/*result = new Mesh(
+	result = new Mesh(
 		meshData.vertex.size(),
 		meshData.vertex.data(),
 		meshData.normal.data(),
@@ -387,11 +387,11 @@ ObjectPtr<Mesh> Mesh::LoadMeshFromFile(const std::wstring& str, ID3D12Device* de
 		meshData.uv3.data(),
 		meshData.uv4.data(),
 		device,
-		commandList,
 		meshData.indexFormat,
 		meshData.indexData.size() / ((meshData.indexFormat == DXGI_FORMAT_R16_UINT) ? 2 : 4),
-		meshData.indexData.data(),
-		res
-	);*/
+		meshData.indexData.data()
+	);
+	result->boundingCenter = meshData.boundingCenter;
+	result->boundingExtent = meshData.boundingExtent;
 	return result;
 }

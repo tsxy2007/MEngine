@@ -2,10 +2,17 @@
 #include "../Common/d3dUtil.h"
 class PSOContainer;
 class Shader;
+class RenderTexture;
 enum BackBufferState
 {
 	BackBufferState_Present = 0,
 	BackBufferState_RenderTarget = 1
+};
+
+enum CopyTarget
+{
+	CopyTarget_DepthBuffer = 0,
+	CopyTarget_ColorBuffer = 1
 };
 
 class Graphics
@@ -32,4 +39,9 @@ public:
 			afterState
 		));
 	}
+
+	static void CopyTexture(
+		ID3D12GraphicsCommandList* commandList,
+		RenderTexture* source, CopyTarget sourceTarget,
+		RenderTexture* dest, CopyTarget destTarget);
 };

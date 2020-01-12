@@ -1,15 +1,11 @@
 #pragma once
-#include <vector>
-#include "../RenderComponent/RenderTexture.h"
-#include "../PipelineComponent/IPerCameraResource.h"
 #include "../Common/Camera.h"
-#include <unordered_map>
-#include "../JobSystem/JobSystem.h"
+#include "../JobSystem/JobInclude.h"
 #include "RenderPipeline.h"
 class ThreadCommand;
 class FrameResource;
-class RenderPipeline;
 class TempRTAllocator;
+class RenderTexture;
 class World;
 struct TemporalRTCommand
 {
@@ -24,6 +20,12 @@ struct TemporalRTCommand
 };
 class PerCameraRenderingEvent;
 class CommandBuffer;
+enum CommandListType
+{
+	CommandListType_None,
+	CommandListType_Graphics,
+	CommandListType_Compute
+};
 class PipelineComponent
 {
 	friend class RenderPipeline;
@@ -86,12 +88,7 @@ protected:
 		Depending<Args...> d(gpuDepending);
 	}
 public:
-	enum CommandListType
-	{
-		CommandListType_None,
-		CommandListType_Graphics,
-		CommandListType_Compute
-	};
+
 	struct EventData
 	{
 		ID3D12Device* device;

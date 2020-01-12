@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "../Common/MObject.h"
+class JobBucket;
 struct Pass
 {
 	std::string name;
@@ -16,14 +17,16 @@ struct Pass
 	D3D12_BLEND_DESC blendState;
 };
 
+enum ShaderVariableType
+{
+	ShaderVariableType_ConstantBuffer,
+	ShaderVariableType_DescriptorHeap, 
+	ShaderVariableType_StructuredBuffer
+};
 struct ShaderVariable
 {
-	enum Type
-	{
-		ConstantBuffer, DescriptorHeap, StructuredBuffer
-	};
 	std::string name;
-	Type type;
+	ShaderVariableType type;
 	UINT tableSize;
 	UINT registerPos;
 	UINT space;
@@ -43,7 +46,7 @@ public:
 		Pass* passes, UINT passCount,
 		ShaderVariable* shaderVariables, UINT shaderVarCount,
 		ID3D12Device* device,
-		bool useShaderCache
+		JobBucket* compileJob
 	);
 	void GetPassPSODesc(UINT pass, D3D12_GRAPHICS_PIPELINE_STATE_DESC* targetPSO);
 	ShaderVariable GetVariable(std::string name);

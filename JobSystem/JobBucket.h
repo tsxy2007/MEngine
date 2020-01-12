@@ -4,6 +4,7 @@
 #include "../Common/Pool.h"
 class JobSystem;
 class JobThreadRunnable;
+class JobNode;
 class JobBucket
 {
 	friend class JobSystem;
@@ -11,25 +12,11 @@ class JobBucket
 	friend class JobHandle;
 	friend class JobThreadRunnable;
 private:
-	static ConcurrentPool<JobNode> jobNodePool;
 	std::vector<JobNode*> jobNodesVec;
+	JobSystem* sys = nullptr;
 public:
+	JobBucket();
+	void SetJobSystem(JobSystem* sys);
 	template <typename Func>
-	JobHandle GetTask(Func&& func)
-	{
-		JobNode* node = jobNodePool.New();
-		jobNodesVec.emplace_back(node);
-		node->Create(func);
-		JobHandle retValue(node);
-		return retValue;
-	}
-	template <typename Func>
-	JobHandle GetTask(Func& func)
-	{
-		JobNode* node = jobNodePool.New();
-		jobNodesVec.emplace_back(node);
-		node->Create<Func>(func);
-		JobHandle retValue(node);
-		return retValue;
-	}
+	JobHandle GetTask(const Func& func);
 };

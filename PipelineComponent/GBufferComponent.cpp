@@ -61,7 +61,7 @@ public:
 	{
 		tcmd->ResetCommand();
 		ID3D12GraphicsCommandList* commandList = tcmd->GetCmdList();
-		GBufferFrameResource* frameRes = (GBufferFrameResource*)resource->GetResource(component, cam, [=]()->GBufferFrameResource*
+		GBufferFrameResource* frameRes = (GBufferFrameResource*)resource->GetPerCameraResource(component, cam, [=]()->GBufferFrameResource*
 		{
 			return new GBufferFrameResource(device);
 		});
@@ -78,6 +78,7 @@ public:
 		NORMAL_RT->ClearRenderTarget(commandList, 0, true, false);
 		MOTION_VECTOR_RT->ClearRenderTarget(commandList, 0, true, false);
 		EMISSION_RT->ClearRenderTarget(commandList, 0, false, true);
+
 		D3D12_CPU_DESCRIPTOR_HANDLE handles[5];
 		auto st = [&](UINT p)->void
 		{
@@ -168,7 +169,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	albedoBuffer.descriptor.colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	albedoBuffer.descriptor.depthType = RenderTextureDepthSettings_None;
 	albedoBuffer.descriptor.depthSlice = 1;
-	albedoBuffer.descriptor.type = RenderTextureType::Tex2D;
+	albedoBuffer.descriptor.type = RenderTextureType::RenderTextureType_Tex2D;
 
 	TemporalRTCommand& specularBuffer = tempRTRequire[1];
 	specularBuffer.type = TemporalRTCommand::Create;
@@ -176,7 +177,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	specularBuffer.descriptor.colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	specularBuffer.descriptor.depthType = RenderTextureDepthSettings_None;
 	specularBuffer.descriptor.depthSlice = 1;
-	specularBuffer.descriptor.type = RenderTextureType::Tex2D;
+	specularBuffer.descriptor.type = RenderTextureType::RenderTextureType_Tex2D;
 
 	TemporalRTCommand& normalBuffer = tempRTRequire[2];
 	normalBuffer.type = TemporalRTCommand::Create;
@@ -184,7 +185,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	normalBuffer.descriptor.colorFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
 	normalBuffer.descriptor.depthType = RenderTextureDepthSettings_None;
 	normalBuffer.descriptor.depthSlice = 1;
-	normalBuffer.descriptor.type = RenderTextureType::Tex2D;
+	normalBuffer.descriptor.type = RenderTextureType::RenderTextureType_Tex2D;
 
 	TemporalRTCommand& emissionBuffer = tempRTRequire[3];
 	emissionBuffer.type = TemporalRTCommand::Create;
@@ -192,7 +193,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	emissionBuffer.descriptor.colorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 	emissionBuffer.descriptor.depthType = RenderTextureDepthSettings_Depth32;
 	emissionBuffer.descriptor.depthSlice = 1;
-	emissionBuffer.descriptor.type = RenderTextureType::Tex2D;
+	emissionBuffer.descriptor.type = RenderTextureType::RenderTextureType_Tex2D;
 
 	TemporalRTCommand& motionVectorBuffer = tempRTRequire[4];
 	motionVectorBuffer.type = TemporalRTCommand::Create;
@@ -200,7 +201,7 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	motionVectorBuffer.descriptor.colorFormat = DXGI_FORMAT_R16G16_SNORM;
 	motionVectorBuffer.descriptor.depthType = RenderTextureDepthSettings_None;
 	motionVectorBuffer.descriptor.depthSlice = 1;
-	motionVectorBuffer.descriptor.type = RenderTextureType::Tex2D;
+	motionVectorBuffer.descriptor.type = RenderTextureType::RenderTextureType_Tex2D;
 
 	std::vector<DXGI_FORMAT> colorFormats(tempRTRequire.size());
 	for (int i = 0; i < tempRTRequire.size(); ++i)
@@ -215,21 +216,16 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	ObjectPtr<DescriptorHeap> heap;
 	mat = new Material(ShaderCompiler::GetShader("OpaqueStandard"), materialPropertyBuffer, 0, heap);
 	GeometryGenerator geoGen;
-	BuildShapeGeometry(geoGen.CreateBox(1, 1, 1, 1), mesh, device, commandList, nullptr);
+	mesh = Mesh::LoadMeshFromFile(L"Wheel.vmesh", device);
+	if (!mesh)
+	{
+		BuildShapeGeometry(geoGen.CreateBox(1, 1, 1, 1), mesh, device, commandList, nullptr);
+	}
 	trans = new Transform(nullptr);
 	meshRenderer = new MeshRenderer(trans.operator->(), device, mesh, mat);
 	grpRenderer = new GRP_Renderer(
 		sizeof(MaterialConstants),
-		MeshLayout::GetMeshLayoutIndex(
-			true,
-			false,
-			false,
-			true,
-			false,
-			false,
-			false,
-			false
-		),
+		mesh->GetLayoutIndex(),
 		256,
 		10000,
 		ShaderCompiler::GetShader("OpaqueStandard"),
@@ -279,5 +275,5 @@ void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh
 		indices.size(),
 		indices.data()
 	);
-	
+
 }

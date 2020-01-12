@@ -40,5 +40,5 @@ public:
 		UINT indexCount,
 		void* indexArrayPtr
 	);
-	static ObjectPtr<Mesh> LoadMeshFromFile(const std::wstring& str, ID3D12Device* device, ID3D12GraphicsCommandList* commandList, FrameResource* res);
+	static ObjectPtr<Mesh> LoadMeshFromFile(const std::wstring& str, ID3D12Device* device);
 };
