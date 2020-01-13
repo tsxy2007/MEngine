@@ -17,11 +17,12 @@
 using namespace DirectX;
 PSOContainer* gbufferContainer(nullptr);
 PSOContainer* depthPrepassContainer(nullptr);
-#define ALBEDO_RT (component->GetTempRT(0))
-#define SPECULAR_RT (component->GetTempRT(1))
-#define NORMAL_RT  (component->GetTempRT(2))
-#define EMISSION_RT  (component->GetTempRT(3))
-#define MOTION_VECTOR_RT (component->GetTempRT(4))
+std::vector<RenderTexture*> gbufferTempRT(5);
+#define ALBEDO_RT (gbufferTempRT[0])
+#define SPECULAR_RT (gbufferTempRT[1])
+#define NORMAL_RT  (gbufferTempRT[2])
+#define EMISSION_RT  (gbufferTempRT[3])
+#define MOTION_VECTOR_RT (gbufferTempRT[4])
 
 ObjectPtr<Material> mat;
 ObjectPtr<Mesh> mesh;
@@ -32,19 +33,17 @@ PrepareComponent* prepareComp = nullptr;
 class GBufferFrameResource : public IPipelineResource
 {
 public:
-	DescriptorHeap renderTargetHeap;
 	UploadBuffer ub;
 	UploadBuffer cullBuffer;
 	GBufferFrameResource(ID3D12Device* device)
 	{
 		cullBuffer.Create(device, 1, true, sizeof(GRP_Renderer::CullData));
 		ub.Create(device, 2, true, sizeof(ObjectConstants));
-		renderTargetHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 5, false);
 		XMFLOAT4X4 mat = MathHelper::Identity4x4();
 		XMMATRIX* vec = (XMMATRIX*)&mat;
-		vec->r[3] = { 0, 0.5, 0, 1 };
+		vec->r[3] = { 0, 0, 0, 1 };
 		ub.CopyData(0, &mat);
-		vec->r[3] = { 0, -0.5, 0, 1 };
+		vec->r[3] = { 0, 0, 0, 1 };
 		ub.CopyData(1, &mat);
 	}
 };
@@ -55,7 +54,7 @@ public:
 	ThreadCommand* tcmd;		//Command List
 	Camera* cam;				//Camera
 	FrameResource* resource;	//Per Frame Data
-	GBufferComponent* component;//Singleton Component
+	void* component;//Singleton Component
 	World* world;				//Main Scene
 	void operator()()
 	{
@@ -66,30 +65,24 @@ public:
 			return new GBufferFrameResource(device);
 		});
 		grpRenderer->UpdateFrame(resource, device);
-		//Bind To RTV Heap
-		ALBEDO_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 0, 0);
-		SPECULAR_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 1, 0);
-		NORMAL_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 2, 0);
-		EMISSION_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 3, 0);
-		MOTION_VECTOR_RT->BindRTVToHeap(device, &frameRes->renderTargetHeap, 4, 0);
 		//Clear
 		ALBEDO_RT->ClearRenderTarget(commandList, 0, true, false);
 		SPECULAR_RT->ClearRenderTarget(commandList, 0, true, false);
 		NORMAL_RT->ClearRenderTarget(commandList, 0, true, false);
 		MOTION_VECTOR_RT->ClearRenderTarget(commandList, 0, true, false);
-		EMISSION_RT->ClearRenderTarget(commandList, 0, false, true);
+		EMISSION_RT->ClearRenderTarget(commandList, 0, true, true);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handles[5];
 		auto st = [&](UINT p)->void
 		{
-			handles[p] = frameRes->renderTargetHeap.hCPU(p);
+			handles[p] = gbufferTempRT[p]->GetColorDescriptor(p);
 		};
 		InnerLoop<decltype(st), 5>(st);
 		EMISSION_RT->SetViewport(commandList);
 		//Depth Prepass
 		//TODO
 		commandList->OMSetRenderTargets(0, nullptr, true, &EMISSION_RT->GetDepthDescriptor(0));
-		/*meshRenderer->Draw(
+	/*	meshRenderer->Draw(
 			1, commandList,
 			device,
 			&resource->cameraCBs[cam->GetInstanceID()],
@@ -112,25 +105,25 @@ public:
 		);
 		//GBuffer Pass
 		//TODO
-		commandList->OMSetRenderTargets(5, handles, true, &EMISSION_RT->GetDepthDescriptor(0));
-		/*meshRenderer->Draw(
+		commandList->OMSetRenderTargets(5, handles, false, &EMISSION_RT->GetDepthDescriptor(0));
+		/*	meshRenderer->Draw(
 			0, commandList,
 			device,
 			&resource->cameraCBs[cam->GetInstanceID()],
 			&frameRes->ub,
-			1, depthPrepassContainer
+			1, gbufferContainer
 		);*/
-		grpRenderer->DrawCommand(
-			commandList,
-			device,
-			0, resource,
-			resource->cameraCBs[cam->GetInstanceID()],
-			cullEle,
-			prepareComp->frustumPlanes,
-			*(XMFLOAT3*)&prepareComp->frustumMinPos,
-			*(XMFLOAT3*)&prepareComp->frustumMaxPos,
-			gbufferContainer
-		);
+			grpRenderer->DrawCommand(
+				commandList,
+				device,
+				0, resource,
+				resource->cameraCBs[cam->GetInstanceID()],
+				cullEle,
+				prepareComp->frustumPlanes,
+				*(XMFLOAT3*)&prepareComp->frustumMinPos,
+				*(XMFLOAT3*)&prepareComp->frustumMaxPos,
+				gbufferContainer
+			);
 		tcmd->CloseCommand();
 	}
 };
@@ -145,6 +138,8 @@ std::vector<TemporalRTCommand>& GBufferComponent::SendRenderTextureRequire(Event
 }
 void GBufferComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 {
+	if (gbufferTempRT.size() != tempRTRequire.size()) gbufferTempRT.resize(tempRTRequire.size());
+	memcpy(gbufferTempRT.data(), allTempRT.data(), sizeof(RenderTexture*) * tempRTRequire.size());
 	GBufferRunnable runnable
 	{
 		data.device,
@@ -162,6 +157,7 @@ void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh
 
 void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
+	SetCPUDepending<PrepareComponent>();
 	tempRTRequire.resize(5);
 	TemporalRTCommand& albedoBuffer = tempRTRequire[0];
 	albedoBuffer.type = TemporalRTCommand::Create;
@@ -210,7 +206,6 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	}
 	gbufferContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, colorFormats.size(), colorFormats.data());
 	depthPrepassContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, 0, nullptr);
-	SetCPUDepending<PrepareComponent>();
 	ObjectPtr<UploadBuffer> materialPropertyBuffer = new UploadBuffer();
 	materialPropertyBuffer->Create(device, 1, true, sizeof(MaterialConstants));
 	ObjectPtr<DescriptorHeap> heap;

@@ -53,21 +53,3 @@ void MeshRenderer::Draw(
 	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->DrawIndexedInstanced(mesh->GetIndexCount(), 1, 0, 0, 0);
 }
-#include "CommandSignature.h"
-void MeshRenderer::GetIndirectArgument(
-	int targetPass,
-	ID3D12Device* device,
-	UploadBuffer* objectBuffer,
-	UINT objectBufferOffset,
-	MultiDrawCommand* command
-)
-{
-	command->indexBuffer = mesh->IndexBufferView();
-	command->objectCBufferAddress = objectBuffer->Resource()->GetGPUVirtualAddress() + objectBufferOffset * objectBuffer->GetAlignedStride();
-	command->vertexBuffer = mesh->VertexBufferView();
-	command->drawArgs.BaseVertexLocation = 0;
-	command->drawArgs.IndexCountPerInstance = mesh->GetIndexCount();
-	command->drawArgs.InstanceCount = 1;
-	command->drawArgs.StartIndexLocation = 0;
-	command->drawArgs.StartInstanceLocation = 0;
-}

@@ -17,9 +17,11 @@ public:
 	struct CullData
 	{
 		DirectX::XMFLOAT4 planes[6];
-		DirectX::XMFLOAT4 _FrustumMinPoint;
-		DirectX::XMFLOAT4 _FrustumMaxPoint;
+		//Align
+		DirectX::XMFLOAT3 _FrustumMinPoint;
 		UINT _Count;
+		//Align
+		DirectX::XMFLOAT3 _FrustumMaxPoint;
 	};
 	struct RenderElement
 	{
@@ -56,7 +58,7 @@ private:
 	UINT _InputDataBuffer;
 	UINT _OutputBuffer;
 	UINT _CountBuffer;
-	UINT CBuffer;
+	UINT CullBuffer;
 	ComputeShader* cullShader;
 public:
 	GRP_Renderer(

@@ -66,9 +66,9 @@ void CopyToBuffer(
 	ComPtr<ID3D12Resource>& uploadBuffer,
 	ComPtr<ID3D12Resource>& defaultBuffer)
 {
-	Graphics::ResourceStateTransform< D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST>(cmdList, defaultBuffer.Get());
+	Graphics::ResourceStateTransform(cmdList, D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST, defaultBuffer.Get());
 	cmdList->CopyBufferRegion(defaultBuffer.Get(), 0, uploadBuffer.Get(), 0, byteSize);
-	Graphics::ResourceStateTransform<D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ>(cmdList, defaultBuffer.Get());
+	Graphics::ResourceStateTransform(cmdList, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ, defaultBuffer.Get());
 
 }
 

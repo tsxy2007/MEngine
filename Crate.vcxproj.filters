@@ -120,9 +120,6 @@
     <ClInclude Include="RenderComponent\Skybox.h">
       <Filter>Header Files\RenderComponent</Filter>
     </ClInclude>
-    <ClInclude Include="RenderComponent\IndirectDrawer.h">
-      <Filter>Header Files\RenderComponent</Filter>
-    </ClInclude>
     <ClInclude Include="RenderComponent\RenderTexture.h">
       <Filter>Header Files\RenderComponent</Filter>
     </ClInclude>
@@ -312,9 +309,6 @@
       <Filter>Source Files\RenderComponent</Filter>
     </ClCompile>
     <ClCompile Include="RenderComponent\Mesh.cpp">
-      <Filter>Source Files\RenderComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent\IndirectDrawer.cpp">
       <Filter>Source Files\RenderComponent</Filter>
     </ClCompile>
     <ClCompile Include="RenderComponent\RenderTexture.cpp">

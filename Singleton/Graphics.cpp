@@ -44,16 +44,16 @@ inline void Copy(
 {
 	const D3D12_RESOURCE_STATES sourceFormat = sourceIsDepth ? D3D12_RESOURCE_STATE_DEPTH_WRITE : D3D12_RESOURCE_STATE_RENDER_TARGET;
 	const D3D12_RESOURCE_STATES destFormat = destIsDepth ? D3D12_RESOURCE_STATE_DEPTH_WRITE : D3D12_RESOURCE_STATE_RENDER_TARGET;
-	Graphics::ResourceStateTransform<sourceFormat, D3D12_RESOURCE_STATE_COPY_SOURCE>(commandList, sourceLocation.pResource);
-	Graphics::ResourceStateTransform<destFormat, D3D12_RESOURCE_STATE_COPY_DEST>(commandList, destLocation.pResource);
+	Graphics::ResourceStateTransform(commandList, sourceFormat, D3D12_RESOURCE_STATE_COPY_SOURCE, sourceLocation.pResource);
+	Graphics::ResourceStateTransform(commandList, destFormat, D3D12_RESOURCE_STATE_COPY_DEST, destLocation.pResource);
 	commandList->CopyTextureRegion(
 		&destLocation,
 		0, 0, 0,
 		&sourceLocation,
 		nullptr
 	);
-	Graphics::ResourceStateTransform<D3D12_RESOURCE_STATE_COPY_SOURCE, sourceFormat>(commandList, sourceLocation.pResource);
-	Graphics::ResourceStateTransform<D3D12_RESOURCE_STATE_COPY_DEST, destFormat>(commandList, destLocation.pResource);
+	Graphics::ResourceStateTransform(commandList, D3D12_RESOURCE_STATE_COPY_SOURCE, sourceFormat, sourceLocation.pResource);
+	Graphics::ResourceStateTransform(commandList, D3D12_RESOURCE_STATE_COPY_DEST, destFormat, destLocation.pResource);
 }
 
 void Graphics::CopyTexture(
@@ -124,25 +124,16 @@ void Graphics::Blit(
 	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->DrawIndexedInstanced(fullScreenMesh->GetIndexCount(), 1, 0, 0, 0);
 }
-/*	UINT64 n64RequiredSize = 0u;
-UINT   nNumSubresources = 1u;
-D3D12_PLACED_SUBRESOURCE_FOOTPRINT stTxtLayouts = {};
-UINT64 n64TextureRowSizes = 0u;
-UINT   nTextureRowNum = 0u;
-D3D12_RESOURCE_DESC destDesc = backBuffer->GetDesc();
-device->GetCopyableFootprints(&destDesc
-	, 0
-	, nNumSubresources
-	, 0
-	, &stTxtLayouts
-	, &nTextureRowNum
-	, &n64TextureRowSizes
-	, &n64RequiredSize);
-CD3DX12_TEXTURE_COPY_LOCATION Dst(backBuffer, 0);
-CD3DX12_TEXTURE_COPY_LOCATION Src(rt->GetColorResource(), stTxtLayouts);
-commandList->CopyTextureRegion(&Dst, 0, 0, 0, &Src, nullptr);*/
-//commandList->ClearRenderTargetView(backBufferHandle, DirectX::Colors::LightSteelBlue, 0, nullptr);
 
-//sky->Draw()
-//postProcessingShader->BindRootSignature(commandList);
-//Graphics::Blit(commandList, device, &backBufferHandle, 1, nullptr, gbufferContainer, rt->GetWidth(), rt->GetHeight(), postProcessingShader, 0);
+void Graphics::ResourceStateTransform(
+	ID3D12GraphicsCommandList* commandList,
+	D3D12_RESOURCE_STATES beforeState,
+	D3D12_RESOURCE_STATES afterState,
+	ID3D12Resource* resource)
+{
+	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
+		resource,
+		beforeState,
+		afterState
+	));
+}

@@ -5,11 +5,6 @@
 #include "TempRTAllocator.h"
 std::mutex PipelineComponent::mtx;
 JobBucket* PipelineComponent::bucket (nullptr);
-RenderTexture* PipelineComponent::GetTempRT(UINT index)
-{
-	return allTempRT[index];
-}
-
 void PipelineComponent::ExecuteTempRTCommand(ID3D12Device* device, TempRTAllocator* allocator)
 {
 	for (auto ite = loadRTCommands.begin(); ite != loadRTCommands.end(); ++ite)

@@ -51,8 +51,8 @@ void GetJitteredPerspectiveProjectionMatrix(
 	offset.y *= vertical / (0.5f * pixelHeight);
 
 	XMFLOAT4X4* projPt = (XMFLOAT4X4*)projectionMatrix;
-	projPt->m[2][0] += offset.x / horizontal;
-	projPt->m[2][1] -= offset.y / vertical;		//TODD: dont know difference between ogl & dx
+	projPt->m[2][0] -= offset.x / horizontal;
+	projPt->m[2][1] += offset.y / vertical;		//TODD: dont know difference between ogl & dx
 }
 void GetJitteredProjectionMatrix(
 	double nearClipPlane,
@@ -112,6 +112,7 @@ struct PrepareRunnable
 			return new CameraTransformData;
 		});
 		camera->UpdateProjectionMatrix();
+		camera->UpdateViewMatrix();
 		ConfigureJitteredProjectionMatrix(
 			camera,
 			width, height,

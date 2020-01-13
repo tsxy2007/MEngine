@@ -4,6 +4,7 @@
 #include <string>
 #include "../Common/MObject.h"
 class JobBucket;
+class DescriptorHeap;
 struct Pass
 {
 	std::string name;
@@ -51,7 +52,7 @@ public:
 	void GetPassPSODesc(UINT pass, D3D12_GRAPHICS_PIPELINE_STATE_DESC* targetPSO);
 	ShaderVariable GetVariable(std::string name);
 	ShaderVariable GetVariable(UINT id);
-	void BindRootSignature(ID3D12GraphicsCommandList* commandList);
+	void BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* descHeap);
 	int GetPropertyRootSigPos(UINT id);
 	ID3D12RootSignature* GetSignature() const { return mRootSignature.Get(); }
 	void SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset);

@@ -102,7 +102,6 @@ public:
 	void BindDepthBufferToSRVHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
 	void BindUAVToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device, UINT targetMipLevel);
 	void ClearRenderTarget(ID3D12GraphicsCommandList* commandList, UINT slice, bool clearColor, bool clearDepth);
-	void BindRTVToHeap(ID3D12Device* device, DescriptorHeap* targetHeap, UINT targetHeapIndex, UINT slice);
 	DXGI_FORMAT GetColorFormat() const;
 	DXGI_FORMAT GetDepthFormat() const;
 };

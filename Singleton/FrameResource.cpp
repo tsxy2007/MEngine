@@ -35,6 +35,7 @@ void FrameResource::UpdateBeforeFrame(ID3D12Fence** mFence, UINT fenceCount)
 		needClearResourcesAfterFlush.clear();
 	}
 }
+
 void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue** commandQueue, ID3D12Fence** mFence, UINT commandQueueCount)
 {
 	// Advance the fence value to mark commands up to this fence point.
@@ -44,7 +45,9 @@ void FrameResource::UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue** 
 	// Because we are on the GPU timeline, the new fence point won't be 
 	// set until the GPU finishes processing all the commands prior to this Signal().
 	for (UINT i = 0; i < commandQueueCount; ++i)
+	{
 		commandQueue[i]->Signal(mFence[i], Fence);
+	}
 }
 
 void FrameResource::OnLoadCamera(Camera* targetCamera, ID3D12Device* device)

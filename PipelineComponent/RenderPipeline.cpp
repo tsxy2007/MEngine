@@ -71,7 +71,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	data.resource = renderData.resource;
 	data.world = renderData.world;
 	UINT frameNum = *renderData.fenceIndex + 2;
-	renderData.resource->UpdateBeforeFrame(renderData.fence, renderData.fenceCount);
+
 	ThreadCommand* commandList = renderData.resource->commmonThreadCommand;
 	bucketArray[0].GetTask([=]()->void
 	{
@@ -191,23 +191,24 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 			ExecuteThreadCommand(cam, component->threadCommand, renderData.resource);
 		}
 	}
-
+	FrameResource::mCurrFrameResource->UpdateBeforeFrame(renderData.fence, renderData.fenceCount);
 	jobSys->ExecuteBucket(bucketArray.data(), bucketArray.size());
 
 	if (renderData.lastResource != nullptr)
 	{
-		//Final Execute
-		if (renderData.executeLastFrame)
-		{
-			renderData.lastResource->commandBuffer->Submit();
-		}
-		//Finalize Frame
 		ID3D12CommandQueue* queues[3] =
 		{
 			renderData.lastResource->commandBuffer->GetGraphicsQueue(),
 			renderData.lastResource->commandBuffer->GetComputeQueue(),
 			renderData.lastResource->commandBuffer->GetAsyncQueue()
 		};
+		//Final Execute
+		if (renderData.executeLastFrame)
+		{
+			renderData.lastResource->commandBuffer->Submit();
+		}
+		//Finalize Frame
+
 		renderData.lastResource->UpdateAfterFrame(*renderData.fenceIndex, queues, renderData.fence, renderData.fenceCount);
 		renderData.lastResource->commandBuffer->Clear();
 	}

@@ -11,6 +11,7 @@
 #include "../../Singleton/PSOContainer.h"
 #include <mutex>
 #include "../../PipelineComponent/IPerCameraResource.h"
+#include "../../Singleton/Graphics.h"
 struct ObjectData
 {
 	DirectX::XMFLOAT4X4 localToWorld;
@@ -191,8 +192,7 @@ GRP_Renderer::GRP_Renderer(
 	cullResultBuffer = std::unique_ptr<StructuredBuffer>(new StructuredBuffer(
 		device,
 		ele,
-		2,
-		true
+		2
 	));
 
 
@@ -200,7 +200,7 @@ GRP_Renderer::GRP_Renderer(
 	_InputDataBuffer = ShaderID::PropertyToID("_InputDataBuffer");
 	_OutputBuffer = ShaderID::PropertyToID("_OutputBuffer");
 	_CountBuffer = ShaderID::PropertyToID("_CountBuffer");
-	CBuffer = ShaderID::PropertyToID("CBuffer");
+	CullBuffer = ShaderID::PropertyToID("CullBuffer");
 }
 
 GRP_Renderer::RenderElement& GRP_Renderer::AddRenderElement(
@@ -378,8 +378,7 @@ void  GRP_Renderer::DrawCommand(
 			new StructuredBuffer(
 				device,
 				ele,
-				2,
-				true
+				2
 			));
 	}
 	cullShader->BindRootSignature(commandList, nullptr);
@@ -390,28 +389,30 @@ void  GRP_Renderer::DrawCommand(
 		return new GpuDrivenRenderer(device, capacity);
 	});
 	CullData cullD;
-	cullD._Count = elements.size();
 	memcpy(cullD.planes, frustumPlanes, sizeof(DirectX::XMFLOAT4) * 6);
 	memcpy(&cullD._FrustumMaxPoint, &frustumMaxPoint, sizeof(DirectX::XMFLOAT3));
 	memcpy(&cullD._FrustumMinPoint, &frustumMinPoint, sizeof(DirectX::XMFLOAT3));
+	cullD._Count = elements.size();
 	cullDataBuffer.buffer->CopyData(cullDataBuffer.element, &cullD);
 	cullShader->SetResource(commandList, _InputBuffer, perFrameData->cmdDrawBuffers.get(), 0);
 	cullShader->SetResource(commandList, _InputDataBuffer, perFrameData->objectPosBuffer.get(), 0);
 	cullShader->SetStructuredBufferByAddress(commandList, _OutputBuffer, cullResultBuffer->GetAddress(0, 0));
 	cullShader->SetStructuredBufferByAddress(commandList, _CountBuffer, cullResultBuffer->GetAddress(1, 0));
-	cullShader->SetResource(commandList, CBuffer, cullDataBuffer.buffer, cullDataBuffer.element);
+	cullShader->SetResource(commandList, CullBuffer, cullDataBuffer.buffer, cullDataBuffer.element);
 	cullShader->Dispatch(commandList, 1, 1, 1, 1);
 	cullShader->Dispatch(commandList, 0, dispatchCount, 1, 1);
+
 	PSODescriptor desc;
 	desc.meshLayoutIndex = meshLayoutIndex;
 	desc.shaderPass = targetShaderPass;
 	desc.shaderPtr = shader;
 	ID3D12PipelineState* pso = container->GetState(desc, device);
 	commandList->SetPipelineState(pso);
-	shader->BindRootSignature(commandList);
+	shader->BindRootSignature(commandList, textureHeap.operator->());
 	shader->SetResource(commandList, ShaderID::GetMainTex(), textureHeap.operator->(), 0);
 	shader->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraProperty.buffer, cameraProperty.element);
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	cullResultBuffer->TransformBufferState(commandList, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
 	commandList->ExecuteIndirect(
 		cmdSig.GetSignature(),
 		elements.size(),
@@ -420,6 +421,7 @@ void  GRP_Renderer::DrawCommand(
 		cullResultBuffer->GetResource(),
 		cullResultBuffer->GetAddressOffset(1, 0)
 	);
+	cullResultBuffer->TransformBufferState(commandList, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 }
 
 CBufferPool* GRP_Renderer::GetCullDataPool(UINT initCapacity)

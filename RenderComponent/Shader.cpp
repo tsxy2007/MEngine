@@ -12,9 +12,11 @@ Shader::~Shader()
 
 }
 
-void Shader::BindRootSignature(ID3D12GraphicsCommandList* commandList)
+void Shader::BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* descHeap)
 {
 	commandList->SetGraphicsRootSignature(mRootSignature.Get());
+	if (descHeap)
+		descHeap->SetDescriptorHeap(commandList);
 }
 
 void Shader::GetPassPSODesc(UINT pass, D3D12_GRAPHICS_PIPELINE_STATE_DESC* targetPSO)
@@ -154,7 +156,6 @@ void Shader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObjec
 	{
 	case ShaderVariableType_DescriptorHeap:
 		heap = ((DescriptorHeap*)targetObj)->Get().Get();
-		commandList->SetDescriptorHeaps(1, &heap);
 		commandList->SetGraphicsRootDescriptorTable(
 			rootSigPos,
 			((DescriptorHeap*)targetObj)->hGPU(indexOffset)

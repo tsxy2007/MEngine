@@ -38,11 +38,4 @@ public:
 		UINT objectBufferOffset,
 		PSOContainer* container
 	);
-	void GetIndirectArgument(
-		int targetPass,
-		ID3D12Device* device,
-		UploadBuffer* objectBuffer,
-		UINT objectBufferOffset,
-		MultiDrawCommand* command
-	);
 };

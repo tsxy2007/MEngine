@@ -87,7 +87,7 @@ public:
 	void UploadCameraBuffer(PassConstants& mMainPassCB);
 	CameraRenderPath GetRenderingPath() const { return renderType; }
 	template <typename Func>
-	inline IPipelineResource* GetResource(PipelineComponent* targetComponent, const Func&& func)
+	inline IPipelineResource* GetResource(void* targetComponent, const Func& func)
 	{
 		std::lock_guard<std::mutex> lck(mtx);
 		auto&& ite = perCameraResource.find(targetComponent);
@@ -99,14 +99,9 @@ public:
 		}
 		return ite->second;
 	}
-	template <typename Func>
-	inline IPipelineResource* GetResource(PipelineComponent* targetComponent, const Func& func)
-	{
-		return GetResource(targetComponent, std::move(func));
-	}
 	
 private:
-	std::unordered_map<PipelineComponent*, IPipelineResource*> perCameraResource;
+	std::unordered_map<void*, IPipelineResource*> perCameraResource;
 	std::mutex mtx;
 	CameraRenderPath renderType;	// Camera coordinate system with coordinates relative to world space.
 	DirectX::XMFLOAT3 mPosition = { 0.0f, 0.0f, 0.0f };

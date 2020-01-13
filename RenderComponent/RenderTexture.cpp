@@ -195,27 +195,6 @@ void RenderTexture::SetUAV(ID3D12GraphicsCommandList* commandList, bool value)
 }
 */
 
-void RenderTexture::BindRTVToHeap(ID3D12Device* device, DescriptorHeap* targetHeap, UINT targetHeapIndex, UINT slice)
-{
-	UINT maxDepth = depthSlice - 1;
-	slice = min(slice, maxDepth);
-	switch (mType)
-	{
-	case RenderTextureType::RenderTextureType_Tex2D:
-
-		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, targetHeap->hCPU(targetHeapIndex));
-		break;
-
-	case RenderTextureType::RenderTextureType_Tex3D:
-		rtvDesc.Texture3D.FirstWSlice = slice;
-		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, targetHeap->hCPU(targetHeapIndex));
-		break;
-	default:
-		rtvDesc.Texture2DArray.FirstArraySlice = slice;
-		device->CreateRenderTargetView(mColorResource.Get(), &rtvDesc, targetHeap->hCPU(targetHeapIndex));
-	}
-}
-
 RenderTexture::RenderTexture(
 	ID3D12Device* device,
 	UINT width,

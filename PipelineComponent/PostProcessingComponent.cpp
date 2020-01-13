@@ -24,13 +24,15 @@ class PostRunnable
 {
 public:
 	RenderTexture* renderTarget;
+	RenderTexture* motionVector;
+	RenderTexture* destMap;
 	ThreadCommand* threadCmd;
 	D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
 	ID3D12Resource* backBuffer;
 	ID3D12Device* device;
 	UINT width;
 	UINT height;
-	PostProcessingComponent* selfPtr;
+	void* selfPtr;
 	FrameResource* resource;
 	bool isForPresent;
 	Camera* cam;
@@ -45,23 +47,25 @@ public:
 		});
 		taaComponent->Run(
 			renderTarget,
-			selfPtr->GetTempRT(1),
+			renderTarget,
+			motionVector,
+			destMap,
 			commandList,
-			device,
 			resource,
-			selfPtr->prepareComp,
 			cam,
-			selfPtr,
 			width, height
 		);
-		renderTarget->BindColorBufferToSRVHeap(&frameRes->postSRVHeap, 0, device);
+		destMap->BindColorBufferToSRVHeap(&frameRes->postSRVHeap, 0, device);
 
 		if (isForPresent)
 		{
-			Graphics::ResourceStateTransform
-				<D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET>(commandList, backBuffer);
+			Graphics::ResourceStateTransform(
+				commandList, 
+				D3D12_RESOURCE_STATE_PRESENT,
+				D3D12_RESOURCE_STATE_RENDER_TARGET, 
+				backBuffer);
 		}
-		postShader->BindRootSignature(commandList);
+		postShader->BindRootSignature(commandList, &frameRes->postSRVHeap);
 		postShader->SetResource(commandList, ShaderID::GetMainTex(), &frameRes->postSRVHeap, 0);
 		Graphics::Blit(
 			commandList,
@@ -75,8 +79,11 @@ public:
 			0
 		);
 		if (isForPresent) {
-			Graphics::ResourceStateTransform
-				<D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT>(commandList, backBuffer);
+			Graphics::ResourceStateTransform(
+				commandList,
+				D3D12_RESOURCE_STATE_RENDER_TARGET, 
+				D3D12_RESOURCE_STATE_PRESENT,
+				backBuffer);
 		}
 		threadCmd->CloseCommand();
 	}
@@ -85,7 +92,9 @@ public:
 void PostProcessingComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 {
 	JobHandle handle = ScheduleJob<PostRunnable>({
-		GetTempRT(0),
+		allTempRT[0],
+		allTempRT[1],
+		allTempRT[2],
 		commandList,
 		data.backBufferHandle,
 		data.backBuffer,
@@ -100,6 +109,8 @@ void PostProcessingComponent::RenderEvent(EventData& data, ThreadCommand* comman
 }
 void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
+	SetCPUDepending<PrepareComponent>();
+
 	tempRT.resize(3);
 	tempRT[0].type = TemporalRTCommand::Require;
 	tempRT[0].uID = ShaderID::PropertyToID("_CameraRenderTarget");
@@ -125,6 +136,9 @@ void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCom
 		);
 	taaComponent = std::unique_ptr<TemporalAA>(new TemporalAA());
 	prepareComp = RenderPipeline::GetComponent<PrepareComponent>();
+	taaComponent->prePareComp = prepareComp;
+	taaComponent->device = device;
+	taaComponent->toRTContainer = renderTextureContainer.get();
 }
 
  std::vector<TemporalRTCommand>& PostProcessingComponent::SendRenderTextureRequire(EventData& evt)

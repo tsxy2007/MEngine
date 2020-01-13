@@ -35,7 +35,6 @@ private:
 	static std::mutex mtx;
 	static JobBucket* bucket;
 	ThreadCommand* threadCommand;//thread command cache
-	std::vector<RenderTexture*> allTempRT;
 	struct LoadTempRTCommand
 	{
 		UINT uID;
@@ -76,7 +75,7 @@ private:
 	};
 
 protected:
-	RenderTexture* GetTempRT(UINT index);
+	std::vector<RenderTexture*> allTempRT;
 	template <typename... Args>
 	void SetCPUDepending()
 	{

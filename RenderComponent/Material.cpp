@@ -27,7 +27,7 @@ Material::~Material()
 
 void Material::BindShaderResource(ID3D12GraphicsCommandList* commandList)
 {
-	mShader->BindRootSignature(commandList);
+	mShader->BindRootSignature(commandList, shaderResourceHeap.operator->());
 	if (mPropertyBuffer != nullptr)
 	{
 		mShader->SetResource(commandList, 

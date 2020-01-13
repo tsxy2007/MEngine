@@ -245,7 +245,7 @@ void GetCullingShader(ID3D12Device* device, JobBucket* bucket)
 	kernelNames[1] = "Clear";
 	const UINT SHADER_VAR_COUNT = 5;
 	ComputeShaderVariable vars[SHADER_VAR_COUNT];
-	vars[0].name = "CBuffer";
+	vars[0].name = "CullBuffer";
 	vars[0].type = ComputeShaderVariable::ConstantBuffer;
 	vars[0].registerPos = 0;
 	vars[0].space = 0;

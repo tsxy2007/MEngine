@@ -165,7 +165,7 @@ void ComputeShader::BindRootSignature(ID3D12GraphicsCommandList* commandList, De
 {
 	commandList->SetComputeRootSignature(mRootSignature.Get());
 	if (heap != nullptr)
-		commandList->SetDescriptorHeaps(1, heap->Get().GetAddressOf());
+		heap->SetDescriptorHeap(commandList);
 }
 
 void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id, MObject* targetObj, UINT indexOffset)
@@ -181,7 +181,6 @@ void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id,
 	{
 	case ComputeShaderVariable::Type::SRVDescriptorHeap:
 		heap = ((DescriptorHeap*)targetObj)->Get().Get();
-		commandList->SetDescriptorHeaps(1, &heap);
 		commandList->SetComputeRootDescriptorTable(
 			rootSigPos,
 			((DescriptorHeap*)targetObj)->hGPU(indexOffset)
@@ -190,7 +189,6 @@ void ComputeShader::SetResource(ID3D12GraphicsCommandList* commandList, UINT id,
 		break;
 	case ComputeShaderVariable::Type::UAVDescriptorHeap:
 		heap = ((DescriptorHeap*)targetObj)->Get().Get();
-		commandList->SetDescriptorHeaps(1, &heap);
 		commandList->SetComputeRootDescriptorTable(
 			rootSigPos,
 			((DescriptorHeap*)targetObj)->hGPU(indexOffset)

@@ -28,17 +28,11 @@ public:
 		PSOContainer* container,
 		UINT width, UINT height,
 		Shader* shader, UINT pass);
-	template <D3D12_RESOURCE_STATES beforeState, D3D12_RESOURCE_STATES afterState>
 	static void ResourceStateTransform(
 		ID3D12GraphicsCommandList* commandList,
-		ID3D12Resource* resource) 
-	{
-		commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(
-			resource,
-			beforeState,
-			afterState
-		));
-	}
+		D3D12_RESOURCE_STATES beforeState,
+		D3D12_RESOURCE_STATES afterState,
+		ID3D12Resource* resource);
 
 	static void CopyTexture(
 		ID3D12GraphicsCommandList* commandList,

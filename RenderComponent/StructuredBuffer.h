@@ -7,6 +7,7 @@ struct StructuredBufferElement
 	size_t stride;
 	size_t elementCount;
 };
+
 class StructuredBuffer : public MObject
 {
 private:
@@ -17,8 +18,7 @@ public:
 	StructuredBuffer(
 		ID3D12Device* device,
 		StructuredBufferElement* elementsArray,
-		UINT elementsCount,
-		bool isIndirectArgument
+		UINT elementsCount
 	);
 	size_t GetStride(UINT index) const;
 	size_t GetElementCount(UINT index) const;
@@ -26,4 +26,5 @@ public:
 	size_t GetAddressOffset(UINT element, UINT index) const;
 	inline ID3D12Resource* GetResource() const { return mDefaultBuffer.Get(); }
 	void ReleaseResourceAfterFlush(FrameResource* targetResource);
+	void TransformBufferState(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES beforeState, D3D12_RESOURCE_STATES afterState);
 };

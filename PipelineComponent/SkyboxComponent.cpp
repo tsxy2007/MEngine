@@ -9,12 +9,9 @@ using namespace DirectX;
 class SkyboxPerFrameData : public IPipelineResource
 {
 public:
-	DescriptorHeap heap;
 	UploadBuffer posBuffer;
 	SkyboxPerFrameData(ID3D12Device* device)
 	{
-		heap.Create(device,
-			D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 		posBuffer.Create(
 			device,
 			1, true,
@@ -94,18 +91,16 @@ public:
 		XMMATRIX viewProj = XMMatrixMultiply(view, cam->GetProj());
 		XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
 		frameData->posBuffer.CopyData(0, &invViewProj);
-		gbufferTex->BindRTVToHeap(device, &frameData->heap, 0, 0);
-		mvTex->BindRTVToHeap(device, &frameData->heap, 1, 0);
 		ID3D12GraphicsCommandList* cmdList = commandList->GetCmdList();
 		gbufferTex->SetViewport(cmdList);
 		D3D12_CPU_DESCRIPTOR_HANDLE rtHandles[2];
-		rtHandles[0] = frameData->heap.hCPU(0);
-		rtHandles[1] = frameData->heap.hCPU(1);
+		rtHandles[0] = gbufferTex->GetColorDescriptor(0);
+		rtHandles[1] = mvTex->GetColorDescriptor(0);
 		D3D12_CPU_DESCRIPTOR_HANDLE depthHandle = gbufferTex->GetDepthDescriptor(0);
 		cmdList->OMSetRenderTargets(
 			2,
 			rtHandles,
-			true,
+			false,
 			&depthHandle
 		);
 		ConstBufferElement skyboxData;
@@ -126,8 +121,8 @@ void SkyboxComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 {
 	ScheduleJob<SkyboxRunnable>(
 		{
-			 GetTempRT(0),
-			 GetTempRT(1),
+			 allTempRT[0],
+			 allTempRT[1],
 			 this,
 			 commandList,
 			 data.resource,
