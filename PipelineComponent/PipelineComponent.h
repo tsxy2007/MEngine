@@ -7,7 +7,7 @@ class FrameResource;
 class TempRTAllocator;
 class RenderTexture;
 class World;
-struct TemporalRTCommand
+struct TemporalResourceCommand
 {
 	enum CommandType
 	{
@@ -15,8 +15,8 @@ struct TemporalRTCommand
 	};
 	CommandType type;
 	UINT uID;
-	RenderTextureDescriptor descriptor;
-	bool operator=(const TemporalRTCommand& other) const;
+	ResourceDescriptor descriptor;
+	bool operator=(const TemporalResourceCommand& other) const;
 };
 class PerCameraRenderingEvent;
 class CommandBuffer;
@@ -39,8 +39,8 @@ private:
 	{
 		UINT uID;
 		UINT index;
-		RenderTextureDescriptor descriptor;
-		LoadTempRTCommand(UINT uID, UINT index, RenderTextureDescriptor& descriptor) :
+		ResourceDescriptor descriptor;
+		LoadTempRTCommand(UINT uID, UINT index, ResourceDescriptor& descriptor) :
 			uID(uID), index(index), descriptor(descriptor) {}
 	};
 	std::vector<JobHandle> jobHandles;
@@ -75,7 +75,7 @@ private:
 	};
 
 protected:
-	std::vector<RenderTexture*> allTempRT;
+	std::vector<MObject*> allTempResource;
 	template <typename... Args>
 	void SetCPUDepending()
 	{
@@ -115,7 +115,7 @@ public:
 	virtual CommandListType GetCommandListType() = 0;
 	virtual void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) = 0;
 	virtual void Dispose() = 0;
-	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt) = 0;
+	virtual std::vector<TemporalResourceCommand>& SendRenderTextureRequire(EventData& evt) = 0;
 	virtual void RenderEvent(EventData& data, ThreadCommand* commandList) = 0;
 	void ClearHandles();
 	void MarkHandles();

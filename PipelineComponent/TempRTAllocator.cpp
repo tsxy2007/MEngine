@@ -5,6 +5,14 @@ TempRTAllocator::TempRTAllocator()
 	waitingRT.Reserve(30);
 }
 
+bool ResourceDescriptor::operator!=(const ResourceDescriptor& res) const
+{
+	return res.rtDesc != res.rtDesc;
+}
+bool ResourceDescriptor::operator==(const ResourceDescriptor& res) const
+{
+	return res.rtDesc == res.rtDesc;
+}
 
 TempRTAllocator::~TempRTAllocator()
 {
@@ -16,7 +24,7 @@ TempRTAllocator::~TempRTAllocator()
 		delete v.value;
 	}
 }
-RenderTexture* TempRTAllocator::GetRenderTextures(ID3D12Device* device, UINT id, RenderTextureDescriptor& descriptor)
+MObject* TempRTAllocator::GetTempResource(ID3D12Device* device, UINT id, ResourceDescriptor& descriptor)
 {
 
 	std::vector<TempRTData>* datas = nullptr;
@@ -35,29 +43,30 @@ RenderTexture* TempRTAllocator::GetRenderTextures(ID3D12Device* device, UINT id,
 		usingRTData.rt = data.rt;
 		usingRTData.desc = descriptor;
 		usingRT.insert_or_assign(id, usingRTData);
-		RenderTexture* result = data.rt.operator->();
+		MObject* result = data.rt;
 		datas->erase(datas->end() - 1);
 		return result;
 	}
 	else
 	{
 		UsingTempRT usingRTData;
-		usingRTData.rt = new RenderTexture(device, descriptor.width, descriptor.height, descriptor.colorFormat, descriptor.depthType, descriptor.type, descriptor.depthSlice, 1);;
+		RenderTextureDescriptor& rtDesc = descriptor.rtDesc;
+		usingRTData.rt = new RenderTexture(device, rtDesc.width, rtDesc.height, rtDesc.colorFormat, rtDesc.depthType, rtDesc.type, rtDesc.depthSlice, 1);;
 		usingRTData.desc = descriptor;
 		usingRT.insert_or_assign(id, usingRTData);
-		return usingRTData.rt.operator->();
+		return usingRTData.rt;
 	}
 }
 bool TempRTAllocator::Contains(UINT id)
 {
 	return usingRT.find(id) != usingRT.end();
 }
-RenderTexture* TempRTAllocator::GetUsingRenderTexture(UINT id)
+MObject* TempRTAllocator::GetUsingRenderTexture(UINT id)
 {
 	auto&& ite = usingRT.find(id);
 	if (ite != usingRT.end())
 	{
-		return ite->second.rt.operator->();
+		return ite->second.rt;
 	}
 	return nullptr;
 }
@@ -94,10 +103,11 @@ void TempRTAllocator::CumulateReleaseAfterFrame()
 			d.containedFrame++;
 			if (d.containedFrame >= 4)
 			{
-				d.rt->Destroy();
+				MObject* ptr = d.rt;
 				(*data)[j] = (*data)[data->size() - 1];
 				data->erase(data->end() - 1);
 				j--;
+				delete ptr;
 			}
 		}
 	}

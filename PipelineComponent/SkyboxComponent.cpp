@@ -97,6 +97,7 @@ public:
 		rtHandles[0] = gbufferTex->GetColorDescriptor(0);
 		rtHandles[1] = mvTex->GetColorDescriptor(0);
 		D3D12_CPU_DESCRIPTOR_HANDLE depthHandle = gbufferTex->GetDepthDescriptor(0);
+		RenderTexture* gbRT = gbufferTex;
 		cmdList->OMSetRenderTargets(
 			2,
 			rtHandles,
@@ -121,8 +122,8 @@ void SkyboxComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 {
 	ScheduleJob<SkyboxRunnable>(
 		{
-			 allTempRT[0],
-			 allTempRT[1],
+			 (RenderTexture*)allTempResource[0],
+			  (RenderTexture*)allTempResource[1],
 			 this,
 			 commandList,
 			 data.resource,
@@ -135,9 +136,9 @@ void SkyboxComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 void SkyboxComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	tempRT.resize(2);
-	tempRT[0].type = TemporalRTCommand::Require;
+	tempRT[0].type = TemporalResourceCommand::Require;
 	tempRT[0].uID = ShaderID::PropertyToID("_CameraRenderTarget");
-	tempRT[1].type = TemporalRTCommand::Require;
+	tempRT[1].type = TemporalResourceCommand::Require;
 	tempRT[1].uID = ShaderID::PropertyToID("_CameraMotionVectorsTexture");
 	ObjectPtr<Texture> skyboxTexture = new Texture(
 		commandList,

@@ -32,7 +32,7 @@ private:
 	{
 		UINT id;
 		UINT rtIndex;
-		RenderTextureDescriptor desc;
+		ResourceDescriptor desc;
 		UINT startComponent;
 		UINT endComponent;
 	};

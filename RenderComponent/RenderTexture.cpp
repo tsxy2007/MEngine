@@ -30,29 +30,8 @@ bool RenderTextureDescriptor::operator==(const RenderTextureDescriptor& other) c
 		depthType == other.depthType;
 }
 
-bool RenderTextureDescriptor::operator==(RenderTextureDescriptor&& other) const
-{
-	return
-		width == other.width &&
-		height == other.height &&
-		depthSlice == other.depthSlice &&
-		type == other.type &&
-		colorFormat == other.colorFormat &&
-		depthType == other.depthType;
-}
 
 bool RenderTextureDescriptor::operator!=(const RenderTextureDescriptor& other) const
-{
-	return
-		width != other.width &&
-		height != other.height &&
-		depthSlice != other.depthSlice &&
-		type != other.type &&
-		colorFormat != other.colorFormat &&
-		depthType != other.depthType;
-}
-
-bool RenderTextureDescriptor::operator!=(RenderTextureDescriptor&& other) const
 {
 	return
 		width != other.width &&

@@ -4,11 +4,11 @@ class SkyboxComponent : public PipelineComponent
 {
 	friend class SkyboxRunnable;
 protected:
-	std::vector<TemporalRTCommand> tempRT;
+	std::vector<TemporalResourceCommand> tempRT;
 	virtual CommandListType GetCommandListType() {
 		return CommandListType_Graphics;
 	}
-	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt)
+	virtual std::vector<TemporalResourceCommand>& SendRenderTextureRequire(EventData& evt)
 	{
 		return tempRT;
 	}

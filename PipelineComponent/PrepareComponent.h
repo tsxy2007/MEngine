@@ -13,11 +13,11 @@ public:
 	DirectX::XMVECTOR frustumMinPos;
 	DirectX::XMVECTOR frustumMaxPos;
 protected:
-	std::vector<TemporalRTCommand> useless;
+	std::vector<TemporalResourceCommand> useless;
 	virtual CommandListType GetCommandListType() {
 		return CommandListType_None;
 	}
-	virtual std::vector<TemporalRTCommand>& SendRenderTextureRequire(EventData& evt) { return useless; }
+	virtual std::vector<TemporalResourceCommand>& SendRenderTextureRequire(EventData& evt) { return useless; }
 	virtual void RenderEvent(EventData& data, ThreadCommand* commandList);
 	virtual void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) {
 

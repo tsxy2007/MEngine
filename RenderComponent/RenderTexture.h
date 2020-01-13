@@ -36,28 +36,9 @@ struct RenderTextureDescriptor
 	RenderTextureDepthSettings depthType;
 	bool operator==(const RenderTextureDescriptor& other) const;
 
-	bool operator==(RenderTextureDescriptor&& other) const;
-
 	bool operator!=(const RenderTextureDescriptor& other) const;
-
-	bool operator!=(RenderTextureDescriptor&& other) const;
-
 	//bool operator!=(const)
 };
-
-namespace std
-{
-	template <>
-	class hash<RenderTextureDescriptor>
-	{
-	public:
-		size_t operator()(const RenderTextureDescriptor& o) const
-		{
-			hash<UINT> ulongHash;
-			return ulongHash(o.width) ^ ulongHash(o.height) ^ ulongHash(o.depthSlice) ^ ulongHash((UINT)o.type) ^ ulongHash((UINT)o.colorFormat) ^ ulongHash((UINT)o.depthType);
-		}
-	};
-}
 
 class RenderTexture : public MObject
 {

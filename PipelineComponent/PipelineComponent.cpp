@@ -10,12 +10,12 @@ void PipelineComponent::ExecuteTempRTCommand(ID3D12Device* device, TempRTAllocat
 	for (auto ite = loadRTCommands.begin(); ite != loadRTCommands.end(); ++ite)
 	{
 		LoadTempRTCommand& cmd = *ite;
-		allTempRT[cmd.index] = allocator->GetRenderTextures(device, cmd.uID, cmd.descriptor);
+		allTempResource[cmd.index] = allocator->GetTempResource(device, cmd.uID, cmd.descriptor);
 	}
 	loadRTCommands.clear();
 	for (auto ite = requiredRTs.begin(); ite != requiredRTs.end(); ++ite)
 	{
-		allTempRT[ite->first] = allocator->GetUsingRenderTexture(ite->second);
+		allTempResource[ite->first] = allocator->GetUsingRenderTexture(ite->second);
 	}
 	requiredRTs.clear();
 	for (auto ite = unLoadRTCommands.begin(); ite!= unLoadRTCommands.end(); ++ite)
@@ -25,12 +25,12 @@ void PipelineComponent::ExecuteTempRTCommand(ID3D12Device* device, TempRTAllocat
 	unLoadRTCommands.clear();
 }
 
-bool TemporalRTCommand::operator=(const TemporalRTCommand& other) const
+bool TemporalResourceCommand::operator=(const TemporalResourceCommand& other) const
 {
 	bool eq = type == other.type && uID == other.uID;
 	if (type == Create)
 	{
-		return eq && descriptor == other.descriptor;
+		return eq && descriptor.rtDesc == other.descriptor.rtDesc;
 	}
 	else
 	{

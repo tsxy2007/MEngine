@@ -107,16 +107,17 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 		data.camera = cam;
 		std::vector<PipelineComponent*>& waitingComponents = renderPathComponents[(UINT)cam->GetRenderingPath()];
 		renderTextureMarks.Clear();
+		//Read Events' Markers
 		for (UINT i = 0, size = waitingComponents.size(); i < size; ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
-			std::vector<TemporalRTCommand>& descriptors = component->SendRenderTextureRequire(data);
+			std::vector<TemporalResourceCommand>& descriptors = component->SendRenderTextureRequire(data);
 			//Allocate Temporal Render Texture
-			component->allTempRT.resize(descriptors.size());
+			component->allTempResource.resize(descriptors.size());
 			for (UINT j = 0, descriptorSize = descriptors.size(); j < descriptorSize; ++j)
 			{
-				TemporalRTCommand& command = descriptors[j];
-				if (command.type == TemporalRTCommand::Create)
+				TemporalResourceCommand& command = descriptors[j];
+				if (command.type == TemporalResourceCommand::Create)
 				{
 					//Alread contained
 					if (tempRTAllocator.Contains(command.uID))
@@ -139,7 +140,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 			}
 
 		}
-
+		//Mark Resources throw Markers
 		for (UINT i = 0, size = renderTextureMarks.values.size(); i < size; ++i)
 		{
 			RenderTextureMark& mark = renderTextureMarks.values[i].value;
@@ -149,7 +150,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 
 		PipelineComponent::bucket = &bucket;
 		
-		
+		//Execute Events
 		for (auto componentIte = waitingComponents.begin(); componentIte != waitingComponents.end(); ++componentIte)
 		{
 			PipelineComponent* component = *componentIte;

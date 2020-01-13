@@ -92,9 +92,9 @@ public:
 void PostProcessingComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 {
 	JobHandle handle = ScheduleJob<PostRunnable>({
-		allTempRT[0],
-		allTempRT[1],
-		allTempRT[2],
+		(RenderTexture*)allTempResource[0],
+		(RenderTexture*)allTempResource[1],
+		(RenderTexture*)allTempResource[2],
 		commandList,
 		data.backBufferHandle,
 		data.backBuffer,
@@ -112,19 +112,19 @@ void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCom
 	SetCPUDepending<PrepareComponent>();
 
 	tempRT.resize(3);
-	tempRT[0].type = TemporalRTCommand::Require;
+	tempRT[0].type = TemporalResourceCommand::Require;
 	tempRT[0].uID = ShaderID::PropertyToID("_CameraRenderTarget");
-	tempRT[1].type = TemporalRTCommand::Require;
+	tempRT[1].type = TemporalResourceCommand::Require;
 	tempRT[1].uID = ShaderID::PropertyToID("_CameraMotionVectorsTexture");
-	tempRT[2].type = TemporalRTCommand::Create;
+	tempRT[2].type = TemporalResourceCommand::Create;
 	tempRT[2].uID = ShaderID::PropertyToID("_PostProcessBlitTarget");
 	auto& desc = tempRT[2].descriptor;
-	desc.colorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
-	desc.depthSlice = 1;
-	desc.depthType = RenderTextureDepthSettings_None;
-	desc.width = 0;
-	desc.height = 0;
-	desc.type = RenderTextureType_Tex2D;
+	desc.rtDesc.colorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	desc.rtDesc.depthSlice = 1;
+	desc.rtDesc.depthType = RenderTextureDepthSettings_None;
+	desc.rtDesc.width = 0;
+	desc.rtDesc.height = 0;
+	desc.rtDesc.type = RenderTextureType_Tex2D;
 	postShader = ShaderCompiler::GetShader("PostProcess");
 	DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	backBufferContainer = std::unique_ptr<PSOContainer>(
@@ -141,11 +141,11 @@ void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCom
 	taaComponent->toRTContainer = renderTextureContainer.get();
 }
 
- std::vector<TemporalRTCommand>& PostProcessingComponent::SendRenderTextureRequire(EventData& evt)
+ std::vector<TemporalResourceCommand>& PostProcessingComponent::SendRenderTextureRequire(EventData& evt)
 {
 	auto& desc = tempRT[2].descriptor;
-	desc.width = evt.width;
-	desc.height = evt.height;
+	desc.rtDesc.width = evt.width;
+	desc.rtDesc.height = evt.height;
 	return tempRT;
 }
 

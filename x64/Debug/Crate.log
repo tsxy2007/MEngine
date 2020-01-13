@@ -1,3 +1,172 @@
 ﻿cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  PipelineComponent.cpp
+  TempRTAllocator.cpp
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4244: “=”: 从“_Ty”转换到“_Ty2”，可能丢失数据
+          with
+          [
+              _Ty=unsigned __int64
+          ]
+          and
+          [
+              _Ty2=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(382): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const ResourceDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              K=ResourceDescriptor,
+              _Kty=ResourceDescriptor,
+              _Keyty=const ResourceDescriptor &,
+              _Mappedty=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(381): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const ResourceDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              K=ResourceDescriptor,
+              _Kty=ResourceDescriptor,
+              _Keyty=const ResourceDescriptor &,
+              _Mappedty=unsigned __int64
+          ]
+  c:\users\user\source\repos\crate\common\metalib.h(139): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const ResourceDescriptor &,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              K=ResourceDescriptor,
+              _Kty=ResourceDescriptor,
+              _Mappedty=unsigned __int64
+          ]
+  c:\users\user\source\repos\crate\common\metalib.h(139): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const ResourceDescriptor &,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              K=ResourceDescriptor,
+              _Kty=ResourceDescriptor,
+              _Mappedty=unsigned __int64
+          ]
+  c:\users\user\source\repos\crate\common\metalib.h(138): note: 编译 类 模板 成员函数 "void Dictionary<ResourceDescriptor,std::vector<TempRTAllocator::TempRTData,std::allocator<_Ty>> *>::Add(K &,V &)" 时
+          with
+          [
+              _Ty=TempRTAllocator::TempRTData,
+              K=ResourceDescriptor,
+              V=std::vector<TempRTAllocator::TempRTData,std::allocator<TempRTAllocator::TempRTData>> *
+          ]
+  c:\users\user\source\repos\crate\pipelinecomponent\temprtallocator.cpp(35): note: 参见对正在编译的函数 模板 实例化“void Dictionary<ResourceDescriptor,std::vector<TempRTAllocator::TempRTData,std::allocator<_Ty>> *>::Add(K &,V &)”的引用
+          with
+          [
+              _Ty=TempRTAllocator::TempRTData,
+              K=ResourceDescriptor,
+              V=std::vector<TempRTAllocator::TempRTData,std::allocator<TempRTAllocator::TempRTData>> *
+          ]
+  c:\users\user\source\repos\crate\pipelinecomponent\temprtallocator.h(46): note: 参见对正在编译的 类 模板 实例化 "Dictionary<ResourceDescriptor,std::vector<TempRTAllocator::TempRTData,std::allocator<_Ty>> *>" 的引用
+          with
+          [
+              _Ty=TempRTAllocator::TempRTData
+          ]
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(173): warning C4244: “初始化”: 从“_Ty”转换到“_Ty2”，可能丢失数据
+          with
+          [
+              _Ty=unsigned __int64
+          ]
+          and
+          [
+              _Ty2=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(879): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<const ResourceDescriptor&,unsigned __int64,0>(_Other1,_Other2 &&) noexcept”的引用
+          with
+          [
+              _Kty=ResourceDescriptor,
+              _Ty=UINT,
+              _Other1=const ResourceDescriptor &,
+              _Other2=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(881): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<const ResourceDescriptor&,unsigned __int64,0>(_Other1,_Other2 &&) noexcept”的引用
+          with
+          [
+              _Kty=ResourceDescriptor,
+              _Ty=UINT,
+              _Other1=const ResourceDescriptor &,
+              _Other2=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(711): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,const ResourceDescriptor&,unsigned __int64>(_Alloc &,_Objty *const ,const ResourceDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Alloc=std::allocator<std::_List_node<std::pair<const ResourceDescriptor,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<const ResourceDescriptor,UINT>>>::void_pointer>>,
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              _Objty=std::pair<const ResourceDescriptor,UINT>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(716): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,const ResourceDescriptor&,unsigned __int64>(_Alloc &,_Objty *const ,const ResourceDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Alloc=std::allocator<std::_List_node<std::pair<const ResourceDescriptor,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<const ResourceDescriptor,UINT>>>::void_pointer>>,
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              _Objty=std::pair<const ResourceDescriptor,UINT>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(947): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<const ResourceDescriptor&,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,const ResourceDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=ResourceDescriptor,
+              _Ty=UINT,
+              _Alloc=std::allocator<std::pair<const ResourceDescriptor,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(950): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<const ResourceDescriptor&,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,const ResourceDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=ResourceDescriptor,
+              _Ty=UINT,
+              _Alloc=std::allocator<std::pair<const ResourceDescriptor,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(916): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<const ResourceDescriptor&,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,const ResourceDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=ResourceDescriptor,
+              _Ty=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(917): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<const ResourceDescriptor&,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,const ResourceDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=ResourceDescriptor,
+              _Ty=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xhash(299): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty> &std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::emplace_front<const ResourceDescriptor&,unsigned __int64>(const ResourceDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=ResourceDescriptor,
+              _Ty=UINT
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(369): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<const ResourceDescriptor&,unsigned __int64>(const ResourceDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              _Kty=ResourceDescriptor,
+              _Hasher=std::hash<ResourceDescriptor>,
+              _Keyeq=std::equal_to<ResourceDescriptor>,
+              _Alloc=std::allocator<std::pair<const ResourceDescriptor,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(367): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<const ResourceDescriptor&,unsigned __int64>(const ResourceDescriptor &,unsigned __int64 &&)”的引用
+          with
+          [
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              _Kty=ResourceDescriptor,
+              _Hasher=std::hash<ResourceDescriptor>,
+              _Keyeq=std::equal_to<ResourceDescriptor>,
+              _Alloc=std::allocator<std::pair<const ResourceDescriptor,UINT>>
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(382): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const ResourceDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              K=ResourceDescriptor,
+              _Kty=ResourceDescriptor,
+              _Keyty=const ResourceDescriptor &,
+              _Mappedty=unsigned __int64
+          ]
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(381): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const ResourceDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<const ResourceDescriptor,UINT>,
+              K=ResourceDescriptor,
+              _Kty=ResourceDescriptor,
+              _Keyty=const ResourceDescriptor &,
+              _Mappedty=unsigned __int64
+          ]
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Debug\Crate.exe
