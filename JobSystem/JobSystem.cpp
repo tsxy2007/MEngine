@@ -90,18 +90,39 @@ public:
 	}
 };
 
+JobBucket* JobSystem::GetJobBucket()
+{
+	if (releasedBuckets.empty())
+	{
+		JobBucket* bucket = new JobBucket(this);
+		usedBuckets.push_back(bucket);
+		return bucket;
+	}
+	else
+	{
+		auto&& ite = releasedBuckets.end() - 1;
+		JobBucket* cur = *ite;
+		cur->jobNodesVec.clear();
+		releasedBuckets.erase(ite);
+		return cur;
+	}
+}
+void JobSystem::ReleaseJobBucket(JobBucket* node)
+{
+	node->jobNodesVec.clear();
+	releasedBuckets.push_back(node);
+}
+
 JobSystem::JobSystem(int threadCount) : 
 	executingNode(100),
-	JobSystemInitialized(false),
 	mainThreadFinished(true),
 	jobNodePool(100),
 	vectorPool(100)
 {
-	if (JobSystemInitialized) return;
 	mThreadCount = threadCount;
-	JobSystemInitialized = true;
+	usedBuckets.reserve(20);
+	releasedBuckets.reserve(20);
 	allThreads.resize(threadCount);
-
 	for (int i = 0; i < threadCount; ++i)
 	{
 		JobThreadRunnable j;
@@ -112,7 +133,6 @@ JobSystem::JobSystem(int threadCount) :
 
 JobSystem::~JobSystem()
 {
-	if (!JobSystemInitialized) return;
 	JobSystemInitialized = false;
 	{
 		std::lock_guard<std::mutex> lck(threadMtx);
@@ -122,6 +142,10 @@ JobSystem::~JobSystem()
 	{
 		allThreads[i]->join();
 		delete allThreads[i];
+	}
+	for (auto ite = usedBuckets.begin(); ite != usedBuckets.end(); ++ite)
+	{
+		delete *ite;
 	}
 }
 

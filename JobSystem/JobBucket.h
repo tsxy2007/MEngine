@@ -14,9 +14,9 @@ class JobBucket
 private:
 	std::vector<JobNode*> jobNodesVec;
 	JobSystem* sys = nullptr;
+	JobBucket(JobSystem* sys) noexcept;
+	~JobBucket() noexcept{}
 public:
-	JobBucket();
-	void SetJobSystem(JobSystem* sys);
 	template <typename Func>
 	JobHandle GetTask(const Func& func);
 };

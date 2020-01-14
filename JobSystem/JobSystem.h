@@ -24,16 +24,19 @@ private:
 	int currentBucketPos;
 	std::vector<JobBucket*> buckets;
 	std::condition_variable cv;
-	bool JobSystemInitialized;
-
+	std::vector<JobBucket*> usedBuckets;
+	std::vector<JobBucket*> releasedBuckets;
 	std::mutex mainThreadWaitMutex;
 	std::condition_variable mainThreadWaitCV;
 	bool mainThreadFinished;
+	bool JobSystemInitialized = true;
 public:
 	JobSystem(int threadCount);
 	void ExecuteBucket(JobBucket** bucket, int bucketCount);
 	void ExecuteBucket(JobBucket* bucket, int bucketCount);
 	void Wait();
 	~JobSystem();
+	JobBucket* GetJobBucket();
+	void ReleaseJobBucket(JobBucket* node);
 };
 

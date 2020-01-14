@@ -16,4 +16,5 @@ public:
 	static void AddShader(std::string str, Shader* shad);
 	static void AddComputeShader(std::string str, ComputeShader* shad);
 	static void Init(ID3D12Device* device, JobSystem* jobSys);
+	static void Dispose();
 };

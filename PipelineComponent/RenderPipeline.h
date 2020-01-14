@@ -42,7 +42,7 @@ private:
 	static std::unordered_map<std::string, PipelineComponent*> componentsLink;
 	std::vector<std::vector<PipelineComponent*>> renderPathComponents;
 	Dictionary<UINT, RenderTextureMark> renderTextureMarks;
-	std::vector<JobBucket> buckets[2];
+	std::vector<JobBucket*> buckets[2];
 	bool bucketsFlag = false;
 	template<typename T>
 	void Init()

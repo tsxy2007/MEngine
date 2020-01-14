@@ -59,12 +59,12 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* jobSys)
 {
 	CommandBuffer* currentCommandBuffer = renderData.resource->commandBuffer.get();
-	std::vector <JobBucket>& bucketArray = buckets[bucketsFlag];
+	std::vector <JobBucket*>& bucketArray = buckets[bucketsFlag];
 	bucketsFlag = !bucketsFlag;
-	bucketArray.resize(max(renderData.allCameras->size(), 1));
-	for (auto ite = bucketArray.begin(); ite != bucketArray.end(); ++ite)
+	UINT camSize = max(renderData.allCameras->size(), 1);
+	for (int i = bucketArray.size(); i <= camSize; ++i)
 	{
-		ite->SetJobSystem(jobSys);
+		bucketArray.push_back(jobSys->GetJobBucket());
 	}
 	PipelineComponent::EventData data;
 	data.device = renderData.device;
@@ -73,7 +73,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	UINT frameNum = *renderData.fenceIndex + 2;
 
 	ThreadCommand* commandList = renderData.resource->commmonThreadCommand;
-	bucketArray[0].GetTask([=]()->void
+	bucketArray[0]->GetTask([=]()->void
 	{
 		commandList->ResetCommand();
 		while (RenderCommand::ExecuteCommand(
@@ -85,7 +85,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	currentCommandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 	for (UINT camIndex = 0; camIndex < renderData.allCameras->size(); ++camIndex)
 	{
-		JobBucket& bucket = bucketArray[camIndex];
+		JobBucket* bucket = bucketArray[camIndex];
 		Camera* cam = (*renderData.allCameras)[camIndex];
 
 		if (cam->renderTarget)
@@ -117,7 +117,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 			for (UINT j = 0, descriptorSize = descriptors.size(); j < descriptorSize; ++j)
 			{
 				TemporalResourceCommand& command = descriptors[j];
-				if (command.type == TemporalResourceCommand::CommandType_Create_RenderTexture || 
+				if (command.type == TemporalResourceCommand::CommandType_Create_RenderTexture ||
 					command.type == TemporalResourceCommand::CommandType_Create_StructuredBuffer)
 				{
 					//Alread contained
@@ -139,7 +139,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 					//command.tempResState
 					component->requiredRTs.push_back({
 						j,
-						command.uID});
+						command.uID });
 				}
 			}
 
@@ -148,12 +148,12 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 		for (UINT i = 0, size = renderTextureMarks.values.size(); i < size; ++i)
 		{
 			RenderTextureMark& mark = renderTextureMarks.values[i].value;
-			waitingComponents[mark.startComponent]->loadRTCommands.push_back({ mark.id, mark.rtIndex, mark.desc});
+			waitingComponents[mark.startComponent]->loadRTCommands.push_back({ mark.id, mark.rtIndex, mark.desc });
 			waitingComponents[mark.endComponent]->unLoadRTCommands.push_back(mark.id);
 		}
 
-		PipelineComponent::bucket = &bucket;
-		
+		PipelineComponent::bucket = bucket;
+
 		//Execute Events
 		for (auto componentIte = waitingComponents.begin(); componentIte != waitingComponents.end(); ++componentIte)
 		{
@@ -188,7 +188,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 				break;
 			}
 		}
-		
+
 		for (UINT i = 0, size = waitingComponents.size(); i < size; ++i)
 		{
 			PipelineComponent* component = waitingComponents[i];
@@ -196,10 +196,10 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 			ExecuteThreadCommand(cam, component->threadCommand, renderData.resource);
 		}
 	}
-	FrameResource::mCurrFrameResource->UpdateBeforeFrame(renderData.fence, renderData.fenceCount);
-	jobSys->ExecuteBucket(bucketArray.data(), bucketArray.size());
+	FrameResource::mCurrFrameResource->UpdateBeforeFrame(renderData.fence, renderData.fenceCount);//Flush CommandQueue
+	jobSys->ExecuteBucket(bucketArray.data(), camSize);					//Execute Tasks
 
-	if (renderData.lastResource != nullptr)
+	if (renderData.lastResource != nullptr)				//Run Last frame's commandqueue
 	{
 		ID3D12CommandQueue* queues[3] =
 		{
@@ -214,7 +214,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 		}
 		//Finalize Frame
 
-		renderData.lastResource->UpdateAfterFrame(*renderData.fenceIndex, queues, renderData.fence, renderData.fenceCount);
+		renderData.lastResource->UpdateAfterFrame(*renderData.fenceIndex, queues, renderData.fence, renderData.fenceCount);//Signal CommandQueue
 		renderData.lastResource->commandBuffer->Clear();
 	}
 	ThrowIfFailed(renderData.swap->Present(0, 0));
@@ -228,6 +228,7 @@ RenderPipeline::~RenderPipeline()
 		components[i]->Dispose();
 		delete components[i];
 	}
+
 }
 
 RenderPipeline* RenderPipeline::GetInstance(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)

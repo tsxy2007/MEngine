@@ -24,17 +24,17 @@ public:
 class PtrLink final
 {
 private:
-	void Dispose();
+	void Dispose()  noexcept;
 public:
 	MObject* mPtr;
 	int value;
-	PtrLink(MObject* ptr);
+	PtrLink(MObject* ptr) noexcept;
 
-	PtrLink& operator= (const PtrLink& link);
+	PtrLink& operator= (const PtrLink& link) noexcept;
 
-	PtrLink(const PtrLink& link);
+	PtrLink(const PtrLink& link) noexcept;
 
-	~PtrLink();
+	~PtrLink() noexcept;
 };
 
 
@@ -45,68 +45,68 @@ private:
 	PtrLink link;
 
 public:
-	ObjectPtr(T* ptr) :
+	ObjectPtr(T* ptr) noexcept :
 		link(ptr)
 	{}
 
-	ObjectPtr() :
+	ObjectPtr() noexcept :
 		link(nullptr) {}
-	ObjectPtr(const ObjectPtr<T>& ptr) :
+	ObjectPtr(const ObjectPtr<T>& ptr) noexcept :
 		link(ptr.link)
 	{
 
 	}
 
-	operator bool() const
+	operator bool() const noexcept
 	{
 		return link.mPtr != nullptr;
 	}
 
-	operator MObject*() const
+	operator MObject*() const noexcept
 	{
 		return link.mPtr;
 	}
 
-	ObjectPtr(const PtrLink& ptr) : link(ptr)
+	ObjectPtr(const PtrLink& ptr) noexcept : link(ptr)
 	{
 
 	}
 	template<typename F>
-	ObjectPtr<F> Cast() const
+	ObjectPtr<F> Cast() const noexcept
 	{
 		ObjectPtr<F> mobj = link;
 		return mobj;
 	}
 
-	ObjectPtr<T>& operator=(const ObjectPtr<T>& other)
+	ObjectPtr<T>& operator=(const ObjectPtr<T>& other) noexcept
 	{
 		link = other.link;
 		return *this;
 	}
 
-	T* operator->()
+	T* operator->() noexcept
 	{
 		return (T*)link.mPtr;
 	}
 
-	T& operator*()
+	T& operator*() noexcept
 	{
 		return *(T*)link.mPtr;
 	}
 
-	bool operator==(const T* ptr) const
+	bool operator==(const T* ptr) const noexcept
 	{
 		return link.mPtr == ptr;
 	}
-	bool operator!=(const T* ptr) const
+	bool operator!=(const T* ptr) const noexcept
 	{
 		return link.mPtr != ptr;
 	}
-	bool operator==(const ObjectPtr<T>& ptr) const
+	bool operator==(const ObjectPtr<T>& ptr) const noexcept
 	{
 		return link.mPtr == ptr.link.mPtr;
 	}
-	bool operator!=(const ObjectPtr<T>& ptr) const
+	bool operator!=(const ObjectPtr<T>& ptr) const noexcept
 	{
 		return link.mPtr != ptr.link.mPtr;
 	}

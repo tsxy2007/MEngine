@@ -67,7 +67,7 @@ void MObject::RemovePtr(PtrLink* ptr, std::unique_lock<std::mutex>& lck)
 	}
 }
 
-PtrLink::PtrLink(MObject* ptr) :
+PtrLink::PtrLink(MObject* ptr)  noexcept :
 	mPtr(ptr)
 {
 	MObject* obj = (MObject*)(mPtr);
@@ -78,22 +78,22 @@ PtrLink::PtrLink(MObject* ptr) :
 	}
 }
 
-PtrLink::~PtrLink()
+PtrLink::~PtrLink() noexcept
 {
 	Dispose();
 }
 
-PtrLink::PtrLink(const PtrLink& link) :
+PtrLink::PtrLink(const PtrLink& link)  noexcept :
 	mPtr(link.mPtr)
 {
 	if (mPtr != nullptr)
 	{
 		std::lock_guard<std::mutex> lck(MObject::mtx);
-		mPtr ->AddPtr(this);
+		mPtr->AddPtr(this);
 	}
 }
 
-PtrLink& PtrLink::operator= (const PtrLink& link)
+PtrLink& PtrLink::operator= (const PtrLink& link)  noexcept
 {
 	if (link.mPtr == mPtr) return *this;
 	Dispose();
@@ -107,7 +107,7 @@ PtrLink& PtrLink::operator= (const PtrLink& link)
 	return *this;
 }
 
-void PtrLink::Dispose()
+void PtrLink::Dispose() noexcept
 {
 	if (mPtr != nullptr)
 	{

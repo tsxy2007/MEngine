@@ -1,10 +1,8 @@
 #include "JobBucket.h"
 #include "JobNode.h"
-JobBucket::JobBucket()
+#include "JobSystem.h"
+JobBucket::JobBucket(JobSystem* sys) noexcept : 
+	sys(sys)
 {
 	jobNodesVec.reserve(20);
-}
-void JobBucket::SetJobSystem(JobSystem* sys)
-{
-	this->sys = sys;
 }

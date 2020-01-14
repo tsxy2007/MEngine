@@ -105,13 +105,14 @@ CrateApp::~CrateApp()
 {
 	if (md3dDevice != nullptr)
 		FlushCommandQueue();
-	pipelineJobSys = nullptr;
 	RenderPipeline::DestroyInstance();
+	ShaderCompiler::Dispose();
 	((World*)&worldPtr)->~World();
 	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
 	{
 		FrameResource::mFrameResources[i] = nullptr;
 	}
+	pipelineJobSys = nullptr;
 }
 
 bool CrateApp::Initialize()

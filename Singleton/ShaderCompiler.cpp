@@ -273,18 +273,23 @@ void GetCullingShader(ID3D12Device* device, JobBucket* bucket)
 	ShaderCompiler::AddComputeShader("Cull", cs);
 }
 
-JobBucket bucket;
+
 void ShaderCompiler::Init(ID3D12Device* device, JobSystem* jobSys)
 {
-	//JobSystem sys(10);
-	bucket.SetJobSystem(jobSys);
+	JobBucket* bucket;
+	bucket = jobSys->GetJobBucket();
 	mShaders.reserve(50);
 	mComputeShaders.reserve(50);
-	GetOpaqueStandardShader(device, &bucket);
-	GetSkyboxShader(device, &bucket);
-	GetCullingShader(device, &bucket);
-	GetPostProcessShader(device, &bucket);
-	GetTemporalAAShader(device, &bucket);
-	jobSys->ExecuteBucket(&bucket, 1);
+	GetOpaqueStandardShader(device, bucket);
+	GetSkyboxShader(device, bucket);
+	GetCullingShader(device, bucket);
+	GetPostProcessShader(device, bucket);
+	GetTemporalAAShader(device, bucket);
+	jobSys->ExecuteBucket(bucket, 1);
 }
 
+void ShaderCompiler::Dispose()
+{
+	mComputeShaders.clear();
+	mShaders.clear();
+}
