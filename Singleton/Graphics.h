@@ -3,6 +3,7 @@
 class PSOContainer;
 class Shader;
 class RenderTexture;
+class UploadBuffer;
 enum BackBufferState
 {
 	BackBufferState_Present = 0,
@@ -36,6 +37,12 @@ public:
 
 	static void CopyTexture(
 		ID3D12GraphicsCommandList* commandList,
-		RenderTexture* source, CopyTarget sourceTarget,
-		RenderTexture* dest, CopyTarget destTarget);
+		RenderTexture* source, CopyTarget sourceTarget, UINT sourceMipLevel,
+		RenderTexture* dest, CopyTarget destTarget, UINT destMipLevel);
+
+	static void CopyBufferToTexture(
+		ID3D12GraphicsCommandList* commandList,
+		UploadBuffer* sourceBuffer, size_t sourceBufferOffset,
+		ID3D12Resource* textureResource, UINT targetMip,
+		UINT width, UINT height, UINT depth, DXGI_FORMAT targetFormat, UINT pixelSize);
 };

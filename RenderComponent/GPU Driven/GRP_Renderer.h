@@ -45,6 +45,7 @@ private:
 	CommandSignature cmdSig;
 	Shader* shader;
 	UINT maxCapacity;
+	bool isIndirect = false;
 	std::unique_ptr<StructuredBuffer> cullResultBuffer;
 	std::vector<RenderElement> elements;
 	std::unordered_map<Transform*, UINT> dicts;

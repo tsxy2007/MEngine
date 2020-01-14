@@ -6,10 +6,12 @@
 #include "../LogicComponent/World.h"
 #include "../RenderComponent/DescriptorHeap.h"
 #include "TemporalAA.h"
+#include "../RenderComponent/Texture.h"
 Shader* postShader;
 std::unique_ptr<PSOContainer> backBufferContainer;
 std::unique_ptr<PSOContainer> renderTextureContainer;
 std::unique_ptr<TemporalAA> taaComponent;
+//ObjectPtr<Texture> testTex;
 //PrepareComponent* prepareComp = nullptr;
 class PostFrameData : public IPipelineResource
 {
@@ -24,6 +26,7 @@ class PostRunnable
 {
 public:
 	RenderTexture* renderTarget;
+	RenderTexture* depthTarget;
 	RenderTexture* motionVector;
 	RenderTexture* destMap;
 	ThreadCommand* threadCmd;
@@ -39,15 +42,18 @@ public:
 	void operator()()
 	{
 		threadCmd->ResetCommand();
+		
 		ID3D12GraphicsCommandList* commandList = threadCmd->GetCmdList();
+//		Graphics::ResourceStateTransform(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ, motionVector->GetColorResource());
 		PostFrameData* frameRes = (PostFrameData*)resource->GetPerCameraResource(selfPtr, cam,
 			[=]()->PostFrameData*
 		{
 			return new PostFrameData(device);
 		});
+
 		taaComponent->Run(
 			renderTarget,
-			renderTarget,
+			depthTarget,
 			motionVector,
 			destMap,
 			commandList,
@@ -85,6 +91,7 @@ public:
 				D3D12_RESOURCE_STATE_PRESENT,
 				backBuffer);
 		}
+	//	Graphics::ResourceStateTransform(commandList, D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET, motionVector->GetColorResource());
 		threadCmd->CloseCommand();
 	}
 };
@@ -93,6 +100,7 @@ void PostProcessingComponent::RenderEvent(EventData& data, ThreadCommand* comman
 {
 	JobHandle handle = ScheduleJob<PostRunnable>({
 		(RenderTexture*)allTempResource[0],
+		(RenderTexture*)allTempResource[3],
 		(RenderTexture*)allTempResource[1],
 		(RenderTexture*)allTempResource[2],
 		commandList,
@@ -111,20 +119,23 @@ void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCom
 {
 	SetCPUDepending<PrepareComponent>();
 
-	tempRT.resize(3);
-	tempRT[0].type = TemporalResourceCommand::Require;
+	tempRT.resize(4);
+	tempRT[0].type = TemporalResourceCommand::CommandType_Require_RenderTexture;
 	tempRT[0].uID = ShaderID::PropertyToID("_CameraRenderTarget");
-	tempRT[1].type = TemporalResourceCommand::Require;
+	tempRT[1].type = TemporalResourceCommand::CommandType_Require_RenderTexture;
 	tempRT[1].uID = ShaderID::PropertyToID("_CameraMotionVectorsTexture");
-	tempRT[2].type = TemporalResourceCommand::Create;
+	tempRT[2].type = TemporalResourceCommand::CommandType_Create_RenderTexture;
 	tempRT[2].uID = ShaderID::PropertyToID("_PostProcessBlitTarget");
+	tempRT[3].type = TemporalResourceCommand::CommandType_Require_RenderTexture;
+	tempRT[3].uID = ShaderID::PropertyToID("_CameraDepthTexture");
 	auto& desc = tempRT[2].descriptor;
-	desc.rtDesc.colorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	desc.rtDesc.rtFormat.colorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	desc.rtDesc.rtFormat.usage = RenderTextureUsage::RenderTextureUsage_ColorBuffer;
 	desc.rtDesc.depthSlice = 1;
-	desc.rtDesc.depthType = RenderTextureDepthSettings_None;
 	desc.rtDesc.width = 0;
 	desc.rtDesc.height = 0;
 	desc.rtDesc.type = RenderTextureType_Tex2D;
+	
 	postShader = ShaderCompiler::GetShader("PostProcess");
 	DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	backBufferContainer = std::unique_ptr<PSOContainer>(
@@ -139,6 +150,14 @@ void PostProcessingComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCom
 	taaComponent->prePareComp = prepareComp;
 	taaComponent->device = device;
 	taaComponent->toRTContainer = renderTextureContainer.get();
+	/*testTex = new Texture(
+		commandList,
+		device,
+		nullptr,
+		"Test",
+		L"Textures/Test.vtex",
+		false
+	);*/
 }
 
  std::vector<TemporalResourceCommand>& PostProcessingComponent::SendRenderTextureRequire(EventData& evt)

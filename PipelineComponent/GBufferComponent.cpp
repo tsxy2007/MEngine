@@ -17,12 +17,13 @@
 using namespace DirectX;
 PSOContainer* gbufferContainer(nullptr);
 PSOContainer* depthPrepassContainer(nullptr);
-std::vector<RenderTexture*> gbufferTempRT(5);
+std::vector<RenderTexture*> gbufferTempRT(10);
 #define ALBEDO_RT (gbufferTempRT[0])
 #define SPECULAR_RT (gbufferTempRT[1])
 #define NORMAL_RT  (gbufferTempRT[2])
 #define EMISSION_RT  (gbufferTempRT[3])
 #define MOTION_VECTOR_RT (gbufferTempRT[4])
+#define DEPTH_RT (gbufferTempRT[5])
 
 ObjectPtr<Material> mat;
 ObjectPtr<Mesh> mesh;
@@ -66,11 +67,12 @@ public:
 		});
 		grpRenderer->UpdateFrame(resource, device);
 		//Clear
-		ALBEDO_RT->ClearRenderTarget(commandList, 0, true, false);
-		SPECULAR_RT->ClearRenderTarget(commandList, 0, true, false);
-		NORMAL_RT->ClearRenderTarget(commandList, 0, true, false);
-		MOTION_VECTOR_RT->ClearRenderTarget(commandList, 0, true, false);
-		EMISSION_RT->ClearRenderTarget(commandList, 0, true, true);
+		ALBEDO_RT->ClearRenderTarget(commandList, 0);
+		SPECULAR_RT->ClearRenderTarget(commandList, 0);
+		NORMAL_RT->ClearRenderTarget(commandList, 0);
+		MOTION_VECTOR_RT->ClearRenderTarget(commandList, 0);
+		EMISSION_RT->ClearRenderTarget(commandList, 0);
+		DEPTH_RT->ClearRenderTarget(commandList, 0);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handles[5];
 		auto st = [&](UINT p)->void
@@ -81,7 +83,7 @@ public:
 		EMISSION_RT->SetViewport(commandList);
 		//Depth Prepass
 		//TODO
-		commandList->OMSetRenderTargets(0, nullptr, true, &EMISSION_RT->GetDepthDescriptor(0));
+		commandList->OMSetRenderTargets(0, nullptr, true, &DEPTH_RT->GetColorDescriptor(0));
 	/*	meshRenderer->Draw(
 			1, commandList,
 			device,
@@ -105,7 +107,7 @@ public:
 		);
 		//GBuffer Pass
 		//TODO
-		commandList->OMSetRenderTargets(5, handles, false, &EMISSION_RT->GetDepthDescriptor(0));
+		commandList->OMSetRenderTargets(5, handles, false, &DEPTH_RT->GetColorDescriptor(0));
 		/*	meshRenderer->Draw(
 			0, commandList,
 			device,
@@ -158,51 +160,59 @@ void BuildShapeGeometry(GeometryGenerator::MeshData& box, ObjectPtr<Mesh>& bMesh
 void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
 	SetCPUDepending<PrepareComponent>();
-	tempRTRequire.resize(5);
+	tempRTRequire.resize(6);
 	TemporalResourceCommand& albedoBuffer = tempRTRequire[0];
-	albedoBuffer.type = TemporalResourceCommand::Create;
+	albedoBuffer.type = TemporalResourceCommand::CommandType_Create_RenderTexture;
 	albedoBuffer.uID = ShaderID::PropertyToID("_CameraGBufferTexture0");
-	albedoBuffer.descriptor.rtDesc.colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-	albedoBuffer.descriptor.rtDesc.depthType = RenderTextureDepthSettings_None;
+	albedoBuffer.descriptor.rtDesc.rtFormat.colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	albedoBuffer.descriptor.rtDesc.rtFormat.usage = RenderTextureUsage::RenderTextureUsage_ColorBuffer;
 	albedoBuffer.descriptor.rtDesc.depthSlice = 1;
 	albedoBuffer.descriptor.rtDesc.type = RenderTextureType::RenderTextureType_Tex2D;
 
 	TemporalResourceCommand& specularBuffer = tempRTRequire[1];
-	specularBuffer.type = TemporalResourceCommand::Create;
+	specularBuffer.type = TemporalResourceCommand::CommandType_Create_RenderTexture;
 	specularBuffer.uID = ShaderID::PropertyToID("_CameraGBufferTexture1");
-	specularBuffer.descriptor.rtDesc.colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-	specularBuffer.descriptor.rtDesc.depthType = RenderTextureDepthSettings_None;
+	specularBuffer.descriptor.rtDesc.rtFormat.colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	specularBuffer.descriptor.rtDesc.rtFormat.usage = RenderTextureUsage::RenderTextureUsage_ColorBuffer;
 	specularBuffer.descriptor.rtDesc.depthSlice = 1;
 	specularBuffer.descriptor.rtDesc.type = RenderTextureType::RenderTextureType_Tex2D;
 
 	TemporalResourceCommand& normalBuffer = tempRTRequire[2];
-	normalBuffer.type = TemporalResourceCommand::Create;
+	normalBuffer.type = TemporalResourceCommand::CommandType_Create_RenderTexture;
 	normalBuffer.uID = ShaderID::PropertyToID("_CameraGBufferTexture2");
-	normalBuffer.descriptor.rtDesc.colorFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
-	normalBuffer.descriptor.rtDesc.depthType = RenderTextureDepthSettings_None;
+	normalBuffer.descriptor.rtDesc.rtFormat.colorFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
+	normalBuffer.descriptor.rtDesc.rtFormat.usage = RenderTextureUsage::RenderTextureUsage_ColorBuffer;
 	normalBuffer.descriptor.rtDesc.depthSlice = 1;
 	normalBuffer.descriptor.rtDesc.type = RenderTextureType::RenderTextureType_Tex2D;
 
 	TemporalResourceCommand& emissionBuffer = tempRTRequire[3];
-	emissionBuffer.type = TemporalResourceCommand::Create;
+	emissionBuffer.type = TemporalResourceCommand::CommandType_Create_RenderTexture;
 	emissionBuffer.uID = ShaderID::PropertyToID("_CameraRenderTarget");
-	emissionBuffer.descriptor.rtDesc.colorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
-	emissionBuffer.descriptor.rtDesc.depthType = RenderTextureDepthSettings_Depth32;
+	emissionBuffer.descriptor.rtDesc.rtFormat.colorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+	emissionBuffer.descriptor.rtDesc.rtFormat.usage = RenderTextureUsage::RenderTextureUsage_ColorBuffer;
 	emissionBuffer.descriptor.rtDesc.depthSlice = 1;
 	emissionBuffer.descriptor.rtDesc.type = RenderTextureType::RenderTextureType_Tex2D;
 
 	TemporalResourceCommand& motionVectorBuffer = tempRTRequire[4];
-	motionVectorBuffer.type = TemporalResourceCommand::Create;
+	motionVectorBuffer.type = TemporalResourceCommand::CommandType_Create_RenderTexture;
 	motionVectorBuffer.uID = ShaderID::PropertyToID("_CameraMotionVectorsTexture");
-	motionVectorBuffer.descriptor.rtDesc.colorFormat = DXGI_FORMAT_R16G16_SNORM;
-	motionVectorBuffer.descriptor.rtDesc.depthType = RenderTextureDepthSettings_None;
+	motionVectorBuffer.descriptor.rtDesc.rtFormat.colorFormat = DXGI_FORMAT_R16G16_SNORM;
+	motionVectorBuffer.descriptor.rtDesc.rtFormat.usage = RenderTextureUsage::RenderTextureUsage_ColorBuffer;
 	motionVectorBuffer.descriptor.rtDesc.depthSlice = 1;
 	motionVectorBuffer.descriptor.rtDesc.type = RenderTextureType::RenderTextureType_Tex2D;
 
+	TemporalResourceCommand& depthBuffer = tempRTRequire[5];
+	depthBuffer.type = TemporalResourceCommand::CommandType_Create_RenderTexture;
+	depthBuffer.uID = ShaderID::PropertyToID("_CameraDepthTexture");
+	depthBuffer.descriptor.rtDesc.rtFormat.usage = RenderTextureUsage::RenderTextureUsage_DepthBuffer;
+	depthBuffer.descriptor.rtDesc.rtFormat.depthFormat = RenderTextureDepthSettings_Depth32;
+	depthBuffer.descriptor.rtDesc.depthSlice = 1;
+	depthBuffer.descriptor.rtDesc.type = RenderTextureType::RenderTextureType_Tex2D;
+
 	std::vector<DXGI_FORMAT> colorFormats(tempRTRequire.size());
-	for (int i = 0; i < tempRTRequire.size(); ++i)
+	for (int i = 0; i < 5; ++i)
 	{
-		colorFormats[i] = tempRTRequire[i].descriptor.rtDesc.colorFormat;
+		colorFormats[i] = tempRTRequire[i].descriptor.rtDesc.rtFormat.colorFormat;
 	}
 	gbufferContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, colorFormats.size(), colorFormats.data());
 	depthPrepassContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, 0, nullptr);

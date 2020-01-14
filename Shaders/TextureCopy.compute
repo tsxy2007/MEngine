@@ -6,7 +6,7 @@ cbuffer CopyData : register(b0)
 StructuredBuffer<uint> _RGBA32InputBuffer : register(t0);
 StructuredBuffer<uint2> _RGBA64InputBuffer : register(t1);
 StructuredBuffer<float4> _RGBAFloatInputBuffer : register(t2);
-RWTexture2D<float4> _MainTex : register(u0);
+RWTexture2DArray<float4> _MainTex : register(u0);
 [numthreads(8, 8, 1)]
 void CopyToRGBA32(uint2 id : SV_DISPATCHTHREADID)
 {
@@ -21,7 +21,7 @@ void CopyToRGBA32(uint2 id : SV_DISPATCHTHREADID)
     float g = (float)(value & 255) / 255.0;
     value >>= 8;
     float r = (float)(value & 255) / 255.0;
-    _MainTex[pos] = float4(r,g,b,a);
+    _MainTex[uint3(pos, 0)] = float4(r,g,b,a);
 }
 
 [numthreads(8,8,1)]
@@ -37,7 +37,7 @@ void CopyToRGBA64(uint2 id : SV_DISPATCHTHREADID)
     float g = (float)(value.x & 65535) / 65535.0;
     value.x >>= 16;
     float r = (float)(value.x & 65535) / 65535.0;
-    _MainTex[pos] = float4(r,g,b,a);
+    _MainTex[uint3(pos, 0)] = float4(r,g,b,a);
 }
 
 [numthreads(8,8,1)]
@@ -46,5 +46,5 @@ void CopyToRGBAFloat(uint2 id : SV_DISPATCHTHREADID)
     if(id.x >= _Count.x || id.y >= _Count.y)
         return;
     uint2 pos = id + _StartPos; 
-    _MainTex[pos] = _RGBAFloatInputBuffer[id.y * _Count.x + id.x];
+    _MainTex[uint3(pos, 0)] = _RGBAFloatInputBuffer[id.y * _Count.x + id.x];
 }

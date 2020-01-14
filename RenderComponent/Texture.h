@@ -5,13 +5,32 @@
 #include "../Common/MObject.h"
 class FrameResource;
 class DescriptorHeap;
+enum class TextureType : int
+{
+	Tex2D = 0,
+	Cubemap = 1
+};
+
+struct TextureData
+{
+	UINT width;
+	UINT height;
+	TextureType textureType;
+	UINT mipCount;
+	enum LoadFormat
+	{
+		LoadFormat_RGBA8 = 0,
+		LoadFormat_RGBA16 = 1,
+		LoadFormat_RGBAFloat32 = 2,
+		LoadFormat_Num = 3
+	};
+	LoadFormat format;
+};
+
 class Texture : public MObject
 {
 public:
-	enum TextureType
-	{
-		Tex2D, Tex3D, Cubemap
-	};
+
 private:
 	std::wstring Filename;
 	Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
@@ -36,7 +55,7 @@ public:
 		std::string name,
 		std::wstring filePath,
 		bool isDDS,
-		TextureType type = Tex2D
+		TextureType type = TextureType::Tex2D
 	);
 	void BindColorBufferToSRVHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
 };

@@ -117,7 +117,8 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 			for (UINT j = 0, descriptorSize = descriptors.size(); j < descriptorSize; ++j)
 			{
 				TemporalResourceCommand& command = descriptors[j];
-				if (command.type == TemporalResourceCommand::Create)
+				if (command.type == TemporalResourceCommand::CommandType_Create_RenderTexture || 
+					command.type == TemporalResourceCommand::CommandType_Create_StructuredBuffer)
 				{
 					//Alread contained
 					if (tempRTAllocator.Contains(command.uID))
@@ -135,7 +136,10 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 						throw "No Such Render Texture!";
 					}
 					markPtr->endComponent = i;
-					component->requiredRTs.emplace_back(j, command.uID);
+					//command.tempResState
+					component->requiredRTs.push_back({
+						j,
+						command.uID});
 				}
 			}
 
@@ -144,8 +148,8 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 		for (UINT i = 0, size = renderTextureMarks.values.size(); i < size; ++i)
 		{
 			RenderTextureMark& mark = renderTextureMarks.values[i].value;
-			waitingComponents[mark.startComponent]->loadRTCommands.emplace_back(mark.id, mark.rtIndex, mark.desc);
-			waitingComponents[mark.endComponent]->unLoadRTCommands.emplace_back(mark.id);
+			waitingComponents[mark.startComponent]->loadRTCommands.push_back({ mark.id, mark.rtIndex, mark.desc});
+			waitingComponents[mark.endComponent]->unLoadRTCommands.push_back(mark.id);
 		}
 
 		PipelineComponent::bucket = &bucket;

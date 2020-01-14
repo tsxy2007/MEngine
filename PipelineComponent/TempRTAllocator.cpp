@@ -5,13 +5,21 @@ TempRTAllocator::TempRTAllocator()
 	waitingRT.Reserve(30);
 }
 
-bool ResourceDescriptor::operator!=(const ResourceDescriptor& res) const
-{
-	return res.rtDesc != res.rtDesc;
-}
 bool ResourceDescriptor::operator==(const ResourceDescriptor& res) const
 {
-	return res.rtDesc == res.rtDesc;
+	if (type != res.type) return false;
+	if (type == ResourceDescriptor::ResourceType_RenderTexture)
+		return res.rtDesc == rtDesc;
+	else
+	{
+		return res.sbufDesc.elementCount == sbufDesc.elementCount &&
+			res.sbufDesc.stride == sbufDesc.stride;
+	}
+}
+
+bool ResourceDescriptor::operator!=(const ResourceDescriptor& res) const
+{
+	return !operator==(res);
 }
 
 TempRTAllocator::~TempRTAllocator()
@@ -32,26 +40,36 @@ MObject* TempRTAllocator::GetTempResource(ID3D12Device* device, UINT id, Resourc
 	if (datasPtr == nullptr)
 	{
 		datas = new std::vector<TempRTData>();
+		datas->reserve(10);
 		waitingRT.Add(descriptor, datas);
 	}
 	else
 		datas = *datasPtr;
 	if (datas->size() > 0)
 	{
-		TempRTData& data = (*datas)[datas->size() - 1];
+		auto&& dataIte = datas->end() - 1;
+		TempRTData& data = *dataIte;
 		UsingTempRT usingRTData;
 		usingRTData.rt = data.rt;
 		usingRTData.desc = descriptor;
 		usingRT.insert_or_assign(id, usingRTData);
 		MObject* result = data.rt;
-		datas->erase(datas->end() - 1);
+		datas->erase(dataIte);
 		return result;
 	}
 	else
 	{
 		UsingTempRT usingRTData;
-		RenderTextureDescriptor& rtDesc = descriptor.rtDesc;
-		usingRTData.rt = new RenderTexture(device, rtDesc.width, rtDesc.height, rtDesc.colorFormat, rtDesc.depthType, rtDesc.type, rtDesc.depthSlice, 1);;
+		if (descriptor.type == ResourceDescriptor::ResourceType_RenderTexture)
+		{
+			RenderTextureDescriptor& rtDesc = descriptor.rtDesc;
+			usingRTData.rt = new RenderTexture(device, rtDesc.width, rtDesc.height, rtDesc.rtFormat,rtDesc.type, rtDesc.depthSlice, 1);;
+		}
+		else
+		{
+			StructuredBufferElement& sbufDesc = descriptor.sbufDesc;
+			usingRTData.rt = new StructuredBuffer(device, &sbufDesc, 1);
+		}
 		usingRTData.desc = descriptor;
 		usingRT.insert_or_assign(id, usingRTData);
 		return usingRTData.rt;
@@ -66,6 +84,7 @@ MObject* TempRTAllocator::GetUsingRenderTexture(UINT id)
 	auto&& ite = usingRT.find(id);
 	if (ite != usingRT.end())
 	{
+
 		return ite->second.rt;
 	}
 	return nullptr;
@@ -88,7 +107,7 @@ void TempRTAllocator::ReleaseRenderTexutre(UINT id)
 			int size = data->size();
 			size = data->size();
 		}
-		usingRT.erase(id);
+		usingRT.erase(ite);
 	}
 }
 
@@ -101,7 +120,7 @@ void TempRTAllocator::CumulateReleaseAfterFrame()
 		{
 			TempRTData& d = (*data)[j];
 			d.containedFrame++;
-			if (d.containedFrame >= 4)
+			if (d.containedFrame >= 5)
 			{
 				MObject* ptr = d.rt;
 				(*data)[j] = (*data)[data->size() - 1];

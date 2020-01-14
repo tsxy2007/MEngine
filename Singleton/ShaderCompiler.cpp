@@ -273,42 +273,6 @@ void GetCullingShader(ID3D12Device* device, JobBucket* bucket)
 	ShaderCompiler::AddComputeShader("Cull", cs);
 }
 
-void GetTextureCopyShader(ID3D12Device* device, JobBucket* bucket)
-{
-	const UINT KERNEL_COUNT = 3;
-	std::string kernelNames[KERNEL_COUNT];
-	kernelNames[0] = "CopyToRGBA32";
-	kernelNames[1] = "CopyToRGBA64";
-	kernelNames[2] = "CopyToRGBAFloat";
-	const UINT SHADER_VAR_COUNT = 5;
-	ComputeShaderVariable vars[SHADER_VAR_COUNT];
-	vars[0].name = "CopyData";
-	vars[0].type = ComputeShaderVariable::ConstantBuffer;
-	vars[0].registerPos = 0;
-	vars[0].space = 0;
-
-	vars[1].name = "_RGBA32InputBuffer";
-	vars[1].type = ComputeShaderVariable::StructuredBuffer;
-	vars[1].registerPos = 0;
-	vars[1].space = 0;
-
-	vars[2].name = "_RGBA64InputBuffer";
-	vars[2].type = ComputeShaderVariable::StructuredBuffer;
-	vars[2].registerPos = 1;
-	vars[2].space = 0;
-
-	vars[3].name = "_RGBAFloatInputBuffer";
-	vars[3].type = ComputeShaderVariable::StructuredBuffer;
-	vars[3].registerPos = 2;
-	vars[3].space = 0;
-
-	vars[4].name = "_MainTex";
-	vars[4].type = ComputeShaderVariable::UAVDescriptorHeap;
-	vars[4].registerPos = 0;
-	vars[4].space = 0;
-	ComputeShader* cs = new ComputeShader(L"Shaders\\TextureCopy.compute", kernelNames, KERNEL_COUNT, vars, SHADER_VAR_COUNT, device, bucket);
-	ShaderCompiler::AddComputeShader("TextureCopy", cs);
-}
 JobBucket bucket;
 void ShaderCompiler::Init(ID3D12Device* device, JobSystem* jobSys)
 {
@@ -319,7 +283,6 @@ void ShaderCompiler::Init(ID3D12Device* device, JobSystem* jobSys)
 	GetOpaqueStandardShader(device, &bucket);
 	GetSkyboxShader(device, &bucket);
 	GetCullingShader(device, &bucket);
-	GetTextureCopyShader(device, &bucket);
 	GetPostProcessShader(device, &bucket);
 	GetTemporalAAShader(device, &bucket);
 	jobSys->ExecuteBucket(&bucket, 1);

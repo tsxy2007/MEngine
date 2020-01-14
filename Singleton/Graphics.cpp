@@ -58,27 +58,25 @@ inline void Copy(
 
 void Graphics::CopyTexture(
 	ID3D12GraphicsCommandList* commandList,
-	RenderTexture* source, CopyTarget sourceTarget,
-	RenderTexture* dest, CopyTarget destTarget)
+	RenderTexture* source, CopyTarget sourceTarget, UINT sourceMipLevel,
+	RenderTexture* dest, CopyTarget destTarget, UINT destMipLevel)
 {
 	D3D12_TEXTURE_COPY_LOCATION sourceLocation;
 	sourceLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-	sourceLocation.SubresourceIndex = 0;
+	sourceLocation.SubresourceIndex = sourceMipLevel;
 	D3D12_TEXTURE_COPY_LOCATION destLocation;
 	destLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-	destLocation.SubresourceIndex = 0;
+	destLocation.SubresourceIndex = destMipLevel;
+	sourceLocation.pResource = source->GetColorResource();
+	destLocation.pResource = dest->GetColorResource();
 	if (sourceTarget == CopyTarget_ColorBuffer)
 	{
 		if (destTarget == CopyTarget_ColorBuffer)    //Source Color, Dest Color
 		{
-			sourceLocation.pResource = source->GetColorResource();
-			destLocation.pResource = dest->GetColorResource();
 			Copy<false, false>(sourceLocation, destLocation, commandList);
 		}
 		else    //Source Color, Dest Depth
 		{
-			sourceLocation.pResource = source->GetColorResource();
-			destLocation.pResource = dest->GetDepthResource();
 			Copy<false, true>(sourceLocation, destLocation, commandList);
 		}
 	}
@@ -86,17 +84,45 @@ void Graphics::CopyTexture(
 	{
 		if (destTarget == CopyTarget_ColorBuffer)    //Source Depth, Dest Color
 		{
-			sourceLocation.pResource = source->GetDepthResource();
-			destLocation.pResource = dest->GetColorResource();
 			Copy<true, false>(sourceLocation, destLocation, commandList);
 		}
 		else    //Source Depth, Dest Depth
 		{
-			sourceLocation.pResource = source->GetDepthResource();
-			destLocation.pResource = dest->GetDepthResource();
 			Copy<true, true>(sourceLocation, destLocation, commandList);
 		}
 	}
+}
+
+void Graphics::CopyBufferToTexture(
+	ID3D12GraphicsCommandList* commandList,
+	UploadBuffer* sourceBuffer, size_t sourceBufferOffset,
+	ID3D12Resource* textureResource, UINT targetMip,
+	UINT width, UINT height, UINT depth, DXGI_FORMAT targetFormat, UINT pixelSize)
+{
+	D3D12_TEXTURE_COPY_LOCATION sourceLocation;
+	sourceLocation.pResource = sourceBuffer->Resource();
+	sourceLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+	sourceLocation.PlacedFootprint.Offset = sourceBufferOffset;
+	sourceLocation.PlacedFootprint.Footprint =
+	{
+		targetFormat, //DXGI_FORMAT Format;
+		width, //UINT Width;
+		height, //UINT Height;
+		depth, //UINT Depth;
+		d3dUtil::CalcConstantBufferByteSize(width * pixelSize)//UINT RowPitch;
+	};
+	D3D12_TEXTURE_COPY_LOCATION destLocation;
+	destLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+	destLocation.SubresourceIndex = targetMip;
+	destLocation.pResource = textureResource;
+	ResourceStateTransform(commandList, D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_COPY_DEST, textureResource);
+	commandList->CopyTextureRegion(
+		&destLocation,
+		0, 0, 0,
+		&sourceLocation,
+		nullptr
+	);
+	ResourceStateTransform(commandList, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ, textureResource);
 }
 
 void Graphics::Blit(

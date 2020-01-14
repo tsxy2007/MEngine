@@ -7,16 +7,22 @@ class FrameResource;
 class TempRTAllocator;
 class RenderTexture;
 class World;
+
 struct TemporalResourceCommand
 {
 	enum CommandType
 	{
-		Create, Require
+		CommandType_Create_RenderTexture,
+		CommandType_Require_RenderTexture,
+		CommandType_Create_StructuredBuffer,
+		CommandType_Require_StructuredBuffer
 	};
 	CommandType type;
 	UINT uID;
 	ResourceDescriptor descriptor;
-	bool operator=(const TemporalResourceCommand& other) const;
+
+
+	//bool operator==(const TemporalResourceCommand& other) const;
 };
 class PerCameraRenderingEvent;
 class CommandBuffer;
@@ -25,6 +31,11 @@ enum CommandListType
 	CommandListType_None,
 	CommandListType_Graphics,
 	CommandListType_Compute
+};
+struct RequiredRT
+{
+	UINT descIndex;
+	UINT uID;
 };
 class PipelineComponent
 {
@@ -40,15 +51,13 @@ private:
 		UINT uID;
 		UINT index;
 		ResourceDescriptor descriptor;
-		LoadTempRTCommand(UINT uID, UINT index, ResourceDescriptor& descriptor) :
-			uID(uID), index(index), descriptor(descriptor) {}
 	};
 	std::vector<JobHandle> jobHandles;
 	std::vector<LoadTempRTCommand> loadRTCommands;
 	std::vector<UINT> unLoadRTCommands;
 	std::vector<PipelineComponent*> cpuDepending;
 	std::vector<PipelineComponent*> gpuDepending;
-	std::vector<std::pair<UINT, UINT>> requiredRTs;
+	std::vector<RequiredRT> requiredRTs;
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
 	UINT dependingComponentCount = 0;
 	void CreateFence(ID3D12Device* device);

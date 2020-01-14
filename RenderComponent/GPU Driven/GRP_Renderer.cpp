@@ -380,6 +380,13 @@ void  GRP_Renderer::DrawCommand(
 				ele,
 				2
 			));
+		isIndirect = false;
+		
+	}
+	if (!isIndirect)
+	{
+		cullResultBuffer->TransformBufferState(commandList, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
+		isIndirect = true;
 	}
 	cullShader->BindRootSignature(commandList, nullptr);
 	UINT dispatchCount = (UINT)ceil(elements.size() / 64.0);
@@ -399,9 +406,10 @@ void  GRP_Renderer::DrawCommand(
 	cullShader->SetStructuredBufferByAddress(commandList, _OutputBuffer, cullResultBuffer->GetAddress(0, 0));
 	cullShader->SetStructuredBufferByAddress(commandList, _CountBuffer, cullResultBuffer->GetAddress(1, 0));
 	cullShader->SetResource(commandList, CullBuffer, cullDataBuffer.buffer, cullDataBuffer.element);
+	cullResultBuffer->TransformBufferState(commandList, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	cullShader->Dispatch(commandList, 1, 1, 1, 1);
 	cullShader->Dispatch(commandList, 0, dispatchCount, 1, 1);
-
+	cullResultBuffer->TransformBufferState(commandList, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
 	PSODescriptor desc;
 	desc.meshLayoutIndex = meshLayoutIndex;
 	desc.shaderPass = targetShaderPass;
@@ -412,7 +420,6 @@ void  GRP_Renderer::DrawCommand(
 	shader->SetResource(commandList, ShaderID::GetMainTex(), textureHeap.operator->(), 0);
 	shader->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraProperty.buffer, cameraProperty.element);
 	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	cullResultBuffer->TransformBufferState(commandList, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
 	commandList->ExecuteIndirect(
 		cmdSig.GetSignature(),
 		elements.size(),
@@ -421,7 +428,7 @@ void  GRP_Renderer::DrawCommand(
 		cullResultBuffer->GetResource(),
 		cullResultBuffer->GetAddressOffset(1, 0)
 	);
-	cullResultBuffer->TransformBufferState(commandList, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
 }
 
 CBufferPool* GRP_Renderer::GetCullDataPool(UINT initCapacity)

@@ -63,6 +63,7 @@ class SkyboxRunnable
 public:
 	RenderTexture* gbufferTex;
 	RenderTexture* mvTex;
+	RenderTexture* depthTex;
 	SkyboxComponent* selfPtr;
 	ThreadCommand* commandList;
 	FrameResource* resource;
@@ -74,13 +75,14 @@ public:
 		if (psoContainer == nullptr ||
 			psoContainer->GetColorFormats()[0] != gbufferTex->GetColorFormat() ||
 			psoContainer->GetColorFormats()[1] != mvTex->GetColorFormat() ||
-			psoContainer->GetDepthFormat() != gbufferTex->GetDepthFormat())
+			psoContainer->GetDepthFormat() != depthTex->GetColorFormat())
 		{
 			DXGI_FORMAT rtFormats[2];
 			rtFormats[0] = gbufferTex->GetColorFormat();
 			rtFormats[1] = mvTex->GetColorFormat();
+			
 			psoContainer = std::unique_ptr<PSOContainer>(
-				new PSOContainer(gbufferTex->GetDepthFormat(), 2, rtFormats)
+				new PSOContainer(depthTex->GetColorFormat(), 2, rtFormats)
 				);
 		}
 		SkyboxPerFrameData* frameData = (SkyboxPerFrameData*)resource->GetPerCameraResource(selfPtr, cam, [&]()->SkyboxPerFrameData*
@@ -96,8 +98,8 @@ public:
 		D3D12_CPU_DESCRIPTOR_HANDLE rtHandles[2];
 		rtHandles[0] = gbufferTex->GetColorDescriptor(0);
 		rtHandles[1] = mvTex->GetColorDescriptor(0);
-		D3D12_CPU_DESCRIPTOR_HANDLE depthHandle = gbufferTex->GetDepthDescriptor(0);
-		RenderTexture* gbRT = gbufferTex;
+		D3D12_CPU_DESCRIPTOR_HANDLE depthHandle = depthTex->GetColorDescriptor(0);
+		auto format = depthTex->GetColorFormat();
 		cmdList->OMSetRenderTargets(
 			2,
 			rtHandles,
@@ -124,6 +126,7 @@ void SkyboxComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 		{
 			 (RenderTexture*)allTempResource[0],
 			  (RenderTexture*)allTempResource[1],
+			  (RenderTexture*)allTempResource[2],
 			 this,
 			 commandList,
 			 data.resource,
@@ -135,11 +138,13 @@ void SkyboxComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 
 void SkyboxComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
 {
-	tempRT.resize(2);
-	tempRT[0].type = TemporalResourceCommand::Require;
+	tempRT.resize(3);
+	tempRT[0].type = TemporalResourceCommand::CommandType_Require_RenderTexture;
 	tempRT[0].uID = ShaderID::PropertyToID("_CameraRenderTarget");
-	tempRT[1].type = TemporalResourceCommand::Require;
+	tempRT[1].type = TemporalResourceCommand::CommandType_Require_RenderTexture;
 	tempRT[1].uID = ShaderID::PropertyToID("_CameraMotionVectorsTexture");
+	tempRT[2].type = TemporalResourceCommand::CommandType_Require_RenderTexture;
+	tempRT[2].uID = ShaderID::PropertyToID("_CameraDepthTexture");
 	ObjectPtr<Texture> skyboxTexture = new Texture(
 		commandList,
 		device,
@@ -147,7 +152,7 @@ void SkyboxComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList
 		"grasscube1024",
 		L"Textures/grasscube1024.dds",
 		true,
-		Texture::Cubemap
+		TextureType::Cubemap
 	);
 	defaultSkybox = new Skybox(
 		skyboxTexture,

@@ -2,9 +2,16 @@
 #include "../Common/d3dUtil.h"
 #include <mutex>
 #include <atomic>
-#include <vector>
+struct StateTransformBuffer
+{
+	ID3D12Resource* targetResource;
+	D3D12_RESOURCE_STATES beforeState;
+	D3D12_RESOURCE_STATES afterState;
+};
+class PipelineComponent;
 class ThreadCommand final
 {
+	friend class PipelineComponent;
 private:
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> cmdAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> cmdList;

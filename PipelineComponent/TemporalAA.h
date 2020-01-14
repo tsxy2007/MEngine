@@ -57,14 +57,19 @@ private:
 	{
 		this->width = width;
 		this->height = height;
+		RenderTextureFormat rtFormat;
+		rtFormat.usage = RenderTextureUsage::RenderTextureUsage_ColorBuffer;
+		rtFormat.colorFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		lastRenderTarget = std::unique_ptr<RenderTexture>(
-			new RenderTexture(device, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, RenderTextureDepthSettings_None, RenderTextureType_Tex2D, 0, 0)
+			new RenderTexture(device, width, height, rtFormat, RenderTextureType_Tex2D, 0, 0)
 			);
+		rtFormat.colorFormat = DXGI_FORMAT_R32_FLOAT;
 		lastDepthTexture = std::unique_ptr<RenderTexture>(
-			new RenderTexture(device, width, height, DXGI_FORMAT_R32_FLOAT, RenderTextureDepthSettings_None, RenderTextureType_Tex2D, 0, 0)
+			new RenderTexture(device, width, height, rtFormat, RenderTextureType_Tex2D, 0, 0)
 			);
+		rtFormat.colorFormat = DXGI_FORMAT_R16G16_SNORM;
 		lastMotionVectorTexture = std::unique_ptr<RenderTexture>(
-			new RenderTexture(device, width, height, DXGI_FORMAT_R16G16_SNORM, RenderTextureDepthSettings_None, RenderTextureType_Tex2D, 0, 0)
+			new RenderTexture(device, width, height, rtFormat, RenderTextureType_Tex2D, 0, 0)
 			);
 	}
 public:
@@ -122,14 +127,14 @@ public:
 		if (tempCamData->UpdateFrame(width, height, device))
 		{
 			//Refresh & skip
-			Graphics::CopyTexture(commandList, inputColorBuffer, CopyTarget_ColorBuffer, renderTargetTex, CopyTarget_ColorBuffer);
+			Graphics::CopyTexture(commandList, inputColorBuffer, CopyTarget_ColorBuffer, 0, renderTargetTex, CopyTarget_ColorBuffer, 0);
 		}
 		else
 		{
 			TAAConstBuffer constBufferData;
 			inputColorBuffer->BindColorBufferToSRVHeap(&tempFrameData->srvHeap, 0, device);
 			constBufferData._MainTexIndex = 0;
-			inputDepthBuffer->BindDepthBufferToSRVHeap(&tempFrameData->srvHeap, 1, device);
+			inputDepthBuffer->BindColorBufferToSRVHeap(&tempFrameData->srvHeap, 1, device);
 			constBufferData._DepthTexIndex = 1;
 			motionVector->BindColorBufferToSRVHeap(&tempFrameData->srvHeap, 2, device);
 			constBufferData._MotionVectorIndex = 2;
@@ -166,8 +171,8 @@ public:
 				taaShader, 0
 			);
 		}
-		Graphics::CopyTexture(commandList, renderTargetTex, CopyTarget_ColorBuffer, tempCamData->lastRenderTarget.get(), CopyTarget_ColorBuffer);
-		Graphics::CopyTexture(commandList, motionVector, CopyTarget_ColorBuffer, tempCamData->lastMotionVectorTexture.get(), CopyTarget_ColorBuffer);
-		Graphics::CopyTexture(commandList, inputDepthBuffer, CopyTarget_DepthBuffer, tempCamData->lastDepthTexture.get(), CopyTarget_ColorBuffer);
+		Graphics::CopyTexture(commandList, renderTargetTex, CopyTarget_ColorBuffer, 0, tempCamData->lastRenderTarget.get(), CopyTarget_ColorBuffer, 0);
+		Graphics::CopyTexture(commandList, motionVector, CopyTarget_ColorBuffer, 0, tempCamData->lastMotionVectorTexture.get(), CopyTarget_ColorBuffer, 0);
+		Graphics::CopyTexture(commandList, inputDepthBuffer, CopyTarget_DepthBuffer, 0, tempCamData->lastDepthTexture.get(), CopyTarget_ColorBuffer, 0);
 	}
 };
