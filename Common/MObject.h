@@ -84,7 +84,7 @@ public:
 		return *this;
 	}
 
-	constexpr T* operator->() noexcept
+	constexpr T* operator->() const noexcept
 	{
 		return (T*)link.mPtr;
 	}

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\BitArray.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\ConcurrentStack.h" />
     <ClInclude Include="Common\ConstantBufferStruct.h" />
@@ -86,6 +87,7 @@
     <ClInclude Include="PipelineComponent\SkyboxComponent.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Common\BitArray.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\d3dApp.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />

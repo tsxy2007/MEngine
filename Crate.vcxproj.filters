@@ -237,6 +237,9 @@
     <ClInclude Include="PipelineComponent\LightingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Common\BitArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\GameTimer.cpp">
@@ -390,6 +393,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PipelineComponent\LightingComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\BitArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

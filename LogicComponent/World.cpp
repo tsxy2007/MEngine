@@ -5,6 +5,7 @@
 #include "../Singleton/FrameResource.h"
 #include "../RenderComponent/Material.h"
 #include "../RenderComponent/Mesh.h"
+#include "../RenderComponent/DescriptorHeap.h"
 using namespace DirectX;
 #pragma region  TEST_BUILDING_AREA
 void BuildMaterials(ObjectPtr<UploadBuffer>& materialPropertyBuffer, ID3D12Device* device, ObjectPtr<Material>& opaqueMaterial, ObjectPtr<DescriptorHeap>& bindlessTextureHeap)
@@ -18,12 +19,49 @@ void BuildMaterials(ObjectPtr<UploadBuffer>& materialPropertyBuffer, ID3D12Devic
 
 }
 #pragma endregion
-World::World(ID3D12GraphicsCommandList* cmdList, ID3D12Device* device)
+World::World(ID3D12GraphicsCommandList* cmdList, ID3D12Device* device) :
+	usedDescs(MAXIMUM_HEAP_COUNT),
+	unusedDescs(MAXIMUM_HEAP_COUNT)
 {
+	for (UINT i = 0; i < MAXIMUM_HEAP_COUNT; ++i)
+	{
+		unusedDescs[i] = i;
+	}
+}
 
+UINT World::GetDescHeapIndexFromPool()
+{
+	auto&& last = unusedDescs.end() - 1;
+	UINT value = *last;
+	unusedDescs.erase(last);
+	usedDescs[value] = true;
+	return value;
+}
+
+void World::ReturnDescHeapIndexToPool(UINT target)
+{
+	auto ite = usedDescs[target];
+	if (ite)
+	{
+		unusedDescs.push_back(target);
+		ite = false;
+	}
+}
+
+void World::ForceCollectAllHeapIndex()
+{
+	for (UINT i = 0; i < MAXIMUM_HEAP_COUNT; ++i)
+	{
+		auto ite = usedDescs[i];
+		if (ite)
+		{
+			unusedDescs.push_back(i);
+			ite = false;
+		}
+	}
 }
 
 void World::Update(FrameResource* resource)
 {
-	
+
 }

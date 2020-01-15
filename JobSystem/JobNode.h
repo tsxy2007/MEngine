@@ -22,12 +22,12 @@ private:
 		__m128 arr[16];
 	};
 	std::atomic<unsigned int> targetDepending = 0;
-	std::vector<JobNode*>* dependingEvent;
+	std::vector<JobNode*>* dependingEvent = nullptr;
 	FuncStorage stackArr;
 	void* ptr = nullptr;
 	void(*destructorFunc)(void*) = nullptr;
 	void(*executeFunc)(void*);
-	VectorPool* vectorPool;
+	VectorPool* vectorPool = nullptr;
 	std::mutex* threadMtx;
 	template <typename Func>
 	constexpr void Create(const Func& func, VectorPool* vectorPool, std::mutex* threadMtx);

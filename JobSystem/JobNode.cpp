@@ -4,6 +4,7 @@ JobNode::~JobNode()
 {
 	if (destructorFunc != nullptr)
 		destructorFunc(ptr);
+	if(dependingEvent && vectorPool)
 	dependingEvent->clear();
 	vectorPool->Delete(dependingEvent);
 }
