@@ -24,10 +24,16 @@ ThreadCommand* InitThreadCommand(ID3D12Device* device, Camera* cam, FrameResourc
 		return nullptr;
 	}
 }
-void ExecuteThreadCommand(Camera* cam, ThreadCommand* command, FrameResource* resource)
+void ExecuteThreadCommand(Camera* cam, ThreadCommand* command, FrameResource* resource, PipelineComponent* comp)
 {
+	const D3D12_COMMAND_LIST_TYPE types[3] = 
+	{
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		D3D12_COMMAND_LIST_TYPE_DIRECT,
+		D3D12_COMMAND_LIST_TYPE_COMPUTE
+	};
 	if (command != nullptr) {
-		resource->ReleaseThreadCommand(cam, command);
+		resource->ReleaseThreadCommand(cam, command, types[comp->GetCommandListType()]);
 	}
 }
 
@@ -193,7 +199,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 		{
 			PipelineComponent* component = waitingComponents[i];
 			component->MarkHandles();
-			ExecuteThreadCommand(cam, component->threadCommand, renderData.resource);
+			ExecuteThreadCommand(cam, component->threadCommand, renderData.resource, component);
 		}
 	}
 	FrameResource::mCurrFrameResource->UpdateBeforeFrame(renderData.fence, renderData.fenceCount);//Flush CommandQueue

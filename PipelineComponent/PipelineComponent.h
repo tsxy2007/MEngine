@@ -28,9 +28,9 @@ class PerCameraRenderingEvent;
 class CommandBuffer;
 enum CommandListType
 {
-	CommandListType_None,
-	CommandListType_Graphics,
-	CommandListType_Compute
+	CommandListType_None = 0,
+	CommandListType_Graphics = 1,
+	CommandListType_Compute = 2
 };
 struct RequiredRT
 {

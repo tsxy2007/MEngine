@@ -59,9 +59,13 @@ void FrameResource::OnLoadCamera(Camera* targetCamera, ID3D12Device* device)
 void FrameResource::OnUnloadCamera(Camera* targetCamera)
 {
 	FrameResCamera* data = perCameraDatas[targetCamera];
-	for (int i = 0; i < data->threadCommands.size(); ++i)
+	for (auto ite = data->graphicsThreadCommands.begin(); ite != data->graphicsThreadCommands.end(); ++ite)
 	{
-		threadCommandMemoryPool.Delete(data->threadCommands[i]);
+		threadCommandMemoryPool.Delete(*ite);
+	}
+	for (auto ite = data->computeThreadCommands.begin(); ite != data->computeThreadCommands.end(); ++ite)
+	{
+		threadCommandMemoryPool.Delete(*ite);
 	}
 	perCameraDatas.erase(targetCamera);
 	ConstBufferElement& constBuffer = cameraCBs[targetCamera->GetInstanceID()];
@@ -81,22 +85,41 @@ void FrameResource::ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resou
 
 ThreadCommand* FrameResource::GetNewThreadCommand(Camera* cam, ID3D12Device* device, D3D12_COMMAND_LIST_TYPE cmdListType)
 {
-	std::vector<ThreadCommand*>& threadCommands = perCameraDatas[cam]->threadCommands;
-	if (threadCommands.size() <= 0)
+	std::vector<ThreadCommand*>* threadCommands = nullptr;
+	switch (cmdListType)
+	{
+	case D3D12_COMMAND_LIST_TYPE_DIRECT:
+		threadCommands = &perCameraDatas[cam]->graphicsThreadCommands;
+		break;
+	case D3D12_COMMAND_LIST_TYPE_COMPUTE:
+		threadCommands = &perCameraDatas[cam]->computeThreadCommands;
+		break;
+	}
+	if (threadCommands->empty())
 	{
 		return threadCommandMemoryPool.New(device, cmdListType);
 	}
 	else
 	{
-		ThreadCommand* result = threadCommands[threadCommands.size() - 1];
-		threadCommands.erase(threadCommands.end() - 1);
+		auto&& ite = threadCommands->end() - 1;
+		ThreadCommand* result = *ite;
+		threadCommands->erase(ite);
 		return result;
 	}
 }
-void FrameResource::ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd)
+void FrameResource::ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd, D3D12_COMMAND_LIST_TYPE cmdListType)
 {
-	std::vector<ThreadCommand*>& threadCommands = perCameraDatas[cam]->threadCommands;
-	threadCommands.push_back(targetCmd);
+	std::vector<ThreadCommand*>* threadCommands = nullptr;
+	switch (cmdListType)
+	{
+	case D3D12_COMMAND_LIST_TYPE_DIRECT:
+		threadCommands = &perCameraDatas[cam]->graphicsThreadCommands;
+		break;
+	case D3D12_COMMAND_LIST_TYPE_COMPUTE:
+		threadCommands = &perCameraDatas[cam]->computeThreadCommands;
+		break;
+	}
+	threadCommands->push_back(targetCmd);
 }
 
 FrameResource::~FrameResource()

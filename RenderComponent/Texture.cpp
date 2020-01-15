@@ -38,20 +38,24 @@ void ReadData(std::wstring& str, TextureData& headerResult, std::vector<char>& d
 	case TextureData::LoadFormat_RGBA16:
 		stride = 8;
 		break;
+	case TextureData::LoadFormat_RGBAFloat16:
+		stride = 8;
+		break;
 	case TextureData::LoadFormat_RGBAFloat32:
 		stride = 16;
 		break;
 	}
-	size_t size = stride * headerResult.width * headerResult.height;
+	size_t size = stride * headerResult.width * headerResult.height * headerResult.depth;
 	UINT width = headerResult.width;
 	UINT height = headerResult.height;
+	UINT depth = headerResult.depth;
 	for (UINT i = 0; i < headerResult.mipCount - 1; ++i)
 	{
 		width /= 2;
 		height /= 2;
-		size += stride * width * height;
+		depth /= 2;
+		size += stride * width * height * depth;
 	}
-	size *= headerResult.textureType == TextureType::Cubemap ? 6 : 1;
 	dataResult.resize(size);
 	ifs.read(dataResult.data(), size);
 }
@@ -171,6 +175,8 @@ Texture::Texture(
 		ReadData(filePath, data, dataResults);
 		if (data.textureType != type)
 			throw "Texture Type Not Match Exception";
+		if (type == TextureType::Cubemap && data.depth != 6)
+			throw "Cubemap's tex size must be 6";
 		D3D12_RESOURCE_DESC texDesc;
 		ZeroMemory(&texDesc, sizeof(D3D12_RESOURCE_DESC));
 		switch (data.format)
@@ -181,6 +187,9 @@ Texture::Texture(
 		case TextureData::LoadFormat_RGBA16:
 			mFormat = DXGI_FORMAT_R16G16B16A16_UNORM;
 			break;
+		case TextureData::LoadFormat_RGBAFloat16:
+			mFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+			break;
 		case TextureData::LoadFormat_RGBAFloat32:
 			mFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
 			break;
@@ -190,7 +199,7 @@ Texture::Texture(
 		texDesc.Alignment = 0;
 		texDesc.Width = data.width;
 		texDesc.Height = data.height;
-		texDesc.DepthOrArraySize = (mType == TextureType::Cubemap) ? 6 : 1;
+		texDesc.DepthOrArraySize = data.depth;
 		texDesc.MipLevels = data.mipCount;
 		texDesc.Format = mFormat;
 		texDesc.SampleDesc.Count = 1;
@@ -214,7 +223,7 @@ Texture::Texture(
 			data.width,
 			data.height,
 			data.mipCount,
-			texDesc.DepthOrArraySize);
+			data.depth);
 		RenderCommand::AddCommand(cmd);
 	}
 }
@@ -229,6 +238,12 @@ void Texture::GetResourceViewDescriptor(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc
 		srvDesc.Texture2D.MipLevels = mipLevels;
 		srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 		break;
+	case TextureType::Tex3D:
+		srvDesc.Format = mFormat;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+		srvDesc.Texture3D.MipLevels = mipLevels;
+		srvDesc.Texture3D.MostDetailedMip = 0;
+		srvDesc.Texture3D.ResourceMinLODClamp = 0.0f;
 	case TextureType::Cubemap:
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 		srvDesc.TextureCube.MostDetailedMip = 0;

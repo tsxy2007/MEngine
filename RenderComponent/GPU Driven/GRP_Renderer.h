@@ -84,16 +84,20 @@ public:
 	DescriptorHeap* GetTextureHeap();
 	void UpdateFrame(FrameResource*, ID3D12Device*);//Should be called Per frame
 	void UpdateTransform(Transform* targetTrans, ID3D12Device* device);
+	void Culling(
+		ID3D12GraphicsCommandList* commandList,
+		ID3D12Device* device,
+		FrameResource* targetResource,
+		ConstBufferElement& cullDataBuffer,
+		DirectX::XMFLOAT4* frustumPlanes,
+		DirectX::XMFLOAT3 frustumMinPoint,
+		DirectX::XMFLOAT3 frustumMaxPoint
+	);
 	void DrawCommand(
 		ID3D12GraphicsCommandList* commandList,
 		ID3D12Device* device,
 		UINT targetShaderPass,
-		FrameResource* targetResource,
 		ConstBufferElement& cameraProperty,
-		ConstBufferElement& cullDataBuffer,
-		DirectX::XMFLOAT4* frustumPlanes,
-		DirectX::XMFLOAT3 frustumMinPoint,
-		DirectX::XMFLOAT3 frustumMaxPoint,
 		PSOContainer* container
 	);
 };

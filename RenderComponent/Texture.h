@@ -8,22 +8,27 @@ class DescriptorHeap;
 enum class TextureType : int
 {
 	Tex2D = 0,
-	Cubemap = 1
+	Tex3D = 1,
+	Cubemap = 2
 };
 
 struct TextureData
 {
 	UINT width;
 	UINT height;
+	UINT depth;
 	TextureType textureType;
 	UINT mipCount;
 	enum LoadFormat
 	{
 		LoadFormat_RGBA8 = 0,
 		LoadFormat_RGBA16 = 1,
-		LoadFormat_RGBAFloat32 = 2,
-		LoadFormat_Num = 3
+		LoadFormat_RGBAFloat16 = 2,
+		LoadFormat_RGBAFloat32 = 3,
+		LoadFormat_Num = 4
 	};
+	//TODO
+	//Should Have Compress Type here
 	LoadFormat format;
 };
 

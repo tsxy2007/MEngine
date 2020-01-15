@@ -11,7 +11,7 @@ private:
 	std::vector<T*> allPtrs;
 	std::vector<void*> allocatedPtrs;
 	int capacity;
-	void AllocateMemory()
+	constexpr void AllocateMemory()
 	{
 		using StorageT = Storage<T, 1>;
 		StorageT* ptr = reinterpret_cast<StorageT*>(malloc(sizeof(StorageT) * capacity));
@@ -22,15 +22,15 @@ private:
 		allocatedPtrs.push_back(ptr);
 	}
 public:
-	Pool(int capa) : capacity(capa)
+	constexpr Pool(int capa) : capacity(capa)
 	{
 		allPtrs.reserve(capa);
 		allocatedPtrs.reserve(10);
 		AllocateMemory();
 	}
-	
+
 	template <typename... Args>
-	T* New(Args... args)
+	constexpr T* New(Args... args)
 	{
 		if (allPtrs.size() <= 0)
 			AllocateMemory();
@@ -40,7 +40,7 @@ public:
 		return value;
 	}
 
-	void Delete(T* ptr)
+	constexpr void Delete(T* ptr)
 	{
 		ptr->~T();
 		allPtrs.push_back(ptr);
@@ -71,13 +71,13 @@ private:
 	std::mutex mtx;
 	bool objectSwitcher = true;
 public:
-	void UpdateSwitcher()
+	constexpr void UpdateSwitcher()
 	{
 		if (unusedObjects[objectSwitcher].count < 0) unusedObjects[objectSwitcher].count = 0;
 		objectSwitcher = !objectSwitcher;
 	}
 
-	void Delete(T* targetPtr)
+	constexpr void Delete(T* targetPtr)
 	{
 		targetPtr->~T();
 		Array* arr = unusedObjects + !objectSwitcher;
@@ -85,23 +85,20 @@ public:
 		if (currentCount >= arr->capacity)
 		{
 			std::lock_guard<std::mutex> lck(mtx);
-			//			lock
+			if (currentCount >= arr->capacity)
 			{
-				if (currentCount >= arr->capacity)
-				{
-					int64_t newCapacity = arr->capacity * 2;
-					StorageT** newArray = new StorageT*[newCapacity];
-					memcpy(newArray, arr->objs, sizeof(StorageT*) * arr->capacity);
-					delete arr->objs;
-					arr->objs = newArray;
-					arr->capacity = newCapacity;
-				}
+				int64_t newCapacity = arr->capacity * 2;
+				StorageT** newArray = new StorageT*[newCapacity];
+				memcpy(newArray, arr->objs, sizeof(StorageT*) * arr->capacity);
+				delete arr->objs;
+				arr->objs = newArray;
+				arr->capacity = newCapacity;
 			}
 		}
 		arr->objs[currentCount] = (StorageT*)targetPtr;
 	}
 	template <typename ... Args>
-	T* New(Args... args)
+	constexpr T* New(Args... args)
 	{
 		Array* arr = unusedObjects + objectSwitcher;
 		int64_t currentCount = --arr->count;
@@ -119,7 +116,7 @@ public:
 		return t;
 	}
 
-	ConcurrentPool(unsigned int initCapacity)
+	constexpr ConcurrentPool(unsigned int initCapacity)
 	{
 		if (initCapacity < 3) initCapacity = 3;
 		unusedObjects[0].objs = new StorageT*[initCapacity];

@@ -353,18 +353,14 @@ void GRP_Renderer::UpdateTransform(Transform* targetTrans, ID3D12Device* device)
 		perFrameData->AddCommand(cmd);
 	}
 }
-void  GRP_Renderer::DrawCommand(
+void GRP_Renderer::Culling(
 	ID3D12GraphicsCommandList* commandList,
 	ID3D12Device* device,
-	UINT targetShaderPass,
 	FrameResource* targetResource,
-	ConstBufferElement& cameraProperty,
 	ConstBufferElement& cullDataBuffer,
 	DirectX::XMFLOAT4* frustumPlanes,
 	DirectX::XMFLOAT3 frustumMinPoint,
-	DirectX::XMFLOAT3 frustumMaxPoint,
-	PSOContainer* container
-)
+	DirectX::XMFLOAT3 frustumMaxPoint)
 {
 	if (elements.size() > cullResultBuffer->GetElementCount(0))
 	{
@@ -381,7 +377,7 @@ void  GRP_Renderer::DrawCommand(
 				2
 			));
 		isIndirect = false;
-		
+
 	}
 	if (!isIndirect)
 	{
@@ -391,7 +387,7 @@ void  GRP_Renderer::DrawCommand(
 	cullShader->BindRootSignature(commandList, nullptr);
 	UINT dispatchCount = (UINT)ceil(elements.size() / 64.0);
 	UINT capacity = this->capacity;
-	GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)targetResource->GetResource(  this, [=]()->GpuDrivenRenderer*
+	GpuDrivenRenderer* perFrameData = (GpuDrivenRenderer*)targetResource->GetResource(this, [=]()->GpuDrivenRenderer*
 	{
 		return new GpuDrivenRenderer(device, capacity);
 	});
@@ -410,6 +406,15 @@ void  GRP_Renderer::DrawCommand(
 	cullShader->Dispatch(commandList, 1, 1, 1, 1);
 	cullShader->Dispatch(commandList, 0, dispatchCount, 1, 1);
 	cullResultBuffer->TransformBufferState(commandList, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT);
+}
+void  GRP_Renderer::DrawCommand(
+	ID3D12GraphicsCommandList* commandList,
+	ID3D12Device* device,
+	UINT targetShaderPass,
+	ConstBufferElement& cameraProperty,
+	PSOContainer* container
+)
+{
 	PSODescriptor desc;
 	desc.meshLayoutIndex = meshLayoutIndex;
 	desc.shaderPass = targetShaderPass;

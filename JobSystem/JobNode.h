@@ -30,7 +30,7 @@ private:
 	VectorPool* vectorPool;
 	std::mutex* threadMtx;
 	template <typename Func>
-	void Create(const Func& func, VectorPool* vectorPool, std::mutex* threadMtx);
+	constexpr void Create(const Func& func, VectorPool* vectorPool, std::mutex* threadMtx);
 	JobNode* Execute(ConcurrentQueue<JobNode*>& taskList, std::condition_variable& cv);
 	void Precede(JobNode* depending);
 public:

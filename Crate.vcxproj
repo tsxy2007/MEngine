@@ -40,6 +40,7 @@
     <ClInclude Include="JobSystem\VectorPool.h" />
     <ClInclude Include="PipelineComponent\CameraData\CameraTransformData.h" />
     <ClInclude Include="PipelineComponent\CommandBuffer.h" />
+    <ClInclude Include="PipelineComponent\LightingComponent.h" />
     <ClInclude Include="PipelineComponent\PostProcessingComponent.h" />
     <ClInclude Include="PipelineComponent\TemporalAA.h" />
     <ClInclude Include="RenderComponent\GPU Driven\GRP_Renderer.h" />
@@ -96,6 +97,7 @@
     <ClCompile Include="Common\Random.cpp" />
     <ClCompile Include="CrateApp.cpp" />
     <ClCompile Include="PipelineComponent\CommandBuffer.cpp" />
+    <ClCompile Include="PipelineComponent\LightingComponent.cpp" />
     <ClCompile Include="PipelineComponent\PostProcessingComponent.cpp" />
     <ClCompile Include="RenderComponent\GPU Driven\GRP_Renderer.cpp" />
     <ClCompile Include="JobSystem\JobBucket.cpp" />

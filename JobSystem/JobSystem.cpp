@@ -113,7 +113,7 @@ void JobSystem::ReleaseJobBucket(JobBucket* node)
 	releasedBuckets.push_back(node);
 }
 
-JobSystem::JobSystem(int threadCount) : 
+JobSystem::JobSystem(int threadCount)  noexcept :
 	executingNode(100),
 	mainThreadFinished(true),
 	jobNodePool(100),
@@ -131,7 +131,7 @@ JobSystem::JobSystem(int threadCount) :
 	}
 }
 
-JobSystem::~JobSystem()
+JobSystem::~JobSystem() noexcept
 {
 	JobSystemInitialized = false;
 	{

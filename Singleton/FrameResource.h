@@ -51,10 +51,13 @@ private:
 	struct FrameResCamera
 	{
 		std::unordered_map<void*, IPipelineResource*> perCameraResource;
-		std::vector<ThreadCommand*> threadCommands;
+		std::vector<ThreadCommand*> graphicsThreadCommands;
+		std::vector<ThreadCommand*> computeThreadCommands;
 		FrameResCamera()
 		{
 			perCameraResource.reserve(50);
+			graphicsThreadCommands.reserve(20);
+			computeThreadCommands.reserve(20);
 		}
 		~FrameResCamera()
 		{
@@ -85,7 +88,7 @@ public:
 	static void ReleaseResourceAfterFlush(Microsoft::WRL::ComPtr<ID3D12Resource>& resources, FrameResource* resource);
 	void UpdateAfterFrame(UINT64& currentFence, ID3D12CommandQueue** commandQueue, ID3D12Fence** mFence, UINT commandQueueCount);
 	ThreadCommand* GetNewThreadCommand(Camera* cam, ID3D12Device* device, D3D12_COMMAND_LIST_TYPE cmdListType);
-	void ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd);
+	void ReleaseThreadCommand(Camera* cam, ThreadCommand* targetCmd, D3D12_COMMAND_LIST_TYPE cmdListType);
 	void OnLoadCamera(Camera* targetCamera, ID3D12Device* device);
 	void OnUnloadCamera(Camera* targetCamera);
     // We cannot reset the allocator until the GPU is done processing the commands.

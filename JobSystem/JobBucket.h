@@ -18,5 +18,5 @@ private:
 	~JobBucket() noexcept{}
 public:
 	template <typename Func>
-	JobHandle GetTask(const Func& func);
+	constexpr JobHandle GetTask(const Func& func);
 };

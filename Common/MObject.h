@@ -45,68 +45,68 @@ private:
 	PtrLink link;
 
 public:
-	ObjectPtr(T* ptr) noexcept :
+	constexpr ObjectPtr(T* ptr) noexcept :
 		link(ptr)
 	{}
 
-	ObjectPtr() noexcept :
+	constexpr ObjectPtr() noexcept :
 		link(nullptr) {}
-	ObjectPtr(const ObjectPtr<T>& ptr) noexcept :
+	constexpr ObjectPtr(const ObjectPtr<T>& ptr) noexcept :
 		link(ptr.link)
 	{
 
 	}
 
-	operator bool() const noexcept
+	constexpr operator bool() const noexcept
 	{
 		return link.mPtr != nullptr;
 	}
 
-	operator MObject*() const noexcept
+	constexpr operator MObject*() const noexcept
 	{
 		return link.mPtr;
 	}
 
-	ObjectPtr(const PtrLink& ptr) noexcept : link(ptr)
+	constexpr ObjectPtr(const PtrLink& ptr) noexcept : link(ptr)
 	{
 
 	}
 	template<typename F>
-	ObjectPtr<F> Cast() const noexcept
+	constexpr ObjectPtr<F> Cast() const noexcept
 	{
 		ObjectPtr<F> mobj = link;
 		return mobj;
 	}
 
-	ObjectPtr<T>& operator=(const ObjectPtr<T>& other) noexcept
+	constexpr ObjectPtr<T>& operator=(const ObjectPtr<T>& other) noexcept
 	{
 		link = other.link;
 		return *this;
 	}
 
-	T* operator->() noexcept
+	constexpr T* operator->() noexcept
 	{
 		return (T*)link.mPtr;
 	}
 
-	T& operator*() noexcept
+	constexpr T& operator*() noexcept
 	{
 		return *(T*)link.mPtr;
 	}
 
-	bool operator==(const T* ptr) const noexcept
+	constexpr bool operator==(const T* ptr) const noexcept
 	{
 		return link.mPtr == ptr;
 	}
-	bool operator!=(const T* ptr) const noexcept
+	constexpr bool operator!=(const T* ptr) const noexcept
 	{
 		return link.mPtr != ptr;
 	}
-	bool operator==(const ObjectPtr<T>& ptr) const noexcept
+	constexpr bool operator==(const ObjectPtr<T>& ptr) const noexcept
 	{
 		return link.mPtr == ptr.link.mPtr;
 	}
-	bool operator!=(const ObjectPtr<T>& ptr) const noexcept
+	constexpr bool operator!=(const ObjectPtr<T>& ptr) const noexcept
 	{
 		return link.mPtr != ptr.link.mPtr;
 	}

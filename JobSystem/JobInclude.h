@@ -3,7 +3,7 @@
 #include "JobBucket.h"
 #include "JobNode.h"
 template <typename Func>
-JobHandle JobBucket::GetTask(const Func& func)
+constexpr JobHandle JobBucket::GetTask(const Func& func)
 {
 	JobNode* node = sys->jobNodePool.New();
 	jobNodesVec.emplace_back(node);
@@ -13,13 +13,12 @@ JobHandle JobBucket::GetTask(const Func& func)
 }
 
 template <typename Func>
-void JobNode::Create(const Func& func, VectorPool* vectorPool, std::mutex* threadMtx)
+constexpr void JobNode::Create(const Func& func, VectorPool* vectorPool, std::mutex* threadMtx)
 {
 	this->threadMtx = threadMtx;
 	this->vectorPool = vectorPool;
 	dependingEvent = vectorPool->New();
-	using Storage = Storage<Func, 1>;
-	if (sizeof(Storage) >= sizeof(FuncStorage))	//Create in heap
+	if (sizeof(Func) >= sizeof(FuncStorage))	//Create in heap
 	{
 		assert(false);
 		ptr = new Func{

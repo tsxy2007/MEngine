@@ -31,11 +31,11 @@ private:
 	bool mainThreadFinished;
 	bool JobSystemInitialized = true;
 public:
-	JobSystem(int threadCount);
+	JobSystem(int threadCount) noexcept;
 	void ExecuteBucket(JobBucket** bucket, int bucketCount);
 	void ExecuteBucket(JobBucket* bucket, int bucketCount);
 	void Wait();
-	~JobSystem();
+	~JobSystem() noexcept;
 	JobBucket* GetJobBucket();
 	void ReleaseJobBucket(JobBucket* node);
 };

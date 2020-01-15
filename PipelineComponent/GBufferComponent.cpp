@@ -17,7 +17,7 @@
 using namespace DirectX;
 PSOContainer* gbufferContainer(nullptr);
 PSOContainer* depthPrepassContainer(nullptr);
-std::vector<RenderTexture*> gbufferTempRT(10);
+RenderTexture* gbufferTempRT[10];
 #define ALBEDO_RT (gbufferTempRT[0])
 #define SPECULAR_RT (gbufferTempRT[1])
 #define NORMAL_RT  (gbufferTempRT[2])
@@ -81,6 +81,18 @@ public:
 		};
 		InnerLoop<decltype(st), 5>(st);
 		EMISSION_RT->SetViewport(commandList);
+		ConstBufferElement cullEle;
+		cullEle.buffer = &frameRes->cullBuffer;
+		cullEle.element = 0;
+		grpRenderer->Culling(
+			commandList,
+			device,
+			resource,
+			cullEle,
+			prepareComp->frustumPlanes,
+			*(XMFLOAT3*)&prepareComp->frustumMinPos,
+			*(XMFLOAT3*)&prepareComp->frustumMaxPos
+		);
 		//Depth Prepass
 		//TODO
 		commandList->OMSetRenderTargets(0, nullptr, true, &DEPTH_RT->GetColorDescriptor(0));
@@ -91,18 +103,12 @@ public:
 			&frameRes->ub,
 			1, depthPrepassContainer
 		);*/
-		ConstBufferElement cullEle;
-		cullEle.buffer = &frameRes->cullBuffer;
-		cullEle.element = 0;
+
 		grpRenderer->DrawCommand(
 			commandList,
 			device,
-			1, resource,
+			1,
 			resource->cameraCBs[cam->GetInstanceID()],
-			cullEle,
-			prepareComp->frustumPlanes,
-			*(XMFLOAT3*)&prepareComp->frustumMinPos,
-			*(XMFLOAT3*)&prepareComp->frustumMaxPos,
 			depthPrepassContainer
 		);
 		//GBuffer Pass
@@ -118,12 +124,8 @@ public:
 			grpRenderer->DrawCommand(
 				commandList,
 				device,
-				0, resource,
+				0,
 				resource->cameraCBs[cam->GetInstanceID()],
-				cullEle,
-				prepareComp->frustumPlanes,
-				*(XMFLOAT3*)&prepareComp->frustumMinPos,
-				*(XMFLOAT3*)&prepareComp->frustumMaxPos,
 				gbufferContainer
 			);
 		tcmd->CloseCommand();
@@ -140,8 +142,7 @@ std::vector<TemporalResourceCommand>& GBufferComponent::SendRenderTextureRequire
 }
 void GBufferComponent::RenderEvent(EventData& data, ThreadCommand* commandList)
 {
-	if (gbufferTempRT.size() != tempRTRequire.size()) gbufferTempRT.resize(tempRTRequire.size());
-	memcpy(gbufferTempRT.data(), allTempResource.data(), sizeof(RenderTexture*) * tempRTRequire.size());
+	memcpy(gbufferTempRT, allTempResource.data(), sizeof(RenderTexture*) * tempRTRequire.size());
 	GBufferRunnable runnable
 	{
 		data.device,
