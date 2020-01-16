@@ -1,22 +1,22 @@
 #include "Material.h"
 #include "../Singleton/ShaderID.h"
+#include "UploadBuffer.h"
+#include "Texture.h"
+#include "../RenderComponent/DescriptorHeap.h"
 using namespace std;
 using Microsoft::WRL::ComPtr;
 Material::Material(
 	Shader* shader,
 	ObjectPtr<UploadBuffer>& propertyBuffer,
-	UINT propertyBufferIndex,
-	ObjectPtr<DescriptorHeap>& srvHeap
+	UINT propertyBufferIndex
 ) : MObject()
 {
-	shaderResourceHeap = srvHeap;
 	mPropertyIndex = propertyBufferIndex;
 	mShader = shader;
 	mPropertyBuffer = propertyBuffer;
 }
 Material::~Material()
 {
-	shaderResourceHeap = nullptr;
 	mPropertyBuffer = nullptr;
 	mShader = nullptr;
 	for (int i = 0; i < propertiesValue.size(); ++i)
@@ -27,7 +27,7 @@ Material::~Material()
 
 void Material::BindShaderResource(ID3D12GraphicsCommandList* commandList)
 {
-	mShader->BindRootSignature(commandList, shaderResourceHeap.operator->());
+	mShader->BindRootSignature(commandList);
 	if (mPropertyBuffer != nullptr)
 	{
 		mShader->SetResource(commandList, 
@@ -61,9 +61,9 @@ bool Material::SetProperty(UINT id, ObjectPtr<MObject> obj, ShaderVariableType t
 	return false;
 }
 
-bool Material::SetBindlessResource(UINT id, UINT offsetIndex)
+bool Material::SetBindlessResource(UINT id, UINT offsetIndex, DescriptorHeap* shaderResourceHeap)
 {
-	return SetProperty(id, shaderResourceHeap.operator->(), ShaderVariableType_DescriptorHeap, offsetIndex);
+	return SetProperty(id, shaderResourceHeap, ShaderVariableType_DescriptorHeap, offsetIndex);
 }
 
 void Material::RemoveProperty(UINT key)

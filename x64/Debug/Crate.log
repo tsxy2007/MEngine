@@ -1,18 +1,20 @@
 ﻿cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  BitArray.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   CrateApp.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  PostProcessingComponent.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  Transform.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  World.cpp
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   GBufferComponent.cpp
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  LightingComponent.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  PipelineComponent.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  PostProcessingComponent.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  PrepareComponent.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   RenderPipeline.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  SkyboxComponent.cpp
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4244: “=”: 从“_Ty”转换到“_Ty2”，可能丢失数据
           with
           [
@@ -62,7 +64,7 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
               K=UINT,
               V=RenderPipeline::RenderTextureMark
           ] (编译源文件 PipelineComponent\RenderPipeline.cpp)
-  c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(135): note: 参见对正在编译的函数 模板 实例化“void Dictionary<UINT,RenderPipeline::RenderTextureMark>::Add(K &,V &)”的引用
+  c:\users\user\source\repos\crate\pipelinecomponent\renderpipeline.cpp(140): note: 参见对正在编译的函数 模板 实例化“void Dictionary<UINT,RenderPipeline::RenderTextureMark>::Add(K &,V &)”的引用
           with
           [
               K=UINT,

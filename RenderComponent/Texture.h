@@ -47,9 +47,9 @@ private:
 public:
 
 	std::string Name;
-	bool isReadable() const { return UploadHeap == nullptr; }
-	bool isAvaliable() const { return Resource == nullptr; }
-	ID3D12Resource* GetResource() const
+	inline bool isReadable() const { return UploadHeap == nullptr; }
+	inline bool isAvaliable() const { return Resource == nullptr; }
+	inline ID3D12Resource* GetResource() const
 	{
 		return Resource.Get();
 	}

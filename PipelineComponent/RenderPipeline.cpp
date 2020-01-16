@@ -61,14 +61,19 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 		renderPathComponents[0].push_back(*i);
 	}
 }
-
-void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* jobSys)
+#ifdef NDEBUG
+void RenderPipeline::PrepareRendering(RenderPipelineData& renderData, JobSystem* jobSys,
+	std::vector <JobBucket*>& bucketArray) noexcept
+#else
+void RenderPipeline::PrepareRendering(RenderPipelineData& renderData, JobSystem* jobSys,
+	std::vector <JobBucket*>& bucketArray)
+#endif
 {
 	CommandBuffer* currentCommandBuffer = renderData.resource->commandBuffer.get();
-	std::vector <JobBucket*>& bucketArray = buckets[bucketsFlag];
-	bucketsFlag = !bucketsFlag;
+	
 	UINT camSize = max(renderData.allCameras->size(), 1);
-	for (int i = bucketArray.size(); i <= camSize; ++i)
+	UINT bucketCountBeforeRendering = bucketArray.size();
+	for (int i = 0; i <= camSize; ++i)
 	{
 		bucketArray.push_back(jobSys->GetJobBucket());
 	}
@@ -79,7 +84,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	UINT frameNum = *renderData.fenceIndex + 2;
 
 	ThreadCommand* commandList = renderData.resource->commmonThreadCommand;
-	bucketArray[0]->GetTask([=]()->void
+	bucketArray[bucketCountBeforeRendering]->GetTask([=]()->void
 	{
 		commandList->ResetCommand();
 		while (RenderCommand::ExecuteCommand(
@@ -91,7 +96,7 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 	currentCommandBuffer->ExecuteGraphicsCommandList(commandList->GetCmdList());
 	for (UINT camIndex = 0; camIndex < renderData.allCameras->size(); ++camIndex)
 	{
-		JobBucket* bucket = bucketArray[camIndex];
+		JobBucket* bucket = bucketArray[camIndex + bucketCountBeforeRendering];
 		Camera* cam = (*renderData.allCameras)[camIndex];
 
 		if (cam->renderTarget)
@@ -203,8 +208,14 @@ void RenderPipeline::RenderCamera(RenderPipelineData& renderData, JobSystem* job
 		}
 	}
 	FrameResource::mCurrFrameResource->UpdateBeforeFrame(renderData.fence, renderData.fenceCount);//Flush CommandQueue
-	jobSys->ExecuteBucket(bucketArray.data(), camSize);					//Execute Tasks
+}
 
+#ifdef NDEBUG
+void RenderPipeline::ExecuteRendering(RenderPipelineData& renderData, std::vector <JobBucket*>& bucketArray) noexcept
+#else
+void RenderPipeline::ExecuteRendering(RenderPipelineData& renderData, std::vector <JobBucket*>& bucketArray)
+#endif
+{
 	if (renderData.lastResource != nullptr)				//Run Last frame's commandqueue
 	{
 		ID3D12CommandQueue* queues[3] =

@@ -62,9 +62,9 @@ public:
 		return link.mPtr != nullptr;
 	}
 
-	constexpr operator MObject*() const noexcept
+	constexpr operator T*() const noexcept
 	{
-		return link.mPtr;
+		return (T*)link.mPtr;
 	}
 
 	constexpr ObjectPtr(const PtrLink& ptr) noexcept : link(ptr)
@@ -94,19 +94,19 @@ public:
 		return *(T*)link.mPtr;
 	}
 
-	constexpr bool operator==(const T* ptr) const noexcept
+	bool operator==(const T* ptr) const noexcept
 	{
 		return link.mPtr == ptr;
 	}
-	constexpr bool operator!=(const T* ptr) const noexcept
+	bool operator!=(const T* ptr) const noexcept
 	{
 		return link.mPtr != ptr;
 	}
-	constexpr bool operator==(const ObjectPtr<T>& ptr) const noexcept
+	bool operator==(const ObjectPtr<T>& ptr) const noexcept
 	{
 		return link.mPtr == ptr.link.mPtr;
 	}
-	constexpr bool operator!=(const ObjectPtr<T>& ptr) const noexcept
+	bool operator!=(const ObjectPtr<T>& ptr) const noexcept
 	{
 		return link.mPtr != ptr.link.mPtr;
 	}

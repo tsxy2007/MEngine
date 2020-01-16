@@ -2,6 +2,7 @@
 #include "../Singleton/PSOContainer.h"
 #include "../Singleton/ShaderID.h"
 #include "../LogicComponent/Transform.h"
+#include "UploadBuffer.h"
 using namespace DirectX;
 
 std::vector<std::pair<MeshRenderer*, MeshRenderer::MeshRendererObjectData>> MeshRenderer::allRendererData;

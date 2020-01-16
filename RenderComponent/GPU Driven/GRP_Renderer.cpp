@@ -169,14 +169,12 @@ GRP_Renderer::GRP_Renderer(
 	shader(shader),
 	maxCapacity(maxCapacity),
 	cmdSig(shader, device),
-	textureHeap(new DescriptorHeap()),
 	textureDescPool(maxCapacity * texRequireInMat),
 	texRequireInMat(texRequireInMat),
 	textureIndicesPool(maxCapacity),
 	meshLayoutIndex(meshLayoutIndex)
 {
 	cullShader = ShaderCompiler::GetComputeShader("Cull");
-	textureHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, maxCapacity * texRequireInMat, true);
 	for (UINT i = 0, size = textureDescPool.size(); i < size; ++i)
 		textureDescPool[i] = i;
 	allocatedIndices = new UINT[maxCapacity * texRequireInMat];
@@ -412,7 +410,8 @@ void  GRP_Renderer::DrawCommand(
 	ID3D12Device* device,
 	UINT targetShaderPass,
 	ConstBufferElement& cameraProperty,
-	PSOContainer* container
+	PSOContainer* container,
+	DescriptorHeap* heap
 )
 {
 	PSODescriptor desc;
@@ -421,10 +420,11 @@ void  GRP_Renderer::DrawCommand(
 	desc.shaderPtr = shader;
 	ID3D12PipelineState* pso = container->GetState(desc, device);
 	commandList->SetPipelineState(pso);
-	shader->BindRootSignature(commandList, textureHeap.operator->());
-	shader->SetResource(commandList, ShaderID::GetMainTex(), textureHeap.operator->(), 0);
+	heap->SetDescriptorHeap(commandList);
+	shader->BindRootSignature(commandList);
+	shader->SetResource(commandList, ShaderID::GetMainTex(), heap, 0);
 	shader->SetResource(commandList, ShaderID::GetPerCameraBufferID(), cameraProperty.buffer, cameraProperty.element);
-	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->ExecuteIndirect(
 		cmdSig.GetSignature(),
 		elements.size(),
@@ -439,11 +439,6 @@ void  GRP_Renderer::DrawCommand(
 CBufferPool* GRP_Renderer::GetCullDataPool(UINT initCapacity)
 {
 	return new CBufferPool(sizeof(CullData), initCapacity);
-}
-
-DescriptorHeap* GRP_Renderer::GetTextureHeap()
-{
-	return textureHeap.operator->();
 }
 
 GRP_Renderer::~GRP_Renderer()

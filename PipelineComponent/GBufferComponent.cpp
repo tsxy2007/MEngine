@@ -24,7 +24,7 @@ RenderTexture* gbufferTempRT[10];
 #define EMISSION_RT  (gbufferTempRT[3])
 #define MOTION_VECTOR_RT (gbufferTempRT[4])
 #define DEPTH_RT (gbufferTempRT[5])
-
+ObjectPtr<UploadBuffer> materialPropertyBuffer;
 ObjectPtr<Material> mat;
 ObjectPtr<Mesh> mesh;
 ObjectPtr<MeshRenderer> meshRenderer;
@@ -109,7 +109,8 @@ public:
 			device,
 			1,
 			resource->cameraCBs[cam->GetInstanceID()],
-			depthPrepassContainer
+			depthPrepassContainer,
+			world->GetGlobalDescHeap()
 		);
 		//GBuffer Pass
 		//TODO
@@ -126,7 +127,8 @@ public:
 				device,
 				0,
 				resource->cameraCBs[cam->GetInstanceID()],
-				gbufferContainer
+				gbufferContainer,
+				world->GetGlobalDescHeap()
 			);
 		tcmd->CloseCommand();
 	}
@@ -217,10 +219,9 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	}
 	gbufferContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, colorFormats.size(), colorFormats.data());
 	depthPrepassContainer = new PSOContainer(DXGI_FORMAT_D32_FLOAT, 0, nullptr);
-	ObjectPtr<UploadBuffer> materialPropertyBuffer = new UploadBuffer();
+	 materialPropertyBuffer = new UploadBuffer();
 	materialPropertyBuffer->Create(device, 1, true, sizeof(MaterialConstants));
-	ObjectPtr<DescriptorHeap> heap;
-	mat = new Material(ShaderCompiler::GetShader("OpaqueStandard"), materialPropertyBuffer, 0, heap);
+	mat = new Material(ShaderCompiler::GetShader("OpaqueStandard"), materialPropertyBuffer, 0);
 	GeometryGenerator geoGen;
 	mesh = Mesh::LoadMeshFromFile(L"Wheel.vmesh", device);
 	if (!mesh)

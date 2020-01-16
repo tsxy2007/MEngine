@@ -35,6 +35,8 @@ const int gNumFrameResources = 3;
 class CrateApp : public D3DApp
 {
 public:
+	std::vector<JobBucket*> buckets[2];
+	bool bucketsFlag = false;
 	Microsoft::WRL::ComPtr<ID3D12Fence> mComputeFence;
 	Microsoft::WRL::ComPtr<ID3D12Fence> mAsyncFence;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mComputeCommandQueue;
@@ -47,7 +49,6 @@ public:
 
 	virtual bool Initialize()override;
 	virtual void OnResize()override;
-	virtual void Update(const GameTimer& gt)override;
 	virtual void Draw(const GameTimer& gt)override;
 
 	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
@@ -121,6 +122,8 @@ bool CrateApp::Initialize()
 	if (!D3DApp::Initialize())
 		return false;
 	ShaderID::Init();
+	buckets[0].reserve(20);
+	buckets[1].reserve(20);
 	UINT cpuCoreCount = std::thread::hardware_concurrency() - 2;	//One for main thread & one for loading
 	pipelineJobSys = std::unique_ptr<JobSystem>(new JobSystem(max(1, cpuCoreCount)));
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
@@ -165,9 +168,11 @@ void CrateApp::OnResize()
 	lastFrameExecute = false;
 }
 
-void CrateApp::Update(const GameTimer& gt)
+std::vector<Camera*> cam(1);
+void CrateApp::Draw(const GameTimer& gt)
 {
 	if (mClientHeight < 1 || mClientWidth < 1) return;
+	//Logic
 	OnKeyboardInput(gt);
 	UpdateCamera(gt);
 	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
@@ -175,12 +180,10 @@ void CrateApp::Update(const GameTimer& gt)
 	FrameResource::mCurrFrameResource = FrameResource::mFrameResources[mCurrFrameResourceIndex].get();
 	mainCamera->SetLens(0.333333 * MathHelper::Pi, AspectRatio(), 1.5, 100);
 	((World*)&worldPtr)->Update(FrameResource::mCurrFrameResource);
-}
-std::vector<Camera*> cam(1);
-void CrateApp::Draw(const GameTimer& gt)
-{
-	if (mClientHeight < 1 || mClientWidth < 1) return;
-	
+
+	//Rendering
+	std::vector <JobBucket*>& bucketArray = buckets[bucketsFlag];
+	bucketsFlag = !bucketsFlag;
 	cam[0] = mainCamera.operator->();
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 	ID3D12Fence* fences[3] = { mFence.Get(), mComputeFence.Get(), mAsyncFence.Get() };
@@ -199,7 +202,15 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.world = (World*)&worldPtr;
 	data.world->windowWidth = mClientWidth;
 	data.world->windowHeight = mClientHeight;
-	rp->RenderCamera(data, pipelineJobSys.get());
+	rp->PrepareRendering(data, pipelineJobSys.get(), bucketArray);
+	pipelineJobSys->ExecuteBucket(bucketArray.data(), bucketArray.size());					//Execute Tasks
+	rp->ExecuteRendering(data, bucketArray);
+	std::vector <JobBucket*>& lastBucketArray = buckets[bucketsFlag];
+	for (auto ite = lastBucketArray.begin(); ite != lastBucketArray.end(); ++ite)
+	{
+		pipelineJobSys->ReleaseJobBucket(*ite);
+	}
+	lastBucketArray.clear();
 	lastFrameExecute = true;
 }
 

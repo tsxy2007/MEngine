@@ -40,7 +40,6 @@ public:
 	};
 private:
 	CBufferPool pool;
-	ObjectPtr<DescriptorHeap> textureHeap;
 	size_t cbufferStride;
 	CommandSignature cmdSig;
 	Shader* shader;
@@ -81,7 +80,6 @@ public:
 	void RemoveElement(Transform* trans, ID3D12Device* device);
 	void UpdateRenderer(Transform* targetTrans, Mesh* mesh, ID3D12Device* device);
 	CommandSignature* GetCmdSignature() { return &cmdSig; }
-	DescriptorHeap* GetTextureHeap();
 	void UpdateFrame(FrameResource*, ID3D12Device*);//Should be called Per frame
 	void UpdateTransform(Transform* targetTrans, ID3D12Device* device);
 	void Culling(
@@ -98,6 +96,7 @@ public:
 		ID3D12Device* device,
 		UINT targetShaderPass,
 		ConstBufferElement& cameraProperty,
-		PSOContainer* container
+		PSOContainer* container,
+		DescriptorHeap* heap
 	);
 };

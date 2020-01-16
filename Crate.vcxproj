@@ -66,6 +66,7 @@
     <ClInclude Include="RenderComponent\CommandSignature.h" />
     <ClInclude Include="RenderComponent\ComputeShader.h" />
     <ClInclude Include="RenderComponent\DescriptorHeap.h" />
+    <ClInclude Include="RenderComponent\Light.h" />
     <ClInclude Include="RenderComponent\Material.h" />
     <ClInclude Include="RenderComponent\Mesh.h" />
     <ClInclude Include="RenderComponent\MeshRenderer.h" />
@@ -121,6 +122,7 @@
     <ClCompile Include="RenderComponent\CommandSignature.cpp" />
     <ClCompile Include="RenderComponent\ComputeShader.cpp" />
     <ClCompile Include="RenderComponent\DescriptorHeap.cpp" />
+    <ClCompile Include="RenderComponent\Light.cpp" />
     <ClCompile Include="RenderComponent\Material.cpp" />
     <ClCompile Include="RenderComponent\Mesh.cpp" />
     <ClCompile Include="RenderComponent\MeshRenderer.cpp" />

@@ -20,7 +20,6 @@ public:
 	UINT GetIndexFormat() const { return indexFormat; }
 	DirectX::XMFLOAT3 boundingCenter = { 0,0,0 };
 	DirectX::XMFLOAT3 boundingExtent = {0.5f,0.5f,0.5f};
-	virtual ~Mesh();
 	inline UINT GetLayoutIndex() const { return meshLayoutIndex; }
 	inline UINT GetVertexCount() const { return mVertexCount; }
 	D3D12_VERTEX_BUFFER_VIEW VertexBufferView()const;

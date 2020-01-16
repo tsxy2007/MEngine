@@ -45,7 +45,7 @@ public:
 	void Dispatch(ID3D12GraphicsCommandList* cList, UINT kernel, UINT x, UINT y, UINT z);
 	void DispatchIndirect(ID3D12GraphicsCommandList* cList, UINT dispatchKernel, StructuredBuffer* indirectBuffer, UINT bufferElement, UINT bufferIndex);
 	template<typename Func>
-	void IterateVariables(Func&& f)
+	void IterateVariables(const Func& f)
 	{
 		for (int i = 0; i < mVariablesVector.size(); ++i)
 		{

@@ -8,21 +8,13 @@
 #include "../RenderComponent/DescriptorHeap.h"
 using namespace DirectX;
 #pragma region  TEST_BUILDING_AREA
-void BuildMaterials(ObjectPtr<UploadBuffer>& materialPropertyBuffer, ID3D12Device* device, ObjectPtr<Material>& opaqueMaterial, ObjectPtr<DescriptorHeap>& bindlessTextureHeap)
-{
-	materialPropertyBuffer = new UploadBuffer();
-	materialPropertyBuffer->Create(device, 1, true, sizeof(MaterialConstants));
-	opaqueMaterial = new Material(ShaderCompiler::GetShader("OpaqueStandard"), materialPropertyBuffer, 0, bindlessTextureHeap);
-	//opaqueMaterial->SetTexture2D(ShaderID::PropertyToID("gDiffuseMap"), mTextures[0]);
-	opaqueMaterial->SetBindlessResource(ShaderID::PropertyToID("gDiffuseMap"), 0);
-	opaqueMaterial->SetBindlessResource(ShaderID::PropertyToID("cubemap"), 9);
-
-}
 #pragma endregion
 World::World(ID3D12GraphicsCommandList* cmdList, ID3D12Device* device) :
 	usedDescs(MAXIMUM_HEAP_COUNT),
-	unusedDescs(MAXIMUM_HEAP_COUNT)
+	unusedDescs(MAXIMUM_HEAP_COUNT),
+	globalDescriptorHeap(new DescriptorHeap)
 {
+	globalDescriptorHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, MAXIMUM_HEAP_COUNT, true);
 	for (UINT i = 0; i < MAXIMUM_HEAP_COUNT; ++i)
 	{
 		unusedDescs[i] = i;
@@ -52,13 +44,9 @@ void World::ForceCollectAllHeapIndex()
 {
 	for (UINT i = 0; i < MAXIMUM_HEAP_COUNT; ++i)
 	{
-		auto ite = usedDescs[i];
-		if (ite)
-		{
-			unusedDescs.push_back(i);
-			ite = false;
-		}
+		unusedDescs[i] = i;
 	}
+	usedDescs.Clear();
 }
 
 void World::Update(FrameResource* resource)

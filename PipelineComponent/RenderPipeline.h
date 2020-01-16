@@ -42,8 +42,6 @@ private:
 	static std::unordered_map<std::string, PipelineComponent*> componentsLink;
 	std::vector<std::vector<PipelineComponent*>> renderPathComponents;
 	Dictionary<UINT, RenderTextureMark> renderTextureMarks;
-	std::vector<JobBucket*> buckets[2];
-	bool bucketsFlag = false;
 	template<typename T>
 	void Init()
 	{
@@ -56,7 +54,13 @@ public:
 	static RenderPipeline* GetInstance(ID3D12Device* device, ID3D12GraphicsCommandList* commandList);
 	static void DestroyInstance();
 	~RenderPipeline();
-	void RenderCamera(RenderPipelineData& data, JobSystem* jobSys);
+#ifdef NDEBUG
+	void PrepareRendering(RenderPipelineData& data, JobSystem* jobSys, std::vector <JobBucket*>& bucketArray) noexcept;
+	void ExecuteRendering(RenderPipelineData& data, std::vector <JobBucket*>& bucketArray) noexcept;
+#else
+	void PrepareRendering(RenderPipelineData& data, JobSystem* jobSys, std::vector <JobBucket*>& bucketArray);
+	void ExecuteRendering(RenderPipelineData& data, std::vector <JobBucket*>& bucketArray);
+#endif
 	template <typename T>
 	static T* GetComponent()
 	{

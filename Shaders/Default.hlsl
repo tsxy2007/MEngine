@@ -15,6 +15,7 @@ SamplerState linearWrapSampler  : register(s2);
 SamplerState linearClampSampler  : register(s3);
 SamplerState anisotropicWrapSampler  : register(s4);
 SamplerState anisotropicClampSampler  : register(s5);
+SamplerComparisonState linearShadowSampler : register(s6);      //tex.SampleCmpLevelZero(linearShadowSampler)
 
 cbuffer Per_Object_Buffer : register(b0)
 {

@@ -6,6 +6,7 @@
 #include "MeshRenderer.h"
 #include "../Common/Camera.h"
 #include "../Singleton/PSOContainer.h"
+#include "DescriptorHeap.h"
 
 std::unique_ptr<Mesh> Skybox::fullScreenMesh = nullptr;
 void Skybox::Draw(
@@ -24,6 +25,7 @@ void Skybox::Draw(
 	desc.shaderPtr = skyboxMat->GetShader();
 	ID3D12PipelineState* pso = container->GetState(desc, device);
 	commandList->SetPipelineState(pso);
+	texDescHeap->SetDescriptorHeap(commandList);
 	skyboxMat->BindShaderResource(commandList);
 	skyboxMat->GetShader()->SetResource(commandList, SkyboxCBufferID, cameraBuffer->buffer, cameraBuffer->element);
 	commandList->IASetVertexBuffers(0, 1, &fullScreenMesh->VertexBufferView());
@@ -52,8 +54,8 @@ skyboxTex(tex)
 	texDescHeap->Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
 	tex->BindColorBufferToSRVHeap(texDescHeap.operator->(), 0, device);
 	ObjectPtr<UploadBuffer> noProperty = nullptr;
-	skyboxMat = new Material(ShaderCompiler::GetShader("Skybox"), noProperty, 0, texDescHeap);
-	skyboxMat->SetBindlessResource(ShaderID::PropertyToID("cubemap"), 0);
+	skyboxMat = new Material(ShaderCompiler::GetShader("Skybox"), noProperty, 0);
+	skyboxMat->SetBindlessResource(ShaderID::PropertyToID("cubemap"), 0, texDescHeap);
 	if (fullScreenMesh == nullptr) {
 		std::array<DirectX::XMFLOAT3, 3> vertex;
 		vertex[0] = { -3, -1, 1 };

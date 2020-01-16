@@ -26,10 +26,6 @@ D3D12_INDEX_BUFFER_VIEW Mesh::IndexBufferView()
 	return ibv;
 }
 
-Mesh::~Mesh()
-{
-}
-
 ComPtr<ID3D12Resource> CreateDefaultBuffer(
 	ID3D12Device* device,
 	UINT64 byteSize,

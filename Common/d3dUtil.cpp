@@ -18,7 +18,7 @@ bool d3dUtil::IsKeyDown(int vkeyCode)
     return (GetAsyncKeyState(vkeyCode) & 0x8000) != 0;
 }
 
-std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> d3dUtil::GetStaticSamplers()
+std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> d3dUtil::GetStaticSamplers()
 {
 	// Applications usually only need a handful of samplers.  So just define them all up front
 	// and keep them available as part of the root signature.  
@@ -58,7 +58,7 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> d3dUtil::GetStaticSamplers()
 		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
 		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressW
 		0.0f,                             // mipLODBias
-		8);                               // maxAnisotropy
+		16);                               // maxAnisotropy
 
 	const CD3DX12_STATIC_SAMPLER_DESC anisotropicClamp(
 		5, // shaderRegister
@@ -67,12 +67,20 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> d3dUtil::GetStaticSamplers()
 		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
 		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressW
 		0.0f,                              // mipLODBias
-		8);                                // maxAnisotropy
+		16);                                // maxAnisotropy
+
+	const CD3DX12_STATIC_SAMPLER_DESC linearShadowClamp(
+		6,
+		D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+
 
 	return {
 		pointWrap, pointClamp,
 		linearWrap, linearClamp,
-		anisotropicWrap, anisotropicClamp };
+		anisotropicWrap, anisotropicClamp, linearShadowClamp };
 }
 
 ComPtr<ID3DBlob> d3dUtil::LoadBinary(const std::wstring& filename)

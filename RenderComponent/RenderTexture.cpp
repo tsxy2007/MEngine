@@ -5,9 +5,6 @@ RenderTexture::~RenderTexture()
 
 }
 
-ID3D12Resource* RenderTexture::GetColorResource() const { return mColorResource.Get(); }
-DXGI_FORMAT RenderTexture::GetColorFormat() const { return mFormat; }
-
 void RenderTexture::ClearRenderTarget(ID3D12GraphicsCommandList* commandList, UINT slice)
 {
 	if (usage == RenderTextureUsage::RenderTextureUsage_ColorBuffer)
@@ -17,33 +14,6 @@ void RenderTexture::ClearRenderTarget(ID3D12GraphicsCommandList* commandList, UI
 	}
 	else
 		commandList->ClearDepthStencilView(rtvHeap.hCPU(slice), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 0, 0, 0, nullptr);
-}
-
-bool RenderTextureDescriptor::operator==(const RenderTextureDescriptor& other) const
-{
-	bool value = width == other.width &&
-		height == other.height &&
-		depthSlice == other.depthSlice &&
-		type == other.type &&
-		rtFormat.usage == other.rtFormat.usage;
-	if (value)
-	{
-		if (rtFormat.usage == RenderTextureUsage::RenderTextureUsage_ColorBuffer)
-		{
-			return rtFormat.colorFormat == other.rtFormat.colorFormat;
-		}
-		else
-		{
-			return rtFormat.depthFormat == other.rtFormat.depthFormat;
-		}
-	}
-	return false;
-}
-
-
-bool RenderTextureDescriptor::operator!=(const RenderTextureDescriptor& other) const
-{
-	return !operator==(other);
 }
 void RenderTexture::SetViewport(ID3D12GraphicsCommandList* commandList)
 {

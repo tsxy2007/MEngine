@@ -37,7 +37,7 @@ void CopyToRGBA64(uint2 id : SV_DISPATCHTHREADID)
     float g = (float)(value.x & 65535) / 65535.0;
     value.x >>= 16;
     float r = (float)(value.x & 65535) / 65535.0;
-    _MainTex[uint3(pos, 0)] = float4(r,g,b,a);
+    _MainTex[uint3(pos, 0)] = float4(r  ,g,b,a);
 }
 
 [numthreads(8,8,1)]

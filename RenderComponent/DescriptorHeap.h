@@ -10,25 +10,26 @@ public:
 		D3D12_DESCRIPTOR_HEAP_TYPE Type,
 		UINT NumDescriptors,
 		bool bShaderVisible = false);
-	inline Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Get() { return pDH; }
+	constexpr Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& Get() { return pDH; }
 
-	inline D3D12_CPU_DESCRIPTOR_HANDLE hCPU(UINT index)
+	constexpr D3D12_CPU_DESCRIPTOR_HANDLE hCPU(UINT index)
 	{
 		if (index >= mNumDescriptors) index = mNumDescriptors - 1;
-		D3D12_CPU_DESCRIPTOR_HANDLE h;
-		h.ptr = hCPUHeapStart.ptr + index * HandleIncrementSize;
+		D3D12_CPU_DESCRIPTOR_HANDLE h = { hCPUHeapStart.ptr + index * HandleIncrementSize };
 		return h;
 	}
-	inline D3D12_GPU_DESCRIPTOR_HANDLE hGPU(UINT index)
+	constexpr D3D12_GPU_DESCRIPTOR_HANDLE hGPU(UINT index)
 	{
 		if (index >= mNumDescriptors) index = mNumDescriptors - 1;
-		D3D12_GPU_DESCRIPTOR_HANDLE h;
-		h.ptr = hGPUHeapStart.ptr + index * HandleIncrementSize;
+		D3D12_GPU_DESCRIPTOR_HANDLE h = { hGPUHeapStart.ptr + index * HandleIncrementSize };
 		return h;
 	}
-	void SetDescriptorHeap(ID3D12GraphicsCommandList* commandList);
-	inline D3D12_DESCRIPTOR_HEAP_DESC GetDesc() const { return Desc; };
-	virtual ~DescriptorHeap();
+	inline void SetDescriptorHeap(ID3D12GraphicsCommandList* commandList)
+	{
+		ID3D12DescriptorHeap* heap = pDH.Get();
+		commandList->SetDescriptorHeaps(1, &heap);
+	}
+	constexpr D3D12_DESCRIPTOR_HEAP_DESC GetDesc() const { return Desc; };
 private:
 	UINT mNumDescriptors = 0;
 	D3D12_DESCRIPTOR_HEAP_DESC Desc;

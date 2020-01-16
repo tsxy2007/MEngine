@@ -12,6 +12,11 @@ Shader::~Shader()
 
 }
 
+void Shader::BindRootSignature(ID3D12GraphicsCommandList* commandList)
+{
+	commandList->SetGraphicsRootSignature(mRootSignature.Get());
+}
+
 void Shader::BindRootSignature(ID3D12GraphicsCommandList* commandList, DescriptorHeap* descHeap)
 {
 	commandList->SetGraphicsRootSignature(mRootSignature.Get());

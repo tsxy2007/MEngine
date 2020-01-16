@@ -69,7 +69,7 @@ void BitArray::Set(size_t index, bool value)
 
 BitArray::BitArray(size_t length)
 {
-	size_t capa = length / 8 + 1;
+	size_t capa = (length % 8 > 0) ? length / 8 + 1 : length / 8;
 	this->length = length;
 	ptr = new UCHAR[capa];
 	memset(ptr, 0, sizeof(UCHAR) * capa);
@@ -77,7 +77,7 @@ BitArray::BitArray(size_t length)
 
 void BitArray::Clear()
 {
-	size_t capa = length / 8 + 1;
+	size_t capa = (length % 8 > 0) ? length / 8 + 1 : length / 8;
 	memset(ptr, 0, sizeof(UCHAR) * capa);
 }
 

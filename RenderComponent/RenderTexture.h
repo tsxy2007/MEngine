@@ -49,10 +49,31 @@ struct RenderTextureDescriptor
 	UINT depthSlice;
 	RenderTextureType type;
 	RenderTextureFormat rtFormat;
-	bool operator==(const RenderTextureDescriptor& other) const;
+	constexpr bool operator==(const RenderTextureDescriptor& other) const
+	{
+		bool value = width == other.width &&
+			height == other.height &&
+			depthSlice == other.depthSlice &&
+			type == other.type &&
+			rtFormat.usage == other.rtFormat.usage;
+		if (value)
+		{
+			if (rtFormat.usage == RenderTextureUsage::RenderTextureUsage_ColorBuffer)
+			{
+				return rtFormat.colorFormat == other.rtFormat.colorFormat;
+			}
+			else
+			{
+				return rtFormat.depthFormat == other.rtFormat.depthFormat;
+			}
+		}
+		return false;
+	}
 
-	bool operator!=(const RenderTextureDescriptor& other) const;
-	//bool operator!=(const)
+	constexpr bool operator!=(const RenderTextureDescriptor& other) const
+	{
+		return !operator==(other);
+	}
 };
 
 class RenderTexture : public MObject
@@ -68,12 +89,12 @@ private:
 	DXGI_FORMAT mFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	Microsoft::WRL::ComPtr<ID3D12Resource> mColorResource;
 	DescriptorHeap rtvHeap;
-	RenderTextureType mType; 
+	RenderTextureType mType;
 	void GetColorViewDesc(D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc);
 	void GetColorUAVDesc(D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, UINT targetMipLevel);
 public:
 	virtual ~RenderTexture();
-	RenderTextureType GetType() const { return mType; }
+	constexpr RenderTextureType GetType() const { return mType; }
 	RenderTexture(
 		ID3D12Device* device,
 		UINT width,
@@ -83,13 +104,13 @@ public:
 		int depthCount,
 		int mipCount
 	);
-	UINT GetWidth() { return mWidth; }
-	UINT GetHeight() { return mHeight; }
+	constexpr UINT GetWidth() { return mWidth; }
+	constexpr UINT GetHeight() { return mHeight; }
 	void SetViewport(ID3D12GraphicsCommandList* commandList);
-	ID3D12Resource* GetColorResource() const;
+	ID3D12Resource* GetColorResource() const{ return mColorResource.Get(); }
 	D3D12_CPU_DESCRIPTOR_HANDLE GetColorDescriptor(UINT slice);
 	void BindColorBufferToSRVHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device);
 	void BindUAVToHeap(DescriptorHeap* targetHeap, UINT index, ID3D12Device* device, UINT targetMipLevel);
 	void ClearRenderTarget(ID3D12GraphicsCommandList* commandList, UINT slice);
-	DXGI_FORMAT GetColorFormat() const;
+	DXGI_FORMAT GetColorFormat() const{ return mFormat; }
 };
