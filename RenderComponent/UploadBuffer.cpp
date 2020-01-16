@@ -14,7 +14,7 @@ void UploadBuffer::Create(ID3D12Device* device, UINT elementCount, bool isConsta
 		mElementByteSize = d3dUtil::CalcConstantBufferByteSize(stride);
 	else mElementByteSize = stride;
 	mStride = stride;
-	if (mUploadBuffer.Get() != nullptr)
+	if (mUploadBuffer)
 	{
 		mUploadBuffer->Unmap(0, nullptr);
 		mUploadBuffer = nullptr;

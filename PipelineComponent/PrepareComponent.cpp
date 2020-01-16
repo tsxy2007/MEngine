@@ -134,10 +134,10 @@ struct PrepareRunnable
 		localToWorldMatrix.r[2] = camera->GetLook();
 		XMFLOAT3 position = camera->GetPosition3f();
 		localToWorldMatrix.r[3] = { position.x, position.y, position.z, 1 };
-		MathLib::GetPerspFrustumPlanes(localToWorldMatrix, camera->GetFovY(), camera->GetAspect(), camera->GetNearZ(), camera->GetFarZ(), ths->frustumPlanes);
+		MathLib::GetPerspFrustumPlanes(std::move(localToWorldMatrix), camera->GetFovY(), camera->GetAspect(), camera->GetNearZ(), camera->GetFarZ(), ths->frustumPlanes);
 		//Calculate Frustum Bounding
 		MathLib::GetFrustumBoundingBox(
-			localToWorldMatrix,
+			std::move(localToWorldMatrix),
 			camera->GetNearWindowHeight(),
 			camera->GetFarWindowHeight(),
 			camera->GetAspect(),

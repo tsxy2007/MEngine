@@ -22,6 +22,7 @@
 #include "PipelineComponent/RenderPipeline.h"
 #include "Singleton/Graphics.h"
 #include "Singleton/MathLib.h"
+#include "JobSystem/JobInclude.h"
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -41,7 +42,6 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12Fence> mAsyncFence;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mComputeCommandQueue;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mAsyncCommandQueue;
-	typedef std::aligned_storage_t<sizeof(World), alignof(World)> WorldStorage;
 	CrateApp(HINSTANCE hInstance);
 	CrateApp(const CrateApp& rhs) = delete;
 	CrateApp& operator=(const CrateApp& rhs) = delete;
@@ -72,7 +72,6 @@ public:
 	POINT mLastMousePos;
 	FrameResource* lastResource = nullptr;
 	std::unique_ptr<ThreadCommand> directThreadCommand;
-	WorldStorage worldPtr;
 };
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	PSTR cmdLine, int showCmd)
@@ -108,7 +107,7 @@ CrateApp::~CrateApp()
 		FlushCommandQueue();
 	RenderPipeline::DestroyInstance();
 	ShaderCompiler::Dispose();
-	((World*)&worldPtr)->~World();
+	World::DestroyInstance();
 	for (int i = 0; i < FrameResource::mFrameResources.size(); ++i)
 	{
 		FrameResource::mFrameResources[i] = nullptr;
@@ -144,7 +143,7 @@ bool CrateApp::Initialize()
 	//BuildPSOs();
 	// Execute the initialization commands.
 	// Wait until initialization is complete.
-	new (&worldPtr)World(directThreadCommand->GetCmdList(), md3dDevice.Get());
+	World::CreateInstance(directThreadCommand->GetCmdList(), md3dDevice.Get());
 	rp = RenderPipeline::GetInstance(md3dDevice.Get(),
 		directThreadCommand->GetCmdList());
 	Graphics::Initialize(md3dDevice.Get(), directThreadCommand->GetCmdList());
@@ -172,18 +171,25 @@ std::vector<Camera*> cam(1);
 void CrateApp::Draw(const GameTimer& gt)
 {
 	if (mClientHeight < 1 || mClientWidth < 1) return;
-	//Logic
-	OnKeyboardInput(gt);
-	UpdateCamera(gt);
 	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
 	lastResource = FrameResource::mCurrFrameResource;
 	FrameResource::mCurrFrameResource = FrameResource::mFrameResources[mCurrFrameResourceIndex].get();
-	mainCamera->SetLens(0.333333 * MathHelper::Pi, AspectRatio(), 1.5, 100);
-	((World*)&worldPtr)->Update(FrameResource::mCurrFrameResource);
-
-	//Rendering
 	std::vector <JobBucket*>& bucketArray = buckets[bucketsFlag];
 	bucketsFlag = !bucketsFlag;
+
+	//Logic
+	JobBucket* mainLogicBucket = pipelineJobSys->GetJobBucket();
+	bucketArray.push_back(mainLogicBucket);
+	JobHandle cameraUpdateJob = mainLogicBucket->GetTask([&]()->void
+	{
+		OnKeyboardInput(gt);
+		UpdateCamera(gt);
+
+		mainCamera->SetLens(0.333333 * MathHelper::Pi, AspectRatio(), 1.5, 100);
+		World::GetInstance()->Update(FrameResource::mCurrFrameResource);
+
+	});
+	//Rendering
 	cam[0] = mainCamera.operator->();
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 	ID3D12Fence* fences[3] = { mFence.Get(), mComputeFence.Get(), mAsyncFence.Get() };
@@ -199,7 +205,7 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.fenceIndex = &mCurrentFence;
 	data.executeLastFrame = lastFrameExecute;
 	data.swap = mSwapChain.Get();
-	data.world = (World*)&worldPtr;
+	data.world = World::GetInstance();
 	data.world->windowWidth = mClientWidth;
 	data.world->windowHeight = mClientHeight;
 	rp->PrepareRendering(data, pipelineJobSys.get(), bucketArray);

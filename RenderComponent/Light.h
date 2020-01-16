@@ -1,8 +1,26 @@
 #pragma once
 #include "../Common/d3dUtil.h"
 #include "../Common/MObject.h"
+#include "../LogicComponent/Component.h"
 #include <math.h>
-class Light : public MObject
+class UploadBuffer;
+class World;
+struct LightCommand
+{
+	DirectX::XMFLOAT3 lightColor;
+	UINT lightType;
+	//Align
+	float shadowSoftValue;
+	float shadowBias;
+	float shadowNormalBias;
+	float range;
+	//Align
+	float spotAngle;
+	int shadowmapIndex;
+	DirectX::XMFLOAT2 __useless__align;
+	//Align
+};
+class Light : public Component
 {
 public:
 	enum LightType
@@ -11,23 +29,40 @@ public:
 		LightType_Spot = 1
 	};
 private:
+	static Light* linkBegin;
+	static UINT lightCount;
+	Light* lastLinkNode = nullptr;
+	Light* nextLinkNode = nullptr;
 	float intensity = 0;
 	DirectX::XMFLOAT3 color = { 1,1,1 };
 	LightType lightType = LightType_Point;
 	bool isDirty = true;
-	bool enableShadow;
+	bool enableShadow = true;
 	float shadowSoftValue = 0;
 	float shadowBias = 0.05f;
 	float shadowNormalBias = 0.4f;
 	float shadowNearPlane = 0.2f;
 	float range = 5;
+	float angle = 60;
+	int shadowIndex = -1;
 public:
+	Light(Transform* trans);
+	virtual void OnEnable();
+	virtual void OnDisable();
+	static void GetLightingList(std::vector<Light*>& lightingResults, DirectX::XMVECTOR* frustumPlanes);
 	float GetIntensity() const { return intensity; }
 	float SetIntensity(float intensity) { 
 		
 		intensity = max(0, intensity);
 		isDirty = true;
 		this->intensity = intensity; 
+	}
+	float GetSpotAngle() const { return angle; }
+	void SetSpotAngle(float angle)
+	{
+		isDirty = true;
+		angle = max(1, angle);
+		this->angle = angle;
 	}
 	DirectX::XMFLOAT3 GetColor() const { return color; }
 	void SetColor(DirectX::XMFLOAT3 value)
@@ -39,10 +74,7 @@ public:
 		color = value;
 	}
 	bool ShadowEnabled() const { return enableShadow; }
-	void SetShadowEnabled(bool value) {
-		isDirty = true;
-		enableShadow = value;
-	}
+	void SetShadowEnabled(bool value);
 	float GetShadowSoftValue() const
 	{
 		return shadowSoftValue;
@@ -92,20 +124,6 @@ public:
 		isDirty = true;
 		lightType = type;
 	}
+	LightCommand GetLightCommand();
 };
 
-struct LightCommand
-{
-	DirectX::XMFLOAT3 lightColor;
-	UINT LightType;
-	//Align
-	float shadowSoftValue;
-	float shadowBias;
-	float shadowNormalBias;
-	float range;
-	//Align
-	UINT useShadow;
-	UINT shadowmapIndex;
-	DirectX::XMFLOAT2 __useless__align;
-	//Align
-};

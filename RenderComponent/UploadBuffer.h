@@ -61,6 +61,10 @@ public:
 	{
 		return mUploadBuffer.Get();
 	}
+	inline UINT GetElementCount() const
+	{
+		return mElementCount;
+	}
 	void ReleaseAfterFlush(FrameResource* res);
 private:
 	struct UploadCommand
@@ -68,10 +72,10 @@ private:
 		UINT startIndex;
 		UINT count;
 	};
-	void* mMappedData;
-    Microsoft::WRL::ComPtr<ID3D12Resource> mUploadBuffer;
-	size_t mStride;
-	UINT mElementCount;
+	void* mMappedData = 0;
+    Microsoft::WRL::ComPtr<ID3D12Resource> mUploadBuffer = nullptr;
+	size_t mStride = 0;
+	UINT mElementCount = 0;
     UINT mElementByteSize = 0;
     bool mIsConstantBuffer = false;
 };

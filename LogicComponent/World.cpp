@@ -7,8 +7,7 @@
 #include "../RenderComponent/Mesh.h"
 #include "../RenderComponent/DescriptorHeap.h"
 using namespace DirectX;
-#pragma region  TEST_BUILDING_AREA
-#pragma endregion
+World* World::current = nullptr;
 World::World(ID3D12GraphicsCommandList* cmdList, ID3D12Device* device) :
 	usedDescs(MAXIMUM_HEAP_COUNT),
 	unusedDescs(MAXIMUM_HEAP_COUNT),
@@ -28,6 +27,11 @@ UINT World::GetDescHeapIndexFromPool()
 	unusedDescs.erase(last);
 	usedDescs[value] = true;
 	return value;
+}
+
+World::~World()
+{
+	globalDescriptorHeap->Destroy();
 }
 
 void World::ReturnDescHeapIndexToPool(UINT target)

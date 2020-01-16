@@ -44,7 +44,7 @@ public:
 template <typename F, unsigned int count>
 struct LoopClass
 {
-	static void Do(F&& f)
+	static void Do(const F& f)
 	{
 		LoopClass<F, count - 1>::Do(std::move(f));
 		f(count);
@@ -54,7 +54,7 @@ struct LoopClass
 template <typename F>
 struct LoopClass<F, 0>
 {
-	static void Do(F&& f)
+	static void Do(const F& f)
 	{
 		f(0);
 	}
@@ -63,7 +63,7 @@ struct LoopClass<F, 0>
 template <typename F, unsigned int count>
 struct LoopClassEarlyBreak
 {
-	static bool Do(F&& f)
+	static bool Do(const F& f)
 	{
 		if (!LoopClassEarlyBreak<F, count - 1>::Do(std::move(f))) return false;
 		return f(count);
@@ -73,33 +73,22 @@ struct LoopClassEarlyBreak
 template <typename F>
 struct LoopClassEarlyBreak<F, 0>
 {
-	static bool Do(F&& f)
+	static bool Do(const F& f)
 	{
 		return f(0);
 	}
 };
 
 template <typename F, unsigned int count>
-void InnerLoop(F& function)
+void InnerLoop(const F& function)
 {
-	LoopClass<F, count - 1>::Do(std::move(function));
+	LoopClass<F, count - 1>::Do(function);
 }
 
 template <typename F, unsigned int count>
-void InnerLoop(F&& function)
+bool InnerLoopEarlyBreak(const F& function)
 {
-	LoopClass<F, count - 1>::Do(std::move(function));
-}
-template <typename F, unsigned int count>
-bool InnerLoopEarlyBreak(F& function)
-{
-	return LoopClassEarlyBreak<F, count - 1>::Do(std::move(function));
-}
-
-template <typename F, unsigned int count>
-bool InnerLoopEarlyBreak(F&& function)
-{
-	return LoopClassEarlyBreak<F, count - 1>::Do(std::move(function));
+	return LoopClassEarlyBreak<F, count - 1>::Do(function);
 }
 template <typename K, typename V>
 class Dictionary
