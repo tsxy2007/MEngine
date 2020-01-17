@@ -209,7 +209,6 @@ void RenderPipeline::PrepareRendering(RenderPipelineData& renderData, JobSystem*
 			ExecuteThreadCommand(cam, component->threadCommand, renderData.resource, component);
 		}
 	}
-	FrameResource::mCurrFrameResource->UpdateBeforeFrame(renderData.fence, renderData.fenceCount);//Flush CommandQueue
 }
 
 #ifdef NDEBUG

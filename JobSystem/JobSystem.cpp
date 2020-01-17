@@ -13,7 +13,7 @@ void JobSystem::UpdateNewBucket()
 		mainThreadFinished = true;
 		{
 			std::lock_guard<std::mutex> lck(mainThreadWaitMutex);
-			mainThreadWaitCV.notify_all();
+			mainThreadWaitCV.notify_one();
 		}
 		return;
 	}
@@ -179,9 +179,11 @@ void JobSystem::ExecuteBucket(JobBucket* bucket, int bucketCount)
 
 void JobSystem::Wait()
 {
-	std::unique_lock<std::mutex> lck(mainThreadWaitMutex);
 	while (!mainThreadFinished)
+	{
+		std::unique_lock<std::mutex> lck(mainThreadWaitMutex);
 		mainThreadWaitCV.wait(lck);
+	}
 }
 
 

@@ -8,21 +8,9 @@ cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   JobBucket.cpp
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  JobHandle.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  JobNode.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   JobSystem.cpp
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  Component.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  SceneTree.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  Transform.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   World.cpp
-cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  CullTask.cpp
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   GBufferComponent.cpp
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
@@ -38,185 +26,160 @@ cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   SkyboxComponent.cpp
 cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
-  TempRTAllocator.cpp
   ComputeShader.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   GRP_Renderer.cpp
-  Light.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   Mesh.cpp
-c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4244: “=”: 从“_Ty”转换到“_Ty2”，可能丢失数据
-          with
-          [
-              _Ty=unsigned __int64
-          ]
-          and
-          [
-              _Ty2=UINT
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(382): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const ResourceDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              K=ResourceDescriptor,
-              _Kty=ResourceDescriptor,
-              _Keyty=const ResourceDescriptor &,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(381): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const ResourceDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              K=ResourceDescriptor,
-              _Kty=ResourceDescriptor,
-              _Keyty=const ResourceDescriptor &,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\users\user\source\repos\crate\common\metalib.h(128): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const ResourceDescriptor &,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              K=ResourceDescriptor,
-              _Kty=ResourceDescriptor,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\users\user\source\repos\crate\common\metalib.h(128): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(const ResourceDescriptor &,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              K=ResourceDescriptor,
-              _Kty=ResourceDescriptor,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\users\user\source\repos\crate\common\metalib.h(127): note: 编译 类 模板 成员函数 "void Dictionary<ResourceDescriptor,std::vector<TempRTAllocator::TempRTData,std::allocator<_Ty>> *>::Add(K &,V &)" 时
-          with
-          [
-              _Ty=TempRTAllocator::TempRTData,
-              K=ResourceDescriptor,
-              V=std::vector<TempRTAllocator::TempRTData,std::allocator<TempRTAllocator::TempRTData>> *
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\users\user\source\repos\crate\pipelinecomponent\temprtallocator.cpp(44): note: 参见对正在编译的函数 模板 实例化“void Dictionary<ResourceDescriptor,std::vector<TempRTAllocator::TempRTData,std::allocator<_Ty>> *>::Add(K &,V &)”的引用
-          with
-          [
-              _Ty=TempRTAllocator::TempRTData,
-              K=ResourceDescriptor,
-              V=std::vector<TempRTAllocator::TempRTData,std::allocator<TempRTAllocator::TempRTData>> *
-          ]
-  c:\users\user\source\repos\crate\pipelinecomponent\temprtallocator.h(70): note: 参见对正在编译的 类 模板 实例化 "Dictionary<ResourceDescriptor,std::vector<TempRTAllocator::TempRTData,std::allocator<_Ty>> *>" 的引用
-          with
-          [
-              _Ty=TempRTAllocator::TempRTData
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(173): warning C4244: “初始化”: 从“_Ty”转换到“_Ty2”，可能丢失数据
-          with
-          [
-              _Ty=unsigned __int64
-          ]
-          and
-          [
-              _Ty2=UINT
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(879): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<const ResourceDescriptor&,unsigned __int64,0>(_Other1,_Other2 &&) noexcept”的引用
-          with
-          [
-              _Kty=ResourceDescriptor,
-              _Ty=UINT,
-              _Other1=const ResourceDescriptor &,
-              _Other2=unsigned __int64
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(881): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<const ResourceDescriptor&,unsigned __int64,0>(_Other1,_Other2 &&) noexcept”的引用
-          with
-          [
-              _Kty=ResourceDescriptor,
-              _Ty=UINT,
-              _Other1=const ResourceDescriptor &,
-              _Other2=unsigned __int64
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(711): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,const ResourceDescriptor&,unsigned __int64>(_Alloc &,_Objty *const ,const ResourceDescriptor &,unsigned __int64 &&)”的引用
-          with
-          [
-              _Alloc=std::allocator<std::_List_node<std::pair<const ResourceDescriptor,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<const ResourceDescriptor,UINT>>>::void_pointer>>,
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              _Objty=std::pair<const ResourceDescriptor,UINT>
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(716): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,const ResourceDescriptor&,unsigned __int64>(_Alloc &,_Objty *const ,const ResourceDescriptor &,unsigned __int64 &&)”的引用
-          with
-          [
-              _Alloc=std::allocator<std::_List_node<std::pair<const ResourceDescriptor,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<const ResourceDescriptor,UINT>>>::void_pointer>>,
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              _Objty=std::pair<const ResourceDescriptor,UINT>
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(947): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<const ResourceDescriptor&,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,const ResourceDescriptor &,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=ResourceDescriptor,
-              _Ty=UINT,
-              _Alloc=std::allocator<std::pair<const ResourceDescriptor,UINT>>
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(950): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<const ResourceDescriptor&,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,const ResourceDescriptor &,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=ResourceDescriptor,
-              _Ty=UINT,
-              _Alloc=std::allocator<std::pair<const ResourceDescriptor,UINT>>
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(916): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<const ResourceDescriptor&,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,const ResourceDescriptor &,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=ResourceDescriptor,
-              _Ty=UINT
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(917): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<const ResourceDescriptor&,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,const ResourceDescriptor &,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=ResourceDescriptor,
-              _Ty=UINT
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xhash(299): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty> &std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::emplace_front<const ResourceDescriptor&,unsigned __int64>(const ResourceDescriptor &,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=ResourceDescriptor,
-              _Ty=UINT
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(369): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<const ResourceDescriptor&,unsigned __int64>(const ResourceDescriptor &,unsigned __int64 &&)”的引用
-          with
-          [
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              _Kty=ResourceDescriptor,
-              _Hasher=std::hash<ResourceDescriptor>,
-              _Keyeq=std::equal_to<ResourceDescriptor>,
-              _Alloc=std::allocator<std::pair<const ResourceDescriptor,UINT>>
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(367): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<const ResourceDescriptor&,unsigned __int64>(const ResourceDescriptor &,unsigned __int64 &&)”的引用
-          with
-          [
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              _Kty=ResourceDescriptor,
-              _Hasher=std::hash<ResourceDescriptor>,
-              _Keyeq=std::equal_to<ResourceDescriptor>,
-              _Alloc=std::allocator<std::pair<const ResourceDescriptor,UINT>>
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(382): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const ResourceDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              K=ResourceDescriptor,
-              _Kty=ResourceDescriptor,
-              _Keyty=const ResourceDescriptor &,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(381): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<K,UINT,std::hash<ResourceDescriptor>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<const ResourceDescriptor&,unsigned __int64>(_Keyty,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<const ResourceDescriptor,UINT>,
-              K=ResourceDescriptor,
-              _Kty=ResourceDescriptor,
-              _Keyty=const ResourceDescriptor &,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 PipelineComponent\TempRTAllocator.cpp)
-  MeshRenderer.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   RenderCommand.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   Shader.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   Skybox.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   StructuredBuffer.cpp
+  Texture.cpp
+  UploadBuffer.cpp
+  FrameResource.cpp
+  Graphics.cpp
+  ShaderCompiler.cpp
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4267: “=”: 从“size_t”转换到“_Ty2”，可能丢失数据
+          with
+          [
+              _Ty2=UINT
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(398): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Keyty=Transform *,
+              _Mappedty=unsigned __int64
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(397): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Keyty=Transform *,
+              _Mappedty=unsigned __int64
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(219): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(Transform *&&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Mappedty=unsigned __int64
+          ]
+  c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(219): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(Transform *&&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Mappedty=unsigned __int64
+          ]
+c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(174): warning C4267: “初始化”: 从“size_t”转换到“_Ty2”，可能丢失数据
+          with
+          [
+              _Ty2=UINT
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(879): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<Transform*,unsigned __int64,0>(_Other1 &&,_Other2 &&) noexcept”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT,
+              _Other1=Transform *,
+              _Other2=unsigned __int64
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(881): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<Transform*,unsigned __int64,0>(_Other1 &&,_Other2 &&) noexcept”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT,
+              _Other1=Transform *,
+              _Other2=unsigned __int64
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(711): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,Transform*,unsigned __int64>(_Alloc &,_Objty *const ,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Alloc=std::allocator<std::_List_node<std::pair<Transform *const ,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<Transform *const ,UINT>>>::void_pointer>>,
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Objty=std::pair<Transform *const ,UINT>
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(716): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,Transform*,unsigned __int64>(_Alloc &,_Objty *const ,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Alloc=std::allocator<std::_List_node<std::pair<Transform *const ,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<Transform *const ,UINT>>>::void_pointer>>,
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Objty=std::pair<Transform *const ,UINT>
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(947): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<Transform*,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT,
+              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(950): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<Transform*,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT,
+              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(916): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<Transform*,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(917): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<Transform*,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xhash(299): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty> &std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::emplace_front<Transform*,unsigned __int64>(Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Kty=Transform *,
+              _Ty=UINT
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(369): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<Transform*,unsigned __int64>(Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Hasher=std::hash<Transform *>,
+              _Keyeq=std::equal_to<Transform *>,
+              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(367): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<Transform*,unsigned __int64>(Transform *&&,unsigned __int64 &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Hasher=std::hash<Transform *>,
+              _Keyeq=std::equal_to<Transform *>,
+              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(398): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Keyty=Transform *,
+              _Mappedty=unsigned __int64
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
+  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(397): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
+          with
+          [
+              _Ty=std::pair<Transform *const ,UINT>,
+              _Kty=Transform *,
+              _Keyty=Transform *,
+              _Mappedty=unsigned __int64
+          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
 c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4244: “=”: 从“_Ty”转换到“_Ty2”，可能丢失数据
           with
           [
@@ -380,151 +343,9 @@ c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.1
               _Keyty=const unsigned int &,
               _Mappedty=unsigned __int64
           ] (编译源文件 PipelineComponent\RenderPipeline.cpp)
-  Texture.cpp
-  UploadBuffer.cpp
-  FrameResource.cpp
-  Graphics.cpp
-  MathLib.cpp
-  ShaderCompiler.cpp
-c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(372): warning C4267: “=”: 从“size_t”转换到“_Ty2”，可能丢失数据
-          with
-          [
-              _Ty2=UINT
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(398): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Kty=Transform *,
-              _Keyty=Transform *,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(397): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Kty=Transform *,
-              _Keyty=Transform *,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(219): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(Transform *&&,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Kty=Transform *,
-              _Mappedty=unsigned __int64
-          ]
-  c:\users\user\source\repos\crate\rendercomponent\gpu driven\grp_renderer.cpp(219): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::insert_or_assign<unsigned __int64>(Transform *&&,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Kty=Transform *,
-              _Mappedty=unsigned __int64
-          ]
-c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\utility(174): warning C4267: “初始化”: 从“size_t”转换到“_Ty2”，可能丢失数据
-          with
-          [
-              _Ty2=UINT
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(879): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<Transform*,unsigned __int64,0>(_Other1 &&,_Other2 &&) noexcept”的引用
-          with
-          [
-              _Kty=Transform *,
-              _Ty=UINT,
-              _Other1=Transform *,
-              _Other2=unsigned __int64
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xmemory0(881): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty>::pair<Transform*,unsigned __int64,0>(_Other1 &&,_Other2 &&) noexcept”的引用
-          with
-          [
-              _Kty=Transform *,
-              _Ty=UINT,
-              _Other1=Transform *,
-              _Other2=unsigned __int64
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(711): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,Transform*,unsigned __int64>(_Alloc &,_Objty *const ,Transform *&&,unsigned __int64 &&)”的引用
-          with
-          [
-              _Alloc=std::allocator<std::_List_node<std::pair<Transform *const ,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<Transform *const ,UINT>>>::void_pointer>>,
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Objty=std::pair<Transform *const ,UINT>
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(716): note: 参见对正在编译的函数 模板 实例化“void std::_Default_allocator_traits<_Alloc>::construct<_Ty,Transform*,unsigned __int64>(_Alloc &,_Objty *const ,Transform *&&,unsigned __int64 &&)”的引用
-          with
-          [
-              _Alloc=std::allocator<std::_List_node<std::pair<Transform *const ,UINT>,std::_Default_allocator_traits<std::allocator<std::pair<Transform *const ,UINT>>>::void_pointer>>,
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Objty=std::pair<Transform *const ,UINT>
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(947): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<Transform*,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,Transform *&&,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=Transform *,
-              _Ty=UINT,
-              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(950): note: 参见对正在编译的函数 模板 实例化“std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *std::_List_buy<std::pair<const _Kty,_Ty>,_Alloc>::_Buynode<Transform*,unsigned __int64>(std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,std::_List_node<std::pair<const _Kty,_Ty>,std::_Default_allocator_traits<_Alloc>::void_pointer> *,Transform *&&,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=Transform *,
-              _Ty=UINT,
-              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(916): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<Transform*,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,Transform *&&,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=Transform *,
-              _Ty=UINT
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\list(917): note: 参见对正在编译的函数 模板 实例化“void std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::_Insert<Transform*,unsigned __int64>(std::_List_unchecked_const_iterator<std::_List_val<std::_List_simple_types<std::pair<const _Kty,_Ty>>>,std::_Iterator_base0>,Transform *&&,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=Transform *,
-              _Ty=UINT
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\xhash(299): note: 参见对正在编译的函数 模板 实例化“std::pair<const _Kty,_Ty> &std::list<std::pair<const _Kty,_Ty>,std::allocator<std::pair<const _Kty,_Ty>>>::emplace_front<Transform*,unsigned __int64>(Transform *&&,unsigned __int64 &&)”的引用
-          with
-          [
-              _Kty=Transform *,
-              _Ty=UINT
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(369): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<Transform*,unsigned __int64>(Transform *&&,unsigned __int64 &&)”的引用
-          with
-          [
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Kty=Transform *,
-              _Hasher=std::hash<Transform *>,
-              _Keyeq=std::equal_to<Transform *>,
-              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(367): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::_Hash<std::_Umap_traits<_Kty,unsigned int,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::emplace<Transform*,unsigned __int64>(Transform *&&,unsigned __int64 &&)”的引用
-          with
-          [
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Kty=Transform *,
-              _Hasher=std::hash<Transform *>,
-              _Keyeq=std::equal_to<Transform *>,
-              _Alloc=std::allocator<std::pair<Transform *const ,UINT>>
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(398): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Kty=Transform *,
-              _Keyty=Transform *,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
-  c:\program files (x86)\microsoft visual studio\2017\community\vc\tools\msvc\14.16.27023\include\unordered_map(397): note: 参见对正在编译的函数 模板 实例化“std::pair<std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>,bool> std::unordered_map<Transform *,UINT,std::hash<_Kty>,std::equal_to<_Kty>,std::allocator<_Ty>>::_Insert_or_assign<Transform*,unsigned __int64>(_Keyty &&,_Mappedty &&)”的引用
-          with
-          [
-              _Ty=std::pair<Transform *const ,UINT>,
-              _Kty=Transform *,
-              _Keyty=Transform *,
-              _Mappedty=unsigned __int64
-          ] (编译源文件 RenderComponent\GPU Driven\GRP_Renderer.cpp)
   正在生成代码
-  744 of 8239 functions ( 9.0%) were compiled, the rest were copied from previous compilation.
-    172 functions were new in current compilation
-    430 functions had inline decision re-evaluated but remain unchanged
+  31 of 8255 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    16 functions were new in current compilation
+    5 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Release\Crate.exe

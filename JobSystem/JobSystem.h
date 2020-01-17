@@ -2,6 +2,7 @@
 #include "VectorPool.h"
 #include "../Common/Pool.h"
 #include "ConcurrentQueue.h"
+#include <atomic>
 class JobNode;
 class JobBucket;
 class JobThreadRunnable;
@@ -28,7 +29,7 @@ private:
 	std::vector<JobBucket*> releasedBuckets;
 	std::mutex mainThreadWaitMutex;
 	std::condition_variable mainThreadWaitCV;
-	bool mainThreadFinished;
+	std::atomic<bool> mainThreadFinished;
 	bool JobSystemInitialized = true;
 public:
 	JobSystem(int threadCount) noexcept;

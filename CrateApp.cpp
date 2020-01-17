@@ -209,6 +209,8 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.world->windowWidth = mClientWidth;
 	data.world->windowHeight = mClientHeight;
 	rp->PrepareRendering(data, pipelineJobSys.get(), bucketArray);
+	pipelineJobSys->Wait();
+	FrameResource::mCurrFrameResource->UpdateBeforeFrame(data.fence, data.fenceCount);//Flush CommandQueue
 	pipelineJobSys->ExecuteBucket(bucketArray.data(), bucketArray.size());					//Execute Tasks
 	rp->ExecuteRendering(data, bucketArray);
 	std::vector <JobBucket*>& lastBucketArray = buckets[bucketsFlag];
