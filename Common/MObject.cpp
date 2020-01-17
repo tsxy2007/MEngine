@@ -24,21 +24,17 @@ void MObject::AddPtr(PtrLink* ptr)
 
 void PtrLink::Destroy() noexcept
 {
-	MObject* target = nullptr;
+	if (mPtr)
 	{
-		std::lock_guard<std::mutex> lck(MObject::mtx);
-		target = mPtr;
-	}
-	if (target)
-	{
-		delete target;
+		delete mPtr;
+		mPtr = nullptr;
 	}
 }
 
 MObject::~MObject() noexcept
 {
 	if (allPtrs.empty()) return;
-	std::lock_guard<std::mutex> lck(mtx);
+	std::lock_guard<std::mutex> lck(MObject::mtx);
 	for (auto ite = allPtrs.begin(); ite != allPtrs.end(); ++ite)
 	{
 		(*ite)->mPtr = nullptr;
@@ -47,10 +43,6 @@ MObject::~MObject() noexcept
 
 void MObject::RemovePtr(PtrLink* ptr, std::unique_lock<std::mutex>& lck)
 {
-	if (this == nullptr)
-	{
-		return;
-	}
 	auto&& ite = allPtrs.end() - 1;
 	allPtrs[ptr->value] = *ite;
 	memcpy(allPtrs[ptr->value], ptr, sizeof(PtrLink));
@@ -105,9 +97,9 @@ PtrLink& PtrLink::operator= (const PtrLink& link)  noexcept
 
 void PtrLink::Dispose() noexcept
 {
-	if (mPtr != nullptr)
+	std::unique_lock<std::mutex> lck(MObject::mtx);
+	if (mPtr)
 	{
-		std::unique_lock<std::mutex> lck(MObject::mtx);
 		mPtr->RemovePtr(this, lck);
 	}
 }

@@ -24,14 +24,6 @@ struct TAAConstBuffer
 	//Align
 	XMFLOAT2 _Jitter;
 	XMFLOAT2 _LastJitter;
-	//Align
-	UINT _MainTexIndex;
-	UINT _LastRtTexIndex;
-	UINT _LastDepthIndex;
-	UINT _LastMotionIndex;
-	//Align
-	UINT _MotionVectorIndex;
-	UINT _DepthTexIndex;
 
 };
 
@@ -133,26 +125,17 @@ public:
 		{
 			TAAConstBuffer constBufferData;
 			inputColorBuffer->BindColorBufferToSRVHeap(&tempFrameData->srvHeap, 0, device);
-			constBufferData._MainTexIndex = 0;
 			inputDepthBuffer->BindColorBufferToSRVHeap(&tempFrameData->srvHeap, 1, device);
-			constBufferData._DepthTexIndex = 1;
 			motionVector->BindColorBufferToSRVHeap(&tempFrameData->srvHeap, 2, device);
-			constBufferData._MotionVectorIndex = 2;
 			tempCamData->lastDepthTexture->BindColorBufferToSRVHeap(&tempFrameData->srvHeap, 3, device);
-			constBufferData._LastDepthIndex = 3;
 			tempCamData->lastMotionVectorTexture->BindColorBufferToSRVHeap(&tempFrameData->srvHeap, 4, device);
-			constBufferData._LastMotionIndex = 4;
 			tempCamData->lastRenderTarget->BindColorBufferToSRVHeap(&tempFrameData->srvHeap, 5, device);
-			constBufferData._LastRtTexIndex = 5;
 			constBufferData._InvNonJitterVP = *(XMFLOAT4X4*)&XMMatrixInverse(&XMMatrixDeterminant(camTransData->nonJitteredVPMatrix), camTransData->nonJitteredVPMatrix);
 			constBufferData._InvLastVp = *(XMFLOAT4X4*)&XMMatrixInverse(&XMMatrixDeterminant(camTransData->lastVP), camTransData->lastVP);
 			constBufferData._FinalBlendParameters = { 0.95f,0.85f, 6000.0f, 0 };		//Stationary Move, Const, 0
 			constBufferData._CameraDepthTexture_TexelSize = { 1.0f / width, 1.0f / height, (float)width, (float) height };
 			constBufferData._ScreenParams = { (float)width, (float)height, 1.0f / width + 1, 1.0f / height + 1 };
-			constBufferData._ZBufferParams.x = (float)(1.0 - (cam->GetFarZ() / cam->GetNearZ()));
-			constBufferData._ZBufferParams.y = (float)(cam->GetFarZ() / cam->GetNearZ());
-			constBufferData._ZBufferParams.z = constBufferData._ZBufferParams.x / cam->GetFarZ();
-			constBufferData._ZBufferParams.w = constBufferData._ZBufferParams.y / cam->GetFarZ();
+			constBufferData._ZBufferParams = prePareComp->_ZBufferParams;
 			constBufferData._TemporalClipBounding = { 3.0f, 1.25f, 3000.0f };
 			constBufferData._Sharpness = 0.1f;
 			constBufferData._Jitter = camTransData->jitter;

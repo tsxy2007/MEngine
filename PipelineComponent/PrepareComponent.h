@@ -12,6 +12,7 @@ public:
 	DirectX::XMFLOAT4 frustumPlanes[6];
 	DirectX::XMVECTOR frustumMinPos;
 	DirectX::XMVECTOR frustumMaxPos;
+	DirectX::XMFLOAT4 _ZBufferParams;
 protected:
 	std::vector<TemporalResourceCommand> useless;
 	virtual CommandListType GetCommandListType() {
