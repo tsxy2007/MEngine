@@ -7,13 +7,14 @@
 #include "JobNode.h"
 void JobSystem::UpdateNewBucket()
 {
-	START:
+START:
 	if (currentBucketPos >= buckets.size())
 	{
-		mainThreadFinished = true;
 		{
+			mainThreadFinished = true;
 			std::lock_guard<std::mutex> lck(mainThreadWaitMutex);
-			mainThreadWaitCV.notify_one();
+			mainThreadFinished = true;
+			mainThreadWaitCV.notify_all();
 		}
 		return;
 	}
@@ -151,7 +152,6 @@ JobSystem::~JobSystem() noexcept
 
 void JobSystem::ExecuteBucket(JobBucket** bucket, int bucketCount)
 {
-	Wait();
 	jobNodePool.UpdateSwitcher();
 	vectorPool.UpdateSwitcher();
 	currentBucketPos = 0;
@@ -159,11 +159,9 @@ void JobSystem::ExecuteBucket(JobBucket** bucket, int bucketCount)
 	memcpy(buckets.data(), bucket, sizeof(JobBucket*) * bucketCount);
 	mainThreadFinished = false;
 	UpdateNewBucket();
-
 }
 void JobSystem::ExecuteBucket(JobBucket* bucket, int bucketCount)
 {
-	Wait();
 	jobNodePool.UpdateSwitcher();
 	vectorPool.UpdateSwitcher();
 	currentBucketPos = 0;
@@ -174,14 +172,13 @@ void JobSystem::ExecuteBucket(JobBucket* bucket, int bucketCount)
 	}
 	mainThreadFinished = false;
 	UpdateNewBucket();
-
 }
 
 void JobSystem::Wait()
 {
+	std::unique_lock<std::mutex> lck(mainThreadWaitMutex);
 	while (!mainThreadFinished)
 	{
-		std::unique_lock<std::mutex> lck(mainThreadWaitMutex);
 		mainThreadWaitCV.wait(lck);
 	}
 }

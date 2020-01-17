@@ -235,7 +235,6 @@ void RenderPipeline::ExecuteRendering(RenderPipelineData& renderData, std::vecto
 		renderData.lastResource->UpdateAfterFrame(*renderData.fenceIndex, queues, renderData.fence, renderData.fenceCount);//Signal CommandQueue
 		renderData.lastResource->commandBuffer->Clear();
 	}
-	ThrowIfFailed(renderData.swap->Present(0, 0));
 	tempRTAllocator.CumulateReleaseAfterFrame();
 }
 

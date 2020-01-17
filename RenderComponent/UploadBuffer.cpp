@@ -10,6 +10,7 @@ void UploadBuffer::Create(ID3D12Device* device, UINT elementCount, bool isConsta
 	// UINT64 OffsetInBytes; // multiple of 256
 	// UINT   SizeInBytes;   // multiple of 256
 	// } D3D12_CONSTANT_BUFFER_VIEW_DESC;
+	mElementCount = elementCount;
 	if (isConstantBuffer)
 		mElementByteSize = d3dUtil::CalcConstantBufferByteSize(stride);
 	else mElementByteSize = stride;

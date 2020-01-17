@@ -21,7 +21,6 @@ struct RenderPipelineData
 	UINT fenceCount;
 	UINT64* fenceIndex;
 	bool executeLastFrame;
-	IDXGISwapChain* swap;
 	World* world;
 };
 class RenderPipeline final

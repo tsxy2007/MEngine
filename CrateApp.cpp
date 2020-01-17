@@ -204,15 +204,15 @@ void CrateApp::Draw(const GameTimer& gt)
 	data.fenceCount = _countof(fences);
 	data.fenceIndex = &mCurrentFence;
 	data.executeLastFrame = lastFrameExecute;
-	data.swap = mSwapChain.Get();
 	data.world = World::GetInstance();
 	data.world->windowWidth = mClientWidth;
 	data.world->windowHeight = mClientHeight;
 	rp->PrepareRendering(data, pipelineJobSys.get(), bucketArray);
 	pipelineJobSys->Wait();
-	FrameResource::mCurrFrameResource->UpdateBeforeFrame(data.fence, data.fenceCount);//Flush CommandQueue
+	data.resource->UpdateBeforeFrame(data.fence, data.fenceCount);//Flush CommandQueue
 	pipelineJobSys->ExecuteBucket(bucketArray.data(), bucketArray.size());					//Execute Tasks
 	rp->ExecuteRendering(data, bucketArray);
+	ThrowIfFailed(mSwapChain->Present(0, 0));
 	std::vector <JobBucket*>& lastBucketArray = buckets[bucketsFlag];
 	for (auto ite = lastBucketArray.begin(); ite != lastBucketArray.end(); ++ite)
 	{

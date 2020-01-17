@@ -29,7 +29,7 @@ private:
 	std::vector<JobBucket*> releasedBuckets;
 	std::mutex mainThreadWaitMutex;
 	std::condition_variable mainThreadWaitCV;
-	std::atomic<bool> mainThreadFinished;
+	bool mainThreadFinished;
 	bool JobSystemInitialized = true;
 public:
 	JobSystem(int threadCount) noexcept;
