@@ -7,18 +7,23 @@ class UploadBuffer;
 class World;
 struct LightCommand
 {
+	DirectX::XMFLOAT3 direction;
+	int shadowmapIndex;
+	//
 	DirectX::XMFLOAT3 lightColor;
 	UINT lightType;
+	//Align
+	DirectX::XMFLOAT3 position;
+	float spotAngle;
 	//Align
 	float shadowSoftValue;
 	float shadowBias;
 	float shadowNormalBias;
 	float range;
 	//Align
-	float spotAngle;
-	int shadowmapIndex;
-	DirectX::XMFLOAT2 __useless__align;
-	//Align
+	float spotRadius;
+	DirectX::XMFLOAT3 __align;
+
 };
 class Light : public Component
 {
@@ -47,9 +52,13 @@ private:
 	int shadowIndex = -1;
 public:
 	Light(Transform* trans);
-	virtual void OnEnable();
-	virtual void OnDisable();
-	static void GetLightingList(std::vector<Light*>& lightingResults, DirectX::XMVECTOR* frustumPlanes);
+	virtual void OnEnable() override;
+	virtual void OnDisable() override;
+	static void GetLightingList(
+		std::vector<LightCommand>& lightingResults,
+		DirectX::XMVECTOR* frustumPlanes,
+		DirectX::XMVECTOR&& frustumMinPoint, 
+		DirectX::XMVECTOR&& frustumMaxPoint);
 	float GetIntensity() const { return intensity; }
 	float SetIntensity(float intensity) { 
 		
@@ -124,6 +133,6 @@ public:
 		isDirty = true;
 		lightType = type;
 	}
-	LightCommand GetLightCommand();
+	LightCommand GetLightCommand(float radius);
 };
 

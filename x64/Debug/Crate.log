@@ -1,3 +1,12 @@
 ﻿cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  GBufferComponent.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  LightingComponent.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  ComputeShader.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
   Light.cpp
+cl : 命令行 warning D9002: 忽略未知选项“/arch:SSE2”
+  ShaderCompiler.cpp
   Crate.vcxproj -> C:\Users\User\source\repos\Crate\x64\Debug\Crate.exe

@@ -273,6 +273,39 @@ void GetCullingShader(ID3D12Device* device, JobBucket* bucket)
 	ShaderCompiler::AddComputeShader("Cull", cs);
 }
 
+void GetClusterBasedLightCullingShader(ID3D12Device* device, JobBucket* bucket)
+{
+	const UINT KERNEL_COUNT = 3;
+	std::string kernelNames[KERNEL_COUNT];
+	kernelNames[0] = "SetXYPlane";
+	kernelNames[1] = "SetZPlane";
+	kernelNames[2] = "CBDR";
+	const UINT SHADER_VAR_COUNT = 4;
+	ComputeShaderVariable vars[SHADER_VAR_COUNT];
+	vars[0].name = "LightCullCBuffer";
+	vars[0].registerPos = 0;
+	vars[0].space = 0;
+	vars[0].type = ComputeShaderVariable::ConstantBuffer;
+
+	vars[1].name = "_MainTex";
+	vars[1].registerPos = 0;
+	vars[1].space = 0;
+	vars[1].type = ComputeShaderVariable::UAVDescriptorHeap;
+	vars[1].tableSize = 2;
+
+	vars[2].name = "_LightIndexBuffer";
+	vars[2].registerPos = 0;
+	vars[2].space = 1;
+	vars[2].type = ComputeShaderVariable::RWStructuredBuffer;
+
+	vars[3].name = "_AllLight";
+	vars[3].registerPos = 0;
+	vars[3].space = 0;
+	vars[3].type = ComputeShaderVariable::StructuredBuffer;
+	ComputeShader* cs = new ComputeShader(L"Shaders\\LightCull.compute", kernelNames, KERNEL_COUNT, vars, SHADER_VAR_COUNT, device, bucket);
+	ShaderCompiler::AddComputeShader("LightCull", cs);
+}
+
 
 void ShaderCompiler::Init(ID3D12Device* device, JobSystem* jobSys)
 {
@@ -285,6 +318,7 @@ void ShaderCompiler::Init(ID3D12Device* device, JobSystem* jobSys)
 	GetCullingShader(device, bucket);
 	GetPostProcessShader(device, bucket);
 	GetTemporalAAShader(device, bucket);
+	GetClusterBasedLightCullingShader(device, bucket);
 	jobSys->ExecuteBucket(bucket, 1);
 }
 

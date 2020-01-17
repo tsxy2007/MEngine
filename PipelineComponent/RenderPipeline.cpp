@@ -8,6 +8,7 @@
 #include "SkyboxComponent.h"
 #include "PostProcessingComponent.h"
 #include "../RenderComponent/RenderCommand.h"
+#include "LightingComponent.h"
 //ThreadCommand* threadCommand;
 RenderPipeline* RenderPipeline::current(nullptr);
 std::unordered_map<std::string, PipelineComponent*> RenderPipeline::componentsLink;
@@ -42,6 +43,7 @@ RenderPipeline::RenderPipeline(ID3D12Device* device, ID3D12GraphicsCommandList* 
 	current = this;
 	//Init All Events Here
 	Init<PrepareComponent>();
+	Init<LightingComponent>();
 	Init<GBufferComponent>();
 	Init<SkyboxComponent>();
 	Init<PostProcessingComponent>();

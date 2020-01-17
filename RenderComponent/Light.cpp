@@ -58,55 +58,68 @@ void Light::OnDisable()
 	}
 }
 
-void Light::GetLightingList(std::vector<Light*>& lightingResults, DirectX::XMVECTOR* frustumPlanes)
+void Light::GetLightingList(
+	std::vector<LightCommand>& lightingResults,
+	DirectX::XMVECTOR* frustumPlanes,
+	DirectX::XMVECTOR&& frustumMinPoint,
+	DirectX::XMVECTOR&& frustumMaxPoint)
 {
 	lightingResults.clear();
 	for (Light* ite = linkBegin; ite; ite = ite->nextLinkNode)
 	{
 		XMVECTOR position = XMLoadFloat3(&ite->transform->GetPosition());
 		XMVECTOR forward = XMLoadFloat3(&ite->transform->GetForward());
-		switch (ite->lightType)
-		{
-		case LightType_Spot:
-		{
-			Cone spotCone(ite->transform->GetPosition(), ite->range, ite->transform->GetForward(), ite->angle);
-			auto func = [&](UINT i)->bool
+		XMVECTOR range = { ite->range, ite->range, ite->range, 0 };
+		XMVECTOR minPoint = position - range;
+		XMVECTOR maxPoint = position + range;
+		if (XMVector3Greater(maxPoint, frustumMinPoint) &&
+			XMVector3Less(minPoint, frustumMaxPoint)) {
+			switch (ite->lightType)
 			{
-				return MathLib::ConeIntersect(std::move(spotCone), std::move(frustumPlanes[i]));
-			};
-			if (InnerLoopEarlyBreak<decltype(func), 6>(func))
+			case LightType_Spot:
 			{
-				lightingResults.push_back(ite);
+				Cone spotCone(ite->transform->GetPosition(), ite->range, ite->transform->GetForward(), ite->angle);
+				auto func = [&](UINT i)->bool
+				{
+					return MathLib::ConeIntersect(std::move(spotCone), std::move(frustumPlanes[i]));
+				};
+				if (InnerLoopEarlyBreak<decltype(func), 6>(func))
+				{
+					lightingResults.push_back(ite->GetLightCommand(spotCone.radius));
+				}
 			}
-		}
-		break;
-		case LightType_Point:
-		{
-			auto func = [&](UINT i)->bool
+			break;
+			case LightType_Point:
 			{
-				return MathLib::GetDistanceToPlane(std::move(frustumPlanes[i]), std::move(position)) < ite->range;
-			};
-			if (InnerLoopEarlyBreak<decltype(func), 6>(func))
-			{
-				lightingResults.push_back(ite);
+				auto func = [&](UINT i)->bool
+				{
+					return MathLib::GetDistanceToPlane(std::move(frustumPlanes[i]), std::move(position)) < ite->range;
+				};
+				if (InnerLoopEarlyBreak<decltype(func), 6>(func))
+				{
+					lightingResults.push_back(ite->GetLightCommand(0));
+				}
 			}
-		}
-		break;
+			break;
+			}
 		}
 	}
 }
 
-LightCommand Light::GetLightCommand()
+LightCommand Light::GetLightCommand(float radius)
 {
 	return 
 	{
+		transform->GetForward(),
+		enableShadow ? shadowIndex : -1,
 		{color.x * intensity, color.y * intensity, color.z * intensity},
 		(UINT)lightType,
+		transform->GetPosition(),
+		angle,
 		shadowSoftValue,
 		shadowBias,
 		shadowNormalBias,
 		range,
-		angle,
-		enableShadow ? shadowIndex : -1
+		radius		
 	};
 }

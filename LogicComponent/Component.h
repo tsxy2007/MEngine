@@ -7,7 +7,7 @@ class Component : public MObject
 	friend class Transform;
 private:
 	UINT componentIndex;
-	bool enabled = true;
+	bool enabled = false;
 protected:
 	Transform* transform;
 public:

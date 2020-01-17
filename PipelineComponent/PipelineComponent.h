@@ -42,7 +42,6 @@ class PipelineComponent
 	friend class RenderPipeline;
 	friend class PerCameraRenderingEvent;
 private:
-
 	static std::mutex mtx;
 	static JobBucket* bucket;
 	ThreadCommand* threadCommand;//thread command cache
@@ -88,11 +87,16 @@ protected:
 	template <typename... Args>
 	void SetCPUDepending()
 	{
+		cpuDepending.clear();
+		cpuDepending.reserve(sizeof...(Args));
 		Depending<Args...> d(cpuDepending);
+		
 	}
 	template <typename... Args>
 	void SetGPUDepending()
 	{
+		gpuDepending.clear();
+		gpuDepending.reserve(sizeof...(Args));
 		Depending<Args...> d(gpuDepending);
 	}
 public:
@@ -109,18 +113,13 @@ public:
 		bool isBackBufferForPresent;
 	};
 	template <typename Func>
-	JobHandle ScheduleJob(Func&& func)
+	JobHandle ScheduleJob(const Func& func)
 	{
-		JobHandle handle = bucket->GetTask(std::move(func));
+		JobHandle handle = bucket->GetTask(func);
 		jobHandles.push_back(handle);
 		return handle;
 	}
 
-	template <typename Func>
-	JobHandle ScheduleJob(Func& func)
-	{
-		return ScheduleJob(std::move(func));
-	}
 	virtual CommandListType GetCommandListType() = 0;
 	virtual void Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList) = 0;
 	virtual void Dispose() = 0;

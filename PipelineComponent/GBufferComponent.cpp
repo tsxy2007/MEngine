@@ -14,6 +14,7 @@
 #include "../RenderComponent/GPU Driven/GRP_Renderer.h"
 #include "../Singleton/MeshLayout.h"
 #include "PrepareComponent.h"
+#include "../RenderComponent/Light.h"
 using namespace DirectX;
 PSOContainer* gbufferContainer(nullptr);
 PSOContainer* depthPrepassContainer(nullptr);
@@ -30,6 +31,7 @@ ObjectPtr<Mesh> mesh;
 ObjectPtr<MeshRenderer> meshRenderer;
 ObjectPtr<Transform> trans;
 ObjectPtr<GRP_Renderer> grpRenderer;
+ObjectPtr<Light> light;
 PrepareComponent* prepareComp = nullptr;
 class GBufferFrameResource : public IPipelineResource
 {
@@ -242,6 +244,8 @@ void GBufferComponent::Initialize(ID3D12Device* device, ID3D12GraphicsCommandLis
 	grpRenderer->AddRenderElement(
 		trans, mesh, device
 	);
+	light = new Light(trans);
+	light->SetEnabled(true);
 	prepareComp = RenderPipeline::GetComponent<PrepareComponent>();
 }
 

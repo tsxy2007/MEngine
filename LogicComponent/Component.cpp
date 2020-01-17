@@ -8,12 +8,10 @@ Component::Component(Transform* trans)
 		componentIndex = trans->allComponents.size();
 		trans->allComponents.emplace_back(this);
 	}
-	OnEnable();
 }
 
 Component::~Component()
 {
-	if (enabled) OnDisable();
 	if (transform != nullptr)
 	{
 		auto&& last = transform->allComponents.end() - 1;
