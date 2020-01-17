@@ -22,31 +22,27 @@ void MObject::AddPtr(PtrLink* ptr)
 	allPtrs.push_back(ptr);
 }
 
-void MObject::Destroy()
+void PtrLink::Destroy() noexcept
 {
+	MObject* target = nullptr;
 	{
-		std::lock_guard<std::mutex> lck(mtx);
-		if (this == nullptr)
-		{
-			return;
-		}
-		for (auto ite = allPtrs.begin(); ite != allPtrs.end(); ++ite)
-		{
-			(*ite)->mPtr = nullptr;
-		}
-		allPtrs.clear();
+		std::lock_guard<std::mutex> lck(MObject::mtx);
+		target = mPtr;
 	}
-	delete this;
+	if (target)
+	{
+		delete target;
+	}
 }
 
-MObject::~MObject()
+MObject::~MObject() noexcept
 {
-	if (allPtrs.size() <= 0) return;
+	if (allPtrs.empty()) return;
+	std::lock_guard<std::mutex> lck(mtx);
 	for (auto ite = allPtrs.begin(); ite != allPtrs.end(); ++ite)
 	{
 		(*ite)->mPtr = nullptr;
 	}
-	allPtrs.clear();
 }
 
 void MObject::RemovePtr(PtrLink* ptr, std::unique_lock<std::mutex>& lck)

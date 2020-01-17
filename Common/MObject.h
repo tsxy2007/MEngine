@@ -15,10 +15,10 @@ private:
 	static std::atomic<unsigned int> CurrentID;
 	unsigned int instanceID;
 public:
-	void Destroy();
+	
 	unsigned int GetInstanceID() const { return instanceID; }
 	MObject();
-	virtual ~MObject();
+	virtual ~MObject() noexcept;
 };
 
 class PtrLink final
@@ -35,6 +35,7 @@ public:
 	PtrLink(const PtrLink& link) noexcept;
 
 	~PtrLink() noexcept;
+	void Destroy() noexcept;
 };
 
 
@@ -71,6 +72,11 @@ public:
 	{
 
 	}
+	constexpr void Destroy()
+	{
+		link.Destroy();
+	}
+
 	template<typename F>
 	constexpr ObjectPtr<F> Cast() const noexcept
 	{

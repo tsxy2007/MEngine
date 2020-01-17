@@ -28,7 +28,7 @@ TempRTAllocator::~TempRTAllocator()
 	{
 		auto& v = waitingRT.values[i];
 		for (int j = 0; j < v.value->size(); ++j)
-			(*v.value)[j].rt->Destroy();
+			delete (*v.value)[j].rt;
 		delete v.value;
 	}
 }

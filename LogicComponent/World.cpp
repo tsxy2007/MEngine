@@ -31,7 +31,7 @@ UINT World::GetDescHeapIndexFromPool()
 
 World::~World()
 {
-	globalDescriptorHeap->Destroy();
+	globalDescriptorHeap.Destroy();
 }
 
 void World::ReturnDescHeapIndexToPool(UINT target)

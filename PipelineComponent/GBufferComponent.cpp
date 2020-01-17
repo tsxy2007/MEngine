@@ -253,7 +253,7 @@ void GBufferComponent::Dispose()
 {
 
 	//meshRenderer->Destroy();
-	trans->Destroy();
+	trans.Destroy();
 	delete gbufferContainer;
 	delete depthPrepassContainer;
 }

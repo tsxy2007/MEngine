@@ -79,7 +79,7 @@ Transform::~Transform()
 	for (auto ite = allComponents.begin(); ite != allComponents.end(); ++ite)
 	{
 		(*ite)->transform = nullptr;
-		(*ite)->Destroy();
+		delete *ite;
 	}
 	allComponents.clear();
 	if (worldIndex >= 0)
